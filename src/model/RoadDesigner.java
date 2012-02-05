@@ -63,10 +63,8 @@ public class RoadDesigner {
             throw new SegmentCollectionEmptyException("Collection is empty");
         }
         
-        int secondPtr = 0;
-        for (Segment segment : firstSet) {
-            setUpConnectionSingle(segment, secondSet[secondPtr], ConnectionType.NEXT_TO);
-            secondPtr++;
+        for (int i = 0; i < firstSet.length; i++) {
+            setUpConnectionSingle(firstSet[i], secondSet[i], ConnectionType.NEXT_TO);
         }
 
     }

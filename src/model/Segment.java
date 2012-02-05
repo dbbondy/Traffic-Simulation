@@ -22,8 +22,8 @@ public class Segment {
     private int id;
     
     public Segment(Lane lane, int lengthLeft, int lengthRight){
-        this.lengthLeft = lengthLeft * (lane.getSegmentDensity());
-        this.lengthRight = lengthRight * (lane.getSegmentDensity());
+        this.lengthLeft = lengthLeft * (Lane.SEGMENT_DENSITY);
+        this.lengthRight = lengthRight * (Lane.SEGMENT_DENSITY);
         this.lane = lane;
         this.id = segmentCounter++;
         connectedSegments = new ArrayList<Segment>();
