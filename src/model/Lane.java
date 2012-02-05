@@ -44,8 +44,6 @@ public class Lane {
     //
     //
     
-   
-    
     private void buildLaneSegments(){ 
             
         RoadDesigner d = new RoadDesigner();
