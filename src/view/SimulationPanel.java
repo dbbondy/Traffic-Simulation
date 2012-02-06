@@ -12,7 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import model.junctions.Junction;
-import model.JunctionConstants;
+
 
 /**
  *
@@ -41,11 +41,15 @@ public class SimulationPanel extends JPanel {
         return imageIsInvalid;
     }
     
-    private void renderToImage(Junction junc){
+    private void renderToImage(){
         
         // create a graphics object from the buffered image object
         Graphics2D graphics = image.createGraphics();
-        if()
+        Junction junc = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
+        if(junc instanceof model.junctions.TwoLaneJunction){
+            drawTwoLaneJunc(graphics);
+            image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        }
         // draw the junction we want from that graphics object. 
         // image = 
     }
@@ -106,16 +110,15 @@ public class SimulationPanel extends JPanel {
         }
 
         // redraw component from cache
-        // TODO take the clip into account
+        // TODO: take the clip into account
         g.drawImage(image, this.getWidth(), this.getHeight(), null);
 
-        //TODO: perhaps put the logic inside the if statement below, into it's own private function.
-        String junc = (String) Simulation.getOption(Simulation.JUNCTION_TYPE);
-        if (junc.equals(JunctionConstants.TWO_LANE_JUNCTION)) {
+        Junction junc = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
+        if (junc instanceof model.junctions.TwoLaneJunction) {
            drawTwoLaneJunc(graphics);
         }
 
-        if (junc.equals(JunctionConstants.ROUNDABOUT_JUNCTION)) {
+        if (junc instanceof model.junctions.RoundaboutJunction) {
             graphics.drawRect(300, 300, 100, 200);
             graphics.setColor(Color.GREEN);
             graphics.fillRect(300, 300, 100, 200);

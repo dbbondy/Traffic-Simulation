@@ -8,6 +8,6 @@ package model.junctions;
  *
  * @author Dan
  */
-public class PlainJunction {
+public class PlainJunction extends Junction{
     
 }

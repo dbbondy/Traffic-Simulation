@@ -8,6 +8,6 @@ package model.junctions;
  *
  * @author Dan
  */
-public class RoundaboutJunction {
+public class RoundaboutJunction extends Junction{
     
 }

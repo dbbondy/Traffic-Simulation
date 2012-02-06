@@ -8,6 +8,6 @@ package model.junctions;
  *
  * @author Dan
  */
-public class TwoLaneJunction {
+public class TwoLaneJunction extends Junction{
     
 }

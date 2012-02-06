@@ -5,6 +5,6 @@ package model.junctions;
  *
  * @author Dan
  */
-public class Junction {
+public abstract class Junction {
     
 }
