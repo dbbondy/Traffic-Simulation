@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
+import model.junctions.Junction;
 import model.JunctionConstants;
 
 /**
@@ -40,10 +41,11 @@ public class SimulationPanel extends JPanel {
         return imageIsInvalid;
     }
     
-    private void renderToImage(){
+    private void renderToImage(Junction junc){
         
         // create a graphics object from the buffered image object
         Graphics2D graphics = image.createGraphics();
+        if()
         // draw the junction we want from that graphics object. 
         // image = 
     }
@@ -105,7 +107,7 @@ public class SimulationPanel extends JPanel {
 
         // redraw component from cache
         // TODO take the clip into account
-        g.drawImage(image, 0, 0, null);
+        g.drawImage(image, this.getWidth(), this.getHeight(), null);
 
         //TODO: perhaps put the logic inside the if statement below, into it's own private function.
         String junc = (String) Simulation.getOption(Simulation.JUNCTION_TYPE);
