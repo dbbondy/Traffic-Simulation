@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public class SimulationStats {
 
-    private HashMap<Class, VehicleCounter> vehicleCounters;
+    private static HashMap<Class, VehicleCounter> vehicleCounters;
 
     public SimulationStats() {
         vehicleCounters = new HashMap<Class, VehicleCounter>();
@@ -44,17 +44,16 @@ public class SimulationStats {
     /**
      * Publishes the statistics gathered by this class to a file named "Simulation Statistics.txt"
      */
-    public void publishStats() {
+    public static void publishStats() {
         try {
             FileWriter fStream = new FileWriter("Simulation Statistics.txt");
-            BufferedWriter bwout = new BufferedWriter(fStream);
-            
-            for (Class v : vehicleCounters.keySet()) {
-                bwout.write("Vehicle type: " + v.getName() + "\n");
-                bwout.write("Number of vehicles of this type: " + vehicleCounters.get(v).getCount() + "\r \n");
+            try (BufferedWriter bwout = new BufferedWriter(fStream)) {
+                for (Class v : vehicleCounters.keySet()) {
+                    bwout.write("Vehicle type: " + v.getName() + "\n");
+                    bwout.write("Number of vehicles of this type: " + vehicleCounters.get(v).getCount() + "\r \n");
+                }
+                bwout.flush();
             }
-            bwout.flush();
-            bwout.close();
         } catch (IOException ioe) {
             System.out.println("failed to print to file correctly.");
         }

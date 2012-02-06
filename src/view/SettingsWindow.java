@@ -16,7 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import model.JunctionConstants;
+
 
 
 /**
@@ -210,9 +210,9 @@ public class SettingsWindow {
                 
                 String junction = (String)junctions.getSelectedItem();
                 if(junction.equals("Two-Lane Junction")){
-                    Simulation.setOption(Simulation.JUNCTION_TYPE, JunctionConstants.TWO_LANE_JUNCTION);
+                    Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TwoLaneJunction());
                 }else if(junction.equals("Roundabout Junction")){
-                    Simulation.setOption(Simulation.JUNCTION_TYPE, JunctionConstants.ROUNDABOUT_JUNCTION);
+                    Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
                 }
                 
 
