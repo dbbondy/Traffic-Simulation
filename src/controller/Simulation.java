@@ -53,18 +53,21 @@ public class Simulation {
     public void Simulate(int numOfSteps){
         for(int i = 0; i < numOfSteps; i++){
             simulateOneStep();
+            setOption(TIME_STEP, i);
         }
+        
     }
     
     private void simulateOneStep(){
         //core simulation loop.
         
-        Junction junc = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
-        int carsRatio = (Integer)Simulation.getOption(Simulation.CAR_RATIO);
-        int trucksRatio = (Integer)Simulation.getOption(Simulation.TRUCK_RATIO);
+        Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE);
+        int carsRatio = (Integer)getOption(Simulation.CAR_RATIO);
+        int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
         junc.distributeNewCars(carsRatio, trucksRatio);
         junc.update(); //goes through all lanes contained in the junction, and tells each car within each lane to "act"
         
+       
         
         
     }

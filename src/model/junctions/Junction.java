@@ -7,4 +7,7 @@ package model.junctions;
  */
 public abstract class Junction {
     
+    public abstract void distributeNewCars(int cars, int trucks);
+    
+    public abstract void update();
 }
