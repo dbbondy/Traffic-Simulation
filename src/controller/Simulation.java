@@ -36,6 +36,8 @@ public class Simulation {
 
 
     }
+    
+    // test comment for commit
 
     //how to create a proper MVC compliant instantiation
     /*
