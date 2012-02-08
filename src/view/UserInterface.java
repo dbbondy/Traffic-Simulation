@@ -13,10 +13,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  *
@@ -46,6 +43,18 @@ public class UserInterface {
         addComponents();
         addListeners();
         frame.setVisible(true);
+        
+        
+    }
+    
+    public void updateGUI(){
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                time.setText("Current time step is: " + (Integer)Simulation.getOption(Simulation.TIME_STEP));
+            }
+        });
     }
 
     private void initComponents() {

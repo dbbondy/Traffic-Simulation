@@ -217,6 +217,7 @@ public class SettingsWindow {
                 
 
                 UserInterface ui = new UserInterface(); //bug with this, try and fix when you can.
+                ui.updateGUI();
                 SettingsWindow.this.frame.dispose();
             }
         });
