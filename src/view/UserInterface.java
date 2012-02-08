@@ -5,12 +5,7 @@
 package view;
 
 import controller.Simulation;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -19,9 +14,9 @@ import javax.swing.*;
  *
  * @author Dan
  */
-public class UserInterface {
+public class UserInterface extends JFrame{
 
-    private JFrame frame;
+    
     private Container contentPane;
     private JPanel buttonPanel;
     private JButton startSim;
@@ -39,27 +34,22 @@ public class UserInterface {
     private SimulationPanel simPanel;
 
     public UserInterface() {
+        super("Traffic Simulation");
         initComponents();
         addComponents();
         addListeners();
-        frame.setVisible(true);
+        this.setVisible(true);
         
         
     }
     
     public void updateGUI(){
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                time.setText("Current time step is: " + (Integer)Simulation.getOption(Simulation.TIME_STEP));
-            }
-        });
+        repaint();
     }
 
     private void initComponents() {
-        frame = new JFrame("Traffic Simulation");
-        contentPane = frame.getContentPane();
+        
+        contentPane = this.getContentPane();
         startSim = new JButton("Start Simulation");
         pauseSim = new JButton("Pause Simulation");
         pauseSim.setEnabled(false);
@@ -77,8 +67,8 @@ public class UserInterface {
         
         simPanel = new SimulationPanel();
         
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(1024, 768));
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setPreferredSize(new Dimension(1024, 768));
         
     }
 
@@ -115,7 +105,7 @@ public class UserInterface {
         contentPane.add(detailPanel, BorderLayout.EAST);
         contentPane.add(buttonPanel, BorderLayout.SOUTH);
         contentPane.add(simPanel, BorderLayout.CENTER);
-        frame.pack();
+        this.pack();
         
     }
 
@@ -165,5 +155,11 @@ public class UserInterface {
                 new SettingsWindow();
             }
         });
+        
     }
+    
+    
+    
+    //TODO: move details panel into it's own class, have the paintComponent override handle updates to the details on itself. then have this class' updateGUI call repaint()
+    //TODO: the pause button listener on the interface will have
 }
