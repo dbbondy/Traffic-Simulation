@@ -91,7 +91,7 @@ public class Simulation {
     }
     
     public static SimulationThread getSimulationThread(){
-        return 
+        return null; // fix me
     }
 
     class SimulationThread extends Thread {
