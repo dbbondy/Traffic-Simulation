@@ -41,11 +41,12 @@ public class Simulation {
     
     
     
-    // test comment for commit
+   
 
     //how to create a proper MVC compliant instantiation
     /*
-     * simulation creates instance of settings window, and waits until processing on that window is complete simulation creates instance of main user interface window
+     * simulation creates instance of settings window, and waits until processing on that window is complete 
+     * simulation creates instance of main user interface window
      */
     public static void setOption(String option, Object value) {
         settings.put(option, value);
@@ -75,7 +76,9 @@ public class Simulation {
         //core simulation step progress.
 
         /*
-         * Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
+         * Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
+         * int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
+         * int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
          * junc.distributeNewCars(carsRatio, trucksRatio); junc.update(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" junc.updateDeletions();
          * //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.
          *
@@ -100,7 +103,7 @@ public class Simulation {
         return simThread;
     }
 
-    class SimulationThread extends Thread {
+    public class SimulationThread extends Thread {
 
         @Override
         public void run() {
