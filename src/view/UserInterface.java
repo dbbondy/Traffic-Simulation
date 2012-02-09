@@ -90,6 +90,7 @@ public class UserInterface extends JFrame {
                 Simulation.start();
                 startSim.setText("Stop Simulation");
                 pauseSim.setEnabled(true);
+                Simulation.Simulate();
 
             }
         });
@@ -125,8 +126,8 @@ public class UserInterface extends JFrame {
     }
 
     private void onUnPauseButtonPress() {
-        synchronized (Simulation.getSimulationThread()) {
-            Simulation.getSimulationThread().notify();
+        synchronized (Simulation.getPausedThread()) {
+            Simulation.getPausedThread().notify();
         }
     }
     //TODO: move details panel into it's own class, have the paintComponent override handle updates to the details on itself. then have this class' updateGUI call repaint()

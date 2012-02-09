@@ -49,6 +49,7 @@ public class SettingsWindow {
         addComponents();
         addListeners();
         frame.setVisible(true);
+        Simulation.getSimThread().start();
     }
 
     private void initComponents() {
@@ -76,6 +77,8 @@ public class SettingsWindow {
         junctions = new JComboBox<String>(junctionOptions);
 
         frame.setLocationRelativeTo(null); //centers the frame in the screen
+        
+        
 
     }
 
@@ -138,6 +141,8 @@ public class SettingsWindow {
         truckRatioField.setName(Simulation.TRUCK_RATIO);
         fields[3] = truckRatioField;
 
+        
+        
         frame.pack();
 
     }
@@ -215,9 +220,9 @@ public class SettingsWindow {
                     Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
                 }
                 
-
-                UserInterface ui = new UserInterface(); //bug with this, try and fix when you can.
-                ui.updateGUI();
+                synchronized(Simulation.getSimThread()){
+                    Simulation.getSimThread().notify();
+                }
                 SettingsWindow.this.frame.dispose();
             }
         });
@@ -245,5 +250,9 @@ public class SettingsWindow {
                 message,
                 title,
                 JOptionPane.ERROR_MESSAGE);
+    }
+    
+    public boolean isVisible(){
+        return isVisible();
     }
 }

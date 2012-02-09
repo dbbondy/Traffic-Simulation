@@ -22,6 +22,7 @@ public class Simulation {
     private SettingsWindow settingsWindow;
     private UserInterface ui;
     private static Map<String, Object> settings;
+    private static PausedThread pausedThread;
     private static SimulationThread simThread;
 
     public Simulation() {
@@ -34,19 +35,15 @@ public class Simulation {
         settings.put(TIME_STEP, 0);
         paused = false;
         started = false;
+        pausedThread = new PausedThread();
         simThread = new SimulationThread();
-
-
+        settingsWindow = new SettingsWindow();
+        
     }
-    
-    
-    
-   
 
     //how to create a proper MVC compliant instantiation
     /*
-     * simulation creates instance of settings window, and waits until processing on that window is complete 
-     * simulation creates instance of main user interface window
+     * simulation creates instance of settings window, and waits until processing on that window is complete simulation creates instance of main user interface window
      */
     public static void setOption(String option, Object value) {
         settings.put(option, value);
@@ -65,9 +62,9 @@ public class Simulation {
         return paused;
     }
 
-    public void Simulate() {
-       simThread.start();
-       
+    public static void Simulate() {
+        pausedThread.start();
+
         //SimulationStats.publishStats();
 
     }
@@ -76,9 +73,7 @@ public class Simulation {
         //core simulation step progress.
 
         /*
-         * Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
-         * int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
-         * int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
+         * Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
          * junc.distributeNewCars(carsRatio, trucksRatio); junc.update(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" junc.updateDeletions();
          * //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.
          *
@@ -98,12 +93,16 @@ public class Simulation {
     public static boolean isStarted() {
         return started;
     }
-    
-    public static SimulationThread getSimulationThread(){
+
+    public static PausedThread getPausedThread() {
+        return pausedThread;
+    }
+
+    public static SimulationThread getSimThread() {
         return simThread;
     }
 
-    public class SimulationThread extends Thread {
+    public class PausedThread extends Thread {
 
         @Override
         public void run() {
@@ -119,10 +118,24 @@ public class Simulation {
                     simulateOneStep();
                     ui.updateGUI(); // more precisely invoke the repaint() method
                 }
-
-
             }
+        }
+    }
 
+    public class SimulationThread extends Thread {
+
+        @Override
+        public void run() {
+            while (settingsWindow.isVisible()) {
+                synchronized (this) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
+                }   
+            }
+            ui = new UserInterface();
         }
     }
 }
