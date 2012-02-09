@@ -1,6 +1,7 @@
 package controller;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import view.SettingsWindow;
 import view.UserInterface;
 
@@ -21,7 +22,7 @@ public class Simulation {
     private SettingsWindow settingsWindow;
     private UserInterface ui;
     private static Map<String, Object> settings;
-    private SimulationThread simThread;
+    private static SimulationThread simThread;
 
     public Simulation() {
         settings = new HashMap<String, Object>();
@@ -33,6 +34,7 @@ public class Simulation {
         settings.put(TIME_STEP, 0);
         paused = false;
         started = false;
+        simThread = new SimulationThread();
 
 
     }
@@ -63,8 +65,8 @@ public class Simulation {
     }
 
     public void Simulate() {
+       simThread.start();
        
-        new SimulationThread().start();
         //SimulationStats.publishStats();
 
     }
@@ -95,7 +97,7 @@ public class Simulation {
     }
     
     public static SimulationThread getSimulationThread(){
-        return null; // fix me
+        return simThread;
     }
 
     class SimulationThread extends Thread {
