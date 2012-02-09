@@ -143,3 +143,25 @@ public class Simulation {
         }
     }
 }
+
+/*TODO
+ * 1. Remove SimulationThread and either use view->view calls or use a method on Simulation 
+   that indirectly does the view->view call. 
+	    * changeSettings() = end UI and start SettingsWindow
+	    * settingsChanged() = end settingsWindow and start UI
+
+2. The PausedThread (rename this) should end at the end of a simulation (as it does)
+   and a new thread should be started at the start of each new simulation. 
+   
+3. this.wait() should be replaced by Thread.sleep() as this.wait() isn't designed 
+   to be used just for making a thread idle for a period of time. It might have other
+   unexpected behaviour on some systems. You will also have to be careful
+   about the synchronized(this) block around that code. It needs to only be around the 
+   while (isPaused()) block instead. It has nothing to do with the sleeping or simulateOneStep
+ */
+
+
+
+
+
+
