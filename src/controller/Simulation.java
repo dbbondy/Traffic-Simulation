@@ -38,7 +38,7 @@ public class Simulation {
         pausedThread = new PausedThread();
         simThread = new SimulationThread();
         settingsWindow = new SettingsWindow();
-        
+
     }
 
     //how to create a proper MVC compliant instantiation
@@ -115,13 +115,12 @@ public class Simulation {
                             ie.printStackTrace();
                         }
                     }
-                    simulateOneStep();
-                    ui.updateGUI(); // more precisely invoke the repaint() method
-                    /*try{
+                    try {
                         this.wait(100);
-                    }catch(InterruptedException ie){
-                        
-                    }*/
+                        simulateOneStep();
+                        ui.updateGUI(); // more precisely invoke the repaint() method
+                    } catch (InterruptedException ie) {
+                    }
                 }
             }
         }

@@ -9,7 +9,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
-import model.DetailsPanel;
 
 /**
  *
@@ -37,7 +36,7 @@ public class UserInterface extends JFrame {
     }
 
     public void updateGUI() {
-        detailPanel.repaint();
+        detailPanel.setTimeText("Current time step is: " + Simulation.getOption(Simulation.TIME_STEP));
     }
 
     private void initComponents() {

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
+package view;
 
 import controller.Simulation;
 import java.awt.Graphics;
@@ -65,18 +65,9 @@ public class DetailsPanel extends JPanel {
         this.add(pausedLbl, cons);
     }
 
-    @Override
-    public void paintComponent(Graphics g) {
-
-        carDensityDetail.setText("Current car density is: " + Simulation.getOption(Simulation.DENSITY));
-        carAggressiveDetail.setText("Current vehicle aggression is: " + Simulation.getOption(Simulation.AGGRESSION));
-        ratioCarsDetail.setText("Current ratio of Cars is :" + Simulation.getOption(Simulation.CAR_RATIO));
-        ratioTrucksDetail.setText("Current ratio of Trucks is: " + Simulation.getOption(Simulation.TRUCK_RATIO));
-        time.setText("Current time step is: " + Simulation.getOption(Simulation.TIME_STEP));
-        pausedLbl.setText("Simulation is paused");
-        
-        if(!Simulation.isPaused()){
-            pausedLbl.setText("");
-        }
+    public void setTimeText(String s){
+        time.setText(s);
     }
+    
+   
 }
