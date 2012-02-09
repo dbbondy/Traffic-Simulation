@@ -221,8 +221,12 @@ public class SettingsWindow {
                 }
                 
                 synchronized(Simulation.getSimThread()){
+                    SettingsWindow.this.setVisible(false);
                     Simulation.getSimThread().notify();
                 }
+                
+                
+                
                 SettingsWindow.this.frame.dispose();
             }
         });
@@ -253,6 +257,10 @@ public class SettingsWindow {
     }
     
     public boolean isVisible(){
-        return isVisible();
+        return frame.isVisible();
+    }
+    
+    public void setVisible(boolean visible){
+        frame.setVisible(visible);
     }
 }

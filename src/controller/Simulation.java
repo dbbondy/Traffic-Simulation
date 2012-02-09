@@ -117,6 +117,11 @@ public class Simulation {
                     }
                     simulateOneStep();
                     ui.updateGUI(); // more precisely invoke the repaint() method
+                    /*try{
+                        this.wait(100);
+                    }catch(InterruptedException ie){
+                        
+                    }*/
                 }
             }
         }
@@ -133,7 +138,7 @@ public class Simulation {
                     } catch (InterruptedException ie) {
                         ie.printStackTrace();
                     }
-                }   
+                }
             }
             ui = new UserInterface();
         }
