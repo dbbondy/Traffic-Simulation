@@ -167,14 +167,13 @@ public class SettingsWindow {
                                     showErrMessage("You cannot have an aggression level greater than 100", "Error");
                                     return;
                                 }
-                                
                             }
+                            
                             if (field.getName().equals(Simulation.CAR_RATIO)) {
                                 if(value > 100){
                                     showErrMessage("You cannot have a car ratio level greater than 100", "Error");
                                     return;
                                 }
-                                
                             }
                             
                             if (field.getName().equals(Simulation.TRUCK_RATIO)) {
@@ -182,7 +181,6 @@ public class SettingsWindow {
                                     showErrMessage("You cannot have a truck ratio level greater than 100", "Error");
                                     return;
                                 }
-                                
                             }
 
                             Simulation.setOption(field.getName(), value);
@@ -191,11 +189,9 @@ public class SettingsWindow {
                             showErrMessage("Some inputted values are incorrect. Please enter correct values", "Error");
                             return;
                         }
-                        
                     }
                 }
                 
-
                 if(((Integer)Simulation.getOption(Simulation.CAR_RATIO)) + ((Integer)Simulation.getOption(Simulation.TRUCK_RATIO)) > 100){
                     showErrMessage("The ratio of cars : trucks must sum to 100.", "Error");
                     Simulation.setOption(Simulation.CAR_RATIO, 0);
@@ -214,10 +210,16 @@ public class SettingsWindow {
                 }
                 
                 String junction = (String)junctions.getSelectedItem();
-                if(junction.equals("Two-Lane Junction")){
-                    Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TwoLaneJunction());
-                }else if(junction.equals("Roundabout Junction")){
-                    Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
+                switch (junction) {
+                    case "Two-Lane Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TwoLaneJunction());
+                        break;
+                    case "Roundabout Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
+                        break;
+                }
+                synchronized(Simulation.getPausedThread()){
+                    Simulation.getPausedThread().notify();
                 }
                 
                 Simulation.settingsChanged();

@@ -72,6 +72,12 @@ public class UserInterface extends JFrame {
         this.pack();
 
     }
+    
+    public void setUpCorrectButtonState(){
+        if(Simulation.isStarted()){
+            
+        }
+    }
 
     private void addListeners() {
 
@@ -116,9 +122,8 @@ public class UserInterface extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
-
                 new SettingsWindow();
+                Simulation.pause();
             }
         });
 

@@ -71,6 +71,10 @@ public class Simulation {
     public static void settingsChanged() {
         if (ui == null) {
             ui = new UserInterface();
+            return;
+        }
+        if(paused == true){
+            paused = false;
         }
     }
 
@@ -122,6 +126,7 @@ public class Simulation {
                     simulateOneStep();
                     ui.updateGUI(); // more precisely invoke the repaint() method
                 } catch (InterruptedException ie) {
+                    ie.printStackTrace();
                 }
             }
         }
