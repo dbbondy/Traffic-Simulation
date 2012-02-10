@@ -61,15 +61,15 @@ public class Simulation {
     }
 
     public static void Simulate() {
-        if(!simulationThread.isAlive()){
+        if (!simulationThread.isAlive()) {
             simulationThread = new SimulationThread();
         }
         simulationThread.start();
         //SimulationStats.publishStats();
     }
-    
-    public static void settingsChanged(){
-        if(ui == null){
+
+    public static void settingsChanged() {
+        if (ui == null) {
             ui = new UserInterface();
         }
     }
@@ -103,8 +103,6 @@ public class Simulation {
         return simulationThread;
     }
 
-  
-
     public static class SimulationThread extends Thread {
 
         @Override
@@ -118,34 +116,23 @@ public class Simulation {
                             ie.printStackTrace();
                         }
                     }
-                    try {
-                        this.wait(100);
-                        simulateOneStep();
-                        ui.updateGUI(); // more precisely invoke the repaint() method
-                    } catch (InterruptedException ie) {
-                    }
+                }
+                try {
+                    Thread.sleep(200);
+                    simulateOneStep();
+                    ui.updateGUI(); // more precisely invoke the repaint() method
+                } catch (InterruptedException ie) {
                 }
             }
         }
     }
-
 }
 
-/*TODO
- 
-
-2. The PausedThread (rename this) should end at the end of a simulation (as it does)
-   and a new thread should be started at the start of each new simulation. 
-   
-3. this.wait() should be replaced by Thread.sleep() as this.wait() isn't designed 
-   to be used just for making a thread idle for a period of time. It might have other
-   unexpected behaviour on some systems. You will also have to be careful
-   about the synchronized(this) block around that code. It needs to only be around the 
-   while (isPaused()) block instead. It has nothing to do with the sleeping or simulateOneStep
+/*
+ * TODO
+ * 1. create automatic pausing when click on "change settings" and automatic unpausing when the change settings window is closed
+ *
+ *
+ *
+ * 
  */
-
-
-
-
-
-

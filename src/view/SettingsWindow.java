@@ -71,7 +71,7 @@ public class SettingsWindow {
         contentPane.setLayout(new GridBagLayout());
         fields = new JTextField[4];
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         String[] junctionOptions = {"<<please enter a choice>>", "Two-Lane Junction", "Roundabout Junction", "Traffic light Junction", "Flyover Junction", "Plain Junction"};
         junctions = new JComboBox<String>(junctionOptions);
