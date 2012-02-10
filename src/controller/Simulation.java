@@ -20,10 +20,9 @@ public class Simulation {
     private static boolean paused;
     private static boolean started;
     private SettingsWindow settingsWindow;
-    private UserInterface ui;
+    private static UserInterface ui;
     private static Map<String, Object> settings;
     private static PausedThread pausedThread;
-    private static SimulationThread simThread;
 
     public Simulation() {
         settings = new HashMap<String, Object>();
@@ -36,7 +35,6 @@ public class Simulation {
         paused = false;
         started = false;
         pausedThread = new PausedThread();
-        simThread = new SimulationThread();
         settingsWindow = new SettingsWindow();
 
     }
@@ -64,9 +62,13 @@ public class Simulation {
 
     public static void Simulate() {
         pausedThread.start();
-
         //SimulationStats.publishStats();
-
+    }
+    
+    public static void settingsChanged(){
+        if(ui == null){
+            ui = new UserInterface();
+        }
     }
 
     private void simulateOneStep() {
@@ -98,9 +100,7 @@ public class Simulation {
         return pausedThread;
     }
 
-    public static SimulationThread getSimThread() {
-        return simThread;
-    }
+  
 
     public class PausedThread extends Thread {
 
@@ -126,22 +126,6 @@ public class Simulation {
         }
     }
 
-    public class SimulationThread extends Thread {
-
-        @Override
-        public void run() {
-            while (settingsWindow.isVisible()) {
-                synchronized (this) {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException ie) {
-                        ie.printStackTrace();
-                    }
-                }
-            }
-            ui = new UserInterface();
-        }
-    }
 }
 
 /*TODO

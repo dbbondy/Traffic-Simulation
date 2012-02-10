@@ -49,7 +49,7 @@ public class SettingsWindow {
         addComponents();
         addListeners();
         frame.setVisible(true);
-        Simulation.getSimThread().start();
+        
     }
 
     private void initComponents() {
@@ -220,12 +220,9 @@ public class SettingsWindow {
                     Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
                 }
                 
-                synchronized(Simulation.getSimThread()){
-                    SettingsWindow.this.setVisible(false);
-                    Simulation.getSimThread().notify();
-                }
                 
                 
+                Simulation.settingsChanged();
                 
                 SettingsWindow.this.frame.dispose();
             }
@@ -263,4 +260,6 @@ public class SettingsWindow {
     public void setVisible(boolean visible){
         frame.setVisible(visible);
     }
+    
+    
 }
