@@ -22,7 +22,7 @@ public class Simulation {
     private SettingsWindow settingsWindow;
     private static UserInterface ui;
     private static Map<String, Object> settings;
-    private static PausedThread pausedThread;
+    private static SimulationThread simulationThread;
 
     public Simulation() {
         settings = new HashMap<String, Object>();
@@ -34,7 +34,7 @@ public class Simulation {
         settings.put(TIME_STEP, 0);
         paused = false;
         started = false;
-        pausedThread = new PausedThread();
+        simulationThread = new SimulationThread();
         settingsWindow = new SettingsWindow();
 
     }
@@ -61,7 +61,10 @@ public class Simulation {
     }
 
     public static void Simulate() {
-        pausedThread.start();
+        if(!simulationThread.isAlive()){
+            simulationThread = new SimulationThread();
+        }
+        simulationThread.start();
         //SimulationStats.publishStats();
     }
     
@@ -71,7 +74,7 @@ public class Simulation {
         }
     }
 
-    private void simulateOneStep() {
+    private static void simulateOneStep() {
         //core simulation step progress.
 
         /*
@@ -96,13 +99,13 @@ public class Simulation {
         return started;
     }
 
-    public static PausedThread getPausedThread() {
-        return pausedThread;
+    public static SimulationThread getPausedThread() {
+        return simulationThread;
     }
 
   
 
-    public class PausedThread extends Thread {
+    public static class SimulationThread extends Thread {
 
         @Override
         public void run() {
@@ -129,10 +132,7 @@ public class Simulation {
 }
 
 /*TODO
- * 1. Remove SimulationThread and either use view->view calls or use a method on Simulation 
-   that indirectly does the view->view call. 
-	    * changeSettings() = end UI and start SettingsWindow
-	    * settingsChanged() = end settingsWindow and start UI
+ 
 
 2. The PausedThread (rename this) should end at the end of a simulation (as it does)
    and a new thread should be started at the start of each new simulation. 

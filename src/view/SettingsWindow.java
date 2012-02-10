@@ -220,10 +220,7 @@ public class SettingsWindow {
                     Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
                 }
                 
-                
-                
                 Simulation.settingsChanged();
-                
                 SettingsWindow.this.frame.dispose();
             }
         });
