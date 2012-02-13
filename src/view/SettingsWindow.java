@@ -217,8 +217,18 @@ public class SettingsWindow {
                     case "Roundabout Junction":
                         Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
                         break;
+                    case "Plain Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.PlainJunction());
+                        break;
+                    case "Traffic light Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TrafficLightJunction());
+                        break;
+                    case "Flyover Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.FlyoverJunction());
+                        break;
                 }
-                synchronized(Simulation.getPausedThread()){
+                
+                synchronized(Simulation.getPausedThread()){ //notifying simulation thread that we are done with waiting.
                     Simulation.getPausedThread().notify();
                 }
                 
@@ -236,11 +246,6 @@ public class SettingsWindow {
                 carRatioField.setText("50");
                 truckRatioField.setText("50");
                 junctions.setSelectedIndex(1);
-               /* Simulation.setOption(Simulation.DENSITY, 10);
-                Simulation.setOption(Simulation.AGGRESSION, 25);
-                Simulation.setOption(Simulation.CAR_RATIO, 50);
-                Simulation.setOption(Simulation.TRUCK_RATIO, 50);
-                Simulation.setOption(Simulation.JUNCTION_TYPE, JunctionConstants.TWO_LANE_JUNCTION);*/
             }
         });
     }

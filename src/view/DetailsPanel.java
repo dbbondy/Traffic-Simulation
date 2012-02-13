@@ -65,9 +65,24 @@ public class DetailsPanel extends JPanel {
         this.add(pausedLbl, cons);
     }
 
-    public void setTimeText(String s){
+    void setTimeText(String s){
         time.setText(s);
     }
     
-   
+    void setVehicleDensityText(String s) {
+        carDensityDetail.setText(s);
+    }
+    
+    void setVehicleAggressionText(String s){
+        carAggressiveDetail.setText(s);
+    }
+    
+    void setRatioCarsText(String s){
+        ratioCarsDetail.setText(s);
+    }
+    
+    void setRatioTrucksText(String s){
+        ratioTrucksDetail.setText(s);
+    }
+    
 }

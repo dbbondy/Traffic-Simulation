@@ -34,9 +34,13 @@ public class UserInterface extends JFrame {
 
 
     }
-
+    
     public void updateGUI() {
         detailPanel.setTimeText("Current time step is: " + Simulation.getOption(Simulation.TIME_STEP));
+        detailPanel.setVehicleDensityText("Current car density is: " + Simulation.getOption(Simulation.DENSITY));
+        detailPanel.setRatioCarsText("Current ratio of Cars is :" + Simulation.getOption(Simulation.CAR_RATIO));
+        detailPanel.setRatioTrucksText("Current ratio of Trucks is: " + Simulation.getOption(Simulation.TRUCK_RATIO));
+        detailPanel.setVehicleAggressionText("Current vehicle aggression is: " + Simulation.getOption(Simulation.AGGRESSION));
     }
 
     private void initComponents() {
@@ -73,11 +77,7 @@ public class UserInterface extends JFrame {
 
     }
     
-    public void setUpCorrectButtonState(){
-        if(Simulation.isStarted()){
-            
-        }
-    }
+    
 
     private void addListeners() {
 
@@ -87,6 +87,7 @@ public class UserInterface extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (Simulation.isStarted()) {
                     Simulation.start();
+                    Simulation.reset();
                     startSim.setText("Start Simulation");
                     pauseSim.setText("Pause Simulation");
                     pauseSim.setEnabled(false);

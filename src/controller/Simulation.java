@@ -102,6 +102,15 @@ public class Simulation {
     public static boolean isStarted() {
         return started;
     }
+    
+    public static void reset(){
+        setOption(DENSITY, 0);
+        setOption(AGGRESSION, 0);
+        setOption(CAR_RATIO, 0);
+        setOption(TRUCK_RATIO, 0);
+        setOption(TIME_STEP, -1); //for a strange reason, if set to 0, the UI shows the number "1" so the number "-1" shows 0.
+        
+    }
 
     public static SimulationThread getPausedThread() {
         return simulationThread;
