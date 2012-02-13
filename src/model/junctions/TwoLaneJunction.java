@@ -11,6 +11,8 @@ import model.Lane;
  * @author Dan
  */
 public class TwoLaneJunction extends Junction{
+
+   
     
     private Lane bottomUpwardsLane; //lane comes from bottom, up into the center
     private Lane bottomUpwardsLane2;
@@ -29,9 +31,26 @@ public class TwoLaneJunction extends Junction{
     private Lane upUpwardsLane; //lane comes from center towards the upwards exit.
     private Lane upUpwardsLane2;
 
-    public TwoLaneJunction(){
-        
-        
+    public TwoLaneJunction() {
+        bottomUpwardsLane = new Lane(0, 0);
+        bottomUpwardsLane2 = new Lane(0, 0);
+        bottomDownwardsLane = new Lane(0, 0);
+        bottomDownwardsLane2 = new Lane(0, 0);
+        leftRightwardsLane = new Lane(0, 0);
+        leftRightwardsLane2 = new Lane(0, 0);
+        leftLeftwardsLane = new Lane(0, 0);
+        leftLeftwardsLane2 = new Lane(0, 0);
+        rightLeftwardsLane = new Lane(0, 0);
+        rightLeftwardsLane2 = new Lane(0, 0);
+        rightRightwardsLane = new Lane(0, 0);
+        rightRightwardsLane2 = new Lane(0, 0);
+        upDownwardsLane = new Lane(0, 0);
+        upDownwardsLane2 = new Lane(0, 0);
+        upUpwardsLane = new Lane(0, 0);
+        upUpwardsLane2 = new Lane(0, 0);
+                
+        //TODO once a car is on the screen, change these (0,0) coords to be correct. JUST A TEMPORARY MEASURE AT THE MOMENT.
+                
     }
     
     
@@ -45,7 +64,8 @@ public class TwoLaneJunction extends Junction{
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    private void manageLanes(){
+    @Override
+    public void manageJunction(){
         
         //deal with cars at ends of junctions and either put them into new lanes, or remove them from the simulation altogether
     }
