@@ -127,7 +127,7 @@ public class SimulationPanel extends JPanel {
             drawRoundaboutJunc(g);
         }
 
-
+//TODO fix the geometric shapes for the junction drawing. They don't depend on the size of the window, like they should.
 
     }
 }

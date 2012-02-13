@@ -209,24 +209,7 @@ public class SettingsWindow {
                     return;
                 }
                 
-                String junction = (String)junctions.getSelectedItem();
-                switch (junction) {
-                    case "Two-Lane Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TwoLaneJunction());
-                        break;
-                    case "Roundabout Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
-                        break;
-                    case "Plain Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.PlainJunction());
-                        break;
-                    case "Traffic light Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TrafficLightJunction());
-                        break;
-                    case "Flyover Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.FlyoverJunction());
-                        break;
-                }
+                determineJuncInit();
                 
                 synchronized(Simulation.getPausedThread()){ //notifying simulation thread that we are done with waiting.
                     Simulation.getPausedThread().notify();
@@ -249,6 +232,27 @@ public class SettingsWindow {
             }
         });
     }
+    
+    private void determineJuncInit(){
+        String junction = (String)junctions.getSelectedItem();
+                switch (junction) {
+                    case "Two-Lane Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TwoLaneJunction());
+                        break;
+                    case "Roundabout Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
+                        break;
+                    case "Plain Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.PlainJunction());
+                        break;
+                    case "Traffic light Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TrafficLightJunction());
+                        break;
+                    case "Flyover Junction":
+                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.FlyoverJunction());
+                        break;
+                }
+    }
 
     private void showErrMessage(String message, String title) {
         JOptionPane.showMessageDialog(frame,
@@ -257,11 +261,11 @@ public class SettingsWindow {
                 JOptionPane.ERROR_MESSAGE);
     }
     
-    public boolean isVisible(){
+    boolean isVisible(){
         return frame.isVisible();
     }
     
-    public void setVisible(boolean visible){
+    void setVisible(boolean visible){
         frame.setVisible(visible);
     }
     
