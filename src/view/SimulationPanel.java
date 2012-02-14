@@ -47,9 +47,8 @@ public class SimulationPanel extends JPanel {
         ArrayList<Lane> lanes = currentJunction.getLanes();
         for(Lane l : lanes){
             for(Vehicle v : l.getVehicles()){
-                int xCoord = l.getXStart();
-                int yCoord = l.getYStart();
-                Segment s = v.getHeadSegment();
+                int x = l.findSegmentPosition(v);
+                
                 //fuck if i know what else to do. =/
             }
         }
@@ -59,11 +58,12 @@ public class SimulationPanel extends JPanel {
 
         // create a graphics object from the buffered image object
         Graphics2D graphics = image.createGraphics();
-        Junction junc = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
-        if (junc instanceof model.junctions.TwoLaneJunction) {
+        
+        if (currentJunction instanceof model.junctions.TwoLaneJunction) {
             drawTwoLaneJunc(graphics);
             image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        } else if (junc instanceof model.junctions.RoundaboutJunction) {
+        } else if (currentJunction instanceof model.junctions.RoundaboutJunction) {
+            // TODO
         }
 
     }
@@ -133,12 +133,12 @@ public class SimulationPanel extends JPanel {
         // TODO: take the clip into account
         g.drawImage(image, this.getWidth(), this.getHeight(), null);
 
-        Junction junc = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
-        if (junc instanceof model.junctions.TwoLaneJunction) {
+        
+        if (currentJunction instanceof model.junctions.TwoLaneJunction) {
             drawTwoLaneJunc(graphics);
         }
 
-        if (junc instanceof model.junctions.RoundaboutJunction) {
+        if (currentJunction instanceof model.junctions.RoundaboutJunction) {
             drawRoundaboutJunc(graphics);
         }
 

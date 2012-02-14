@@ -37,6 +37,17 @@ public class Lane {
         return laneSegments[laneSegments.length - 1];
     }
     
+    public int findSegmentPosition(Vehicle vehicle){
+        Comparator com = VehicleComparator.getInstance();
+        int index = Collections.binarySearch(vehicles, vehicle, com);
+        
+        if(index < 0){
+            return -1;
+        }
+        //not even sure if this is even needed. i THINK i need it. 
+        return index;
+    }
+    
     // 
     //    3 ZxZ straight bits
     //    1 30 degree left
