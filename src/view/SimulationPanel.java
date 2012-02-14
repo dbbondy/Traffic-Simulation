@@ -44,105 +44,92 @@ public class SimulationPanel extends JPanel {
     }
     
     private void drawVehicles(Graphics g){
+        Graphics2D graphics = (Graphics2D) g;
         ArrayList<Lane> lanes = currentJunction.getLanes();
         for(Lane l : lanes){
             for(Vehicle v : l.getVehicles()){
-                int x = l.findSegmentPosition(v);
+                Segment head = v.getHeadSegment();
+                double currentX = head.getRenderX();
+                double currentY = head.getRenderY();
+                double angle = head.getRenderAngle();
                 
-                //fuck if i know what else to do. =/
+                System.out.println(currentX);
+                System.out.println(currentY);
+                System.out.println();
+                graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
+                graphics.fillRect((int) currentX - 13, (int) currentY - 46, 26, 46);
+                graphics.rotate(-(Math.PI * (angle/180)), currentX, currentY);
+                
             }
         }
     }
 
     private void renderToImage() {
 
+        image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        
         // create a graphics object from the buffered image object
         Graphics2D graphics = image.createGraphics();
+        ArrayList<Lane> lanes = currentJunction.getLanes();         
         
-        if (currentJunction instanceof model.junctions.TwoLaneJunction) {
-            drawTwoLaneJunc(graphics);
-            image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        } else if (currentJunction instanceof model.junctions.RoundaboutJunction) {
-            // TODO
+        double angle;
+        double currentX, currentY;
+        
+        graphics.setColor(Color.GRAY);   
+        
+        graphics.fillRect(50, 50, 3, 3);
+        
+        for (Lane lane : lanes) {
+            // the rendering is from top/bottom left not from center
+            currentX = lane.getXStart(); 
+            currentY = lane.getYStart();
+            angle = lane.getInitialAngle();
+            
+            Segment next = lane.getFirstSegment();
+            
+            while (next != null) { // while more segments
+                
+                // draw an angle segment
+                if (next.getAngle() != 0) {
+                    
+                // draw a straight segment
+                } else {
+                    
+                    graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
+                    graphics.fillRect((int) (currentX - (Segment.WIDTH / 2)), (int) (currentY), Segment.WIDTH, next.getLength());
+                    graphics.rotate(-(Math.PI * (angle/180)), currentX, currentY);
+                    
+                    next.setRenderX(currentX);
+                    next.setRenderY(currentY);
+                    next.setRenderAngle(angle);
+                    
+                    currentX -= Math.sin((Math.PI * (angle/180))) * next.getLength();
+                    currentY += Math.cos((Math.PI * (angle/180))) * next.getLength();
+                    
+                }     
+                
+                next = next.getNextSegment();
+            }
         }
 
     }
 
-    private void drawTwoLaneJunc(Graphics graphics) {
-        //draw rectangles
-        graphics.drawRect(350, 375, 75, 320); // bottom rect
-        graphics.drawRect(350, 0, 75, 300); // top rect
-        graphics.drawRect(425, 300, 375, 75); // right rect
-        graphics.drawRect(0, 300, 350, 75); // left rect
-        graphics.drawRect(350, 300, 75, 75); // junction centre
-        graphics.setColor(Color.gray);
-        //fill rectangles
-        graphics.fillRect(350, 375, 75, 320);// fill bottom rect
-        graphics.fillRect(350, 0, 75, 300); // fill top rect
-        graphics.fillRect(425, 300, 375, 75); // fill right rect
-        graphics.fillRect(0, 300, 350, 75); // fill left rect
-        graphics.fillRect(350, 300, 75, 75); //fill junction centre
-        //draw divider lines
-        graphics.setColor(Color.BLUE);
-        graphics.drawLine(387, 375, 387, 700); // divider line for bottom rect
-        graphics.drawLine(387, 0, 387, 300); // divider for top rect
-        graphics.drawLine(0, 337, 350, 337); // divider for right rect
-        graphics.drawLine(425, 337, 800, 337); //divider for left rect
-        //draw road dividers
-        graphics.setColor(Color.white);
-        graphics.drawLine(350, 375, 425, 375); // draw bottom rect dividers
-        graphics.drawLine(350, 395, 425, 395);
-
-        graphics.drawLine(350, 300, 425, 300); // draw top rect dividers
-        graphics.drawLine(350, 280, 425, 280);
-
-        graphics.drawLine(350, 300, 350, 375); // draw left rect dividers
-        graphics.drawLine(330, 300, 330, 375);
-
-        graphics.drawLine(425, 300, 425, 375); // draw right rect dividers
-        graphics.drawLine(445, 300, 445, 375);
-    }
-
-    private void drawRoundaboutJunc(Graphics graphics) {
-        graphics.drawRect(300, 300, 100, 200);
-        graphics.setColor(Color.GREEN);
-        graphics.fillRect(300, 300, 100, 200);
-        //just a placeholder to indicate that the roundabout junction has been selected.
-        
-        //TODO: draw the actual roundabout junction
-    }
-
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D graphics = (Graphics2D) g;
+    public void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);        
+        
+        // no need to paint if we can't see it
+        if (getWidth() == 0 || getHeight() == 0) return;
+        
         // create cache image if necessary
         if (null == image
                 || image.getWidth() != getWidth()
                 || image.getHeight() != getHeight()) {
-            image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-            imageIsInvalid = true;
-        }
-
-        // render to cache if needed
-        if (imageIsInvalid()) {
             renderToImage();
         }
-
-        // redraw component from cache
-        // TODO: take the clip into account
-        g.drawImage(image, this.getWidth(), this.getHeight(), null);
-
         
-        if (currentJunction instanceof model.junctions.TwoLaneJunction) {
-            drawTwoLaneJunc(graphics);
-        }
-
-        if (currentJunction instanceof model.junctions.RoundaboutJunction) {
-            drawRoundaboutJunc(graphics);
-        }
-
-//TODO fix the geometric shapes for the junction drawing. They don't depend on the size of the window, like they should.
-
+        // redraw the junction from the image cache
+        graphics.drawImage(image, 0, 0, null);        
+        drawVehicles(graphics);
     }
 }

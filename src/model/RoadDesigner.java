@@ -25,7 +25,7 @@ public class RoadDesigner {
        
         Segment[] set = new Segment[10];
         for (int i = 0; i < set.length; i++) {
-            set[i] = new Segment(lane, 15, 15);
+            set[i] = new Segment(lane, 15, 0);
         }
 
         for (int i = 0; i < set.length; i++) {

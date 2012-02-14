@@ -33,24 +33,30 @@ public class TwoLaneJunction extends Junction{
     private Lane upUpwardsLane2;
 
     public TwoLaneJunction() {
-        bottomUpwardsLane = new Lane(0, 0);
-        bottomUpwardsLane2 = new Lane(0, 0);
-        bottomDownwardsLane = new Lane(0, 0);
-        bottomDownwardsLane2 = new Lane(0, 0);
-        leftRightwardsLane = new Lane(0, 0);
-        leftRightwardsLane2 = new Lane(0, 0);
-        leftLeftwardsLane = new Lane(0, 0);
-        leftLeftwardsLane2 = new Lane(0, 0);
-        rightLeftwardsLane = new Lane(0, 0);
-        rightLeftwardsLane2 = new Lane(0, 0);
-        rightRightwardsLane = new Lane(0, 0);
-        rightRightwardsLane2 = new Lane(0, 0);
-        upDownwardsLane = new Lane(0, 0);
-        upDownwardsLane2 = new Lane(0, 0);
-        upUpwardsLane = new Lane(0, 0);
-        upUpwardsLane2 = new Lane(0, 0);
+        bottomUpwardsLane = new Lane(0, 0, 0);
+        bottomUpwardsLane2 = new Lane(0, 0, 0);
+        bottomDownwardsLane = new Lane(0, 0, 0);
+        bottomDownwardsLane2 = new Lane(0, 0, 0);
+        leftRightwardsLane = new Lane(0, 0, 0);
+        leftRightwardsLane2 = new Lane(0, 0, 0);
+        leftLeftwardsLane = new Lane(0, 0, 0);
+        leftLeftwardsLane2 = new Lane(0, 0, 0);
+        rightLeftwardsLane = new Lane(0, 0, 0);
+        rightLeftwardsLane2 = new Lane(0, 0, 0);
+        rightRightwardsLane = new Lane(0, 0, 0);
+        rightRightwardsLane2 = new Lane(0, 0, 0);
+        upDownwardsLane = new Lane(0, 0, 0);
+        upDownwardsLane2 = new Lane(0, 0, 0);
+        upUpwardsLane = new Lane(0, 0, 0);
+        upUpwardsLane2 = new Lane(0, 0, 0);
         
-        registerAllLanes();
+        Lane test = new Lane(50, 200, 270);
+        registerLane(test);
+         Vehicle v1 = new Car(test, test.getFirstSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment()); 
+        test.addVehicle(v1);
+        //registerLane(new Lane(300, 400, 180));
+        
+       // registerAllLanes();
         //TODO once a car is on the screen, change these (0,0) coords to be correct. JUST A TEMPORARY MEASURE AT THE MOMENT.
                 
     }

@@ -4,6 +4,7 @@ import exceptions.NoLaneExistsException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.Semaphore;
 
 //TODO: create classes for each invidividual junction and just create instances of Lane necessary amounts of times
 //TODO: split "buildLaneSegments" into "buildStraightSection(x)"  and "buildLeftCurve()" and "buildRightCurve()"
@@ -20,15 +21,22 @@ public class Lane {
     private Segment[] laneSegments; 
     public static final int SEGMENT_DENSITY = 1;
     
+    private int initialAngle;
+    
     private ArrayList<Vehicle> vehicles;
     
-    public Lane(int xCoord, int yCoord) {
+    public Lane(int xCoord, int yCoord, int initialAngle) {
         buildLaneSegments();
         vehicles = new ArrayList<>(32); 
         this.xCoord = xCoord;
-        this.yCoord = yCoord;        
+        this.yCoord = yCoord;
+        this.initialAngle = initialAngle;
     }
     
+    public int getInitialAngle() {
+        return this.initialAngle;
+    }
+        
     public Segment getFirstSegment() {
         return laneSegments[0];
     }
@@ -65,22 +73,20 @@ public class Lane {
     
     private void buildLaneSegments(){ 
             
-        RoadDesigner d = new RoadDesigner();
-        laneSegments = new Segment[20];
+        // todo: this properly
         
-        int sizeCounter = 10;
-        Segment[] tempSegments = null;
-        for(int i = 0 ; i < laneSegments.length; i++){
-            if (i % sizeCounter == 0) {
-                try{
-                    tempSegments = d.build10Segments(this);
-                    laneSegments[i] = tempSegments[0];
-                }catch(NoLaneExistsException e){
-                    e.printStackTrace();
-                }
-            }
-            laneSegments[i] = tempSegments[(i % sizeCounter)];
-        }
+        RoadDesigner d = new RoadDesigner();
+        laneSegments = new Segment[80];
+        
+        Segment b = null;
+        for(int i = 0; i < 80; i++)
+        {
+            Segment a = new Segment(this, 5, 0);
+            a.setPreviousSegment(b);
+            if (b!=null)b.setNextSegment(a);
+            b = a;
+            laneSegments[i] = a;     
+        }     
     }
     
     public Vehicle getVehicleAhead(Segment segment) {

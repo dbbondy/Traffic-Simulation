@@ -10,9 +10,9 @@ import java.util.List;
  */
 public class Segment {
     
-    private int lengthLeft;
-    private int lengthRight;
-    private static final int WIDTH = 25;
+    private int length;
+    private int angle;
+    public static final int WIDTH = 40;
     private Segment next;
     private Segment previous;
     private List<Segment> connectedSegments;
@@ -20,17 +20,52 @@ public class Segment {
     private ConnectionType connType;
     private static int segmentCounter = 0;
     private int id;
-    
-    public Segment(Lane lane, int lengthLeft, int lengthRight){
-        this.lengthLeft = lengthLeft * (Lane.SEGMENT_DENSITY);
-        this.lengthRight = lengthRight * (Lane.SEGMENT_DENSITY);
+    private double renderX; // known after rendering
+    private double renderY; // known after rendering
+    private double renderAngle;
+
+    public Segment(Lane lane, int length, int angle){
+        this.length = length;
+        this.angle = angle;
         this.lane = lane;
         this.id = segmentCounter++;
         connectedSegments = new ArrayList<Segment>();
     }
+
+    public double getRenderAngle() {
+        return renderAngle;
+    }
+
+    public void setRenderAngle(double renderAngle) {
+        this.renderAngle = renderAngle;
+    }
+
+    public double getRenderX() {
+        return renderX;
+    }
+
+    public void setRenderX(double renderX) {
+        this.renderX = renderX;
+    }
+
+    public double getRenderY() {
+        return renderY;
+    }
+
+    public void setRenderY(double renderY) {
+        this.renderY = renderY;
+    }
     
     public int id() {
         return this.id;
+    }
+    
+    public int getLength() {
+        return this.length;
+    }
+    
+    public int getAngle() {
+        return this.angle;
     }
     
     public void setConnectionType(ConnectionType type){
