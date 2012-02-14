@@ -10,7 +10,7 @@ import model.Lane;
  */
 public abstract class Junction {
     
-    protected ArrayList<Lane> lanes;
+    private ArrayList<Lane> lanes;
     
     public abstract void distributeNewCars(int cars, int trucks);
     
@@ -20,5 +20,8 @@ public abstract class Junction {
     
     public abstract void manageJunction();
         
+    public ArrayList<Lane> getLanes(){
+        return lanes;
+    }
     
 }

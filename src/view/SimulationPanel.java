@@ -10,7 +10,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import javax.swing.JPanel;
+import model.Lane;
+import model.Segment;
+import model.Vehicle;
 import model.junctions.Junction;
 
 /**
@@ -21,6 +25,7 @@ public class SimulationPanel extends JPanel {
 
     private BufferedImage image;
     private boolean imageIsInvalid;
+    private Junction currentJunction;
 
     public SimulationPanel() {
         super();
@@ -31,10 +36,23 @@ public class SimulationPanel extends JPanel {
     private void initPanel() {
         this.setPreferredSize(new Dimension(600, 600));
         this.setBackground(Color.white);
+        currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
     }
 
     private boolean imageIsInvalid() {
         return imageIsInvalid;
+    }
+    
+    private void drawVehicles(Graphics g){
+        ArrayList<Lane> lanes = currentJunction.getLanes();
+        for(Lane l : lanes){
+            for(Vehicle v : l.getVehicles()){
+                int xCoord = l.getXStart();
+                int yCoord = l.getYStart();
+                Segment s = v.getHeadSegment();
+                //fuck if i know what else to do. =/
+            }
+        }
     }
 
     private void renderToImage() {

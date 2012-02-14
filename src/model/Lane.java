@@ -24,7 +24,7 @@ public class Lane {
     
     public Lane(int xCoord, int yCoord) {
         buildLaneSegments();
-        vehicles = new ArrayList<Vehicle>(32); 
+        vehicles = new ArrayList<>(32); 
         this.xCoord = xCoord;
         this.yCoord = yCoord;        
     }
@@ -47,6 +47,10 @@ public class Lane {
     //    // build10Xsegments(x)
     //
     //
+    
+    public ArrayList<Vehicle> getVehicles(){
+        return vehicles;
+    }
     
     private void buildLaneSegments(){ 
             

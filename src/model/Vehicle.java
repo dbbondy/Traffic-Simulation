@@ -29,7 +29,7 @@ public abstract class Vehicle {
     public void updateSpeed(int newSpeed){
         currentSpeed = newSpeed;
     }
-    
+     
    /*  public static Vehicle getVehicle(int carRatio, int truckRatio){
         return new Car(); //just a placeholder right now until i figure out how to create based on ratio.
     }

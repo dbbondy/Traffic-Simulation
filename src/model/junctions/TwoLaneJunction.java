@@ -50,11 +50,31 @@ public class TwoLaneJunction extends Junction{
         upUpwardsLane = new Lane(0, 0);
         upUpwardsLane2 = new Lane(0, 0);
         
-        
+        registerAllLanes();
         //TODO once a car is on the screen, change these (0,0) coords to be correct. JUST A TEMPORARY MEASURE AT THE MOMENT.
                 
     }
     
+    private void registerAllLanes(){
+        registerLane(bottomUpwardsLane);
+        registerLane(bottomUpwardsLane2);
+        registerLane(bottomDownwardsLane);
+        registerLane(bottomDownwardsLane2);
+        registerLane(leftRightwardsLane);
+        registerLane(leftRightwardsLane2);
+        registerLane(leftLeftwardsLane);
+        registerLane(leftLeftwardsLane2);
+        registerLane(rightLeftwardsLane);
+        registerLane(rightLeftwardsLane2);
+        registerLane(rightRightwardsLane);
+        registerLane(rightRightwardsLane2);
+        registerLane(upDownwardsLane);
+        registerLane(upDownwardsLane2);
+        registerLane(upUpwardsLane);
+        registerLane(upUpwardsLane2);
+        
+        
+    }
     
     @Override
     public void distributeNewCars(int cars, int trucks) {
@@ -68,5 +88,6 @@ public class TwoLaneJunction extends Junction{
         //deal with cars at ends of junctions and either put them into new lanes, or remove them from the simulation altogether
         bottomUpwardsLane.updateVehicles();
     }
+    
     
 }
