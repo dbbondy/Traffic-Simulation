@@ -2,6 +2,7 @@ package controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import model.junctions.Junction;
 import view.SettingsWindow;
 import view.UserInterface;
 
@@ -81,18 +82,14 @@ public class Simulation {
     private static void simulateOneStep() {
         //core simulation step progress.
 
-        /*
-         * Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
-         * int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
-         * int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
-         * junc.distributeNewCars(carsRatio, trucksRatio); 
-         * junc.update(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" junc.updateDeletions();
-         * //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.
-         *
-         * temporarily commented out
-         */
         
-        
+         Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
+         int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
+         int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
+         junc.distributeNewCars(carsRatio, trucksRatio); 
+         junc.manageJunction(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" junc.updateDeletions();
+         //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.
+         
         int currentStep = (Integer) getOption(TIME_STEP);
         currentStep++;
         setOption(TIME_STEP, currentStep);

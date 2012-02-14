@@ -31,9 +31,6 @@ public class SimulationPanel extends JPanel {
     private void initPanel() {
         this.setPreferredSize(new Dimension(600, 600));
         this.setBackground(Color.white);
-
-
-        //System.out.println(getWidth());
     }
 
     private boolean imageIsInvalid() {
@@ -124,7 +121,7 @@ public class SimulationPanel extends JPanel {
         }
 
         if (junc instanceof model.junctions.RoundaboutJunction) {
-            drawRoundaboutJunc(g);
+            drawRoundaboutJunc(graphics);
         }
 
 //TODO fix the geometric shapes for the junction drawing. They don't depend on the size of the window, like they should.

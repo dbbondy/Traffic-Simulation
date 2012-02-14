@@ -68,9 +68,6 @@ public class Lane {
         }
     }
     
-    
-   
-        
     public Vehicle getVehicleAhead(Segment segment) {
         Comparator com = VehicleComparator.getInstance();
         
@@ -132,9 +129,7 @@ public class Lane {
                 headSegmentFront = vehicle.getHeadSegment();
             }
         }
-        
         return headSegmentFront;
-        
     }
     
     public int getXStart(){
@@ -145,6 +140,15 @@ public class Lane {
         return yCoord;
     }
     
-    
+    public void updateVehicles(){ //will be more complex than this later on. just a placeholder body at the moment
+        for(Vehicle v : vehicles){
+            Segment s = v.getHeadSegment();
+            Segment s1 = s.getNextSegment();
+            if(s1 == null){ 
+                continue;
+            }
+            v.setHeadSegment(s1);
+        }
+    }
     
 }

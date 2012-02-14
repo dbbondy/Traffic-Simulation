@@ -1,6 +1,5 @@
 
 import controller.Simulation;
-import view.SettingsWindow;
 
 /**
  *

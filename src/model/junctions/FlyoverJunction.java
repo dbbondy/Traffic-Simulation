@@ -16,11 +16,6 @@ public class FlyoverJunction extends Junction{
     }
 
     @Override
-    public void update() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public void manageJunction() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

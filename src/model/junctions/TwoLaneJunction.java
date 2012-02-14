@@ -4,7 +4,9 @@
  */
 package model.junctions;
 
+import model.Car;
 import model.Lane;
+import model.Vehicle;
 
 /**
  *
@@ -13,7 +15,6 @@ import model.Lane;
 public class TwoLaneJunction extends Junction{
 
    
-    
     private Lane bottomUpwardsLane; //lane comes from bottom, up into the center
     private Lane bottomUpwardsLane2;
     private Lane bottomDownwardsLane; //lane comes from center down to the bottom of the screen
@@ -48,7 +49,8 @@ public class TwoLaneJunction extends Junction{
         upDownwardsLane2 = new Lane(0, 0);
         upUpwardsLane = new Lane(0, 0);
         upUpwardsLane2 = new Lane(0, 0);
-                
+        
+        
         //TODO once a car is on the screen, change these (0,0) coords to be correct. JUST A TEMPORARY MEASURE AT THE MOMENT.
                 
     }
@@ -56,18 +58,15 @@ public class TwoLaneJunction extends Junction{
     
     @Override
     public void distributeNewCars(int cars, int trucks) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //placeholder method body. will be different to this in full code.
+        Vehicle v1 = new Car(bottomUpwardsLane, bottomUpwardsLane.getFirstSegment()); 
+        bottomUpwardsLane.addVehicle(v1);
     }
 
     @Override
-    public void update() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    @Override
     public void manageJunction(){
-        
         //deal with cars at ends of junctions and either put them into new lanes, or remove them from the simulation altogether
+        bottomUpwardsLane.updateVehicles();
     }
     
 }
