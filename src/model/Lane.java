@@ -26,7 +26,7 @@ public class Lane {
     private ArrayList<Vehicle> vehicles;
     
     public Lane(int xCoord, int yCoord, int initialAngle) {
-        buildLaneSegments();
+        
         vehicles = new ArrayList<>(32); 
         this.xCoord = xCoord;
         this.yCoord = yCoord;
@@ -71,22 +71,11 @@ public class Lane {
         return vehicles;
     }
     
-    private void buildLaneSegments(){ 
+    public void add(Segment[] s){
+        if(laneSegments == null){
+            laneSegments = new Segment[s.length];
             
-        // todo: this properly
-        
-        RoadDesigner d = new RoadDesigner();
-        laneSegments = new Segment[80];
-        
-        Segment b = null;
-        for(int i = 0; i < 80; i++)
-        {
-            Segment a = new Segment(this, 5, 0);
-            a.setPreviousSegment(b);
-            if (b!=null)b.setNextSegment(a);
-            b = a;
-            laneSegments[i] = a;     
-        }     
+        }
     }
     
     public Vehicle getVehicleAhead(Segment segment) {
