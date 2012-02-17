@@ -11,7 +11,7 @@ import java.util.List;
 public class Segment {
     
     private int length;
-    private double angle;
+    private int angle;
     public static final int WIDTH = 22;
     private Segment next;
     private Segment previous;
@@ -24,7 +24,7 @@ public class Segment {
     private double renderY; // known after rendering
     private double renderAngle;
 
-    public Segment(Lane lane, int length, double angle){
+    public Segment(Lane lane, int length, int angle){
         this.length = length;
         this.angle = angle;
         this.lane = lane;
@@ -64,7 +64,7 @@ public class Segment {
         return this.length;
     }
     
-    public double getAngle() {
+    public int getAngle() {
         return this.angle;
     }
     

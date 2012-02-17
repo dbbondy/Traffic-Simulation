@@ -6,6 +6,7 @@ package model.junctions;
 
 import model.Car;
 import model.Lane;
+import model.RoadDesigner;
 import model.Vehicle;
 
 /**
@@ -52,8 +53,9 @@ public class TwoLaneJunction extends Junction{
         
         Lane test = new Lane(50, 200, 270);
         registerLane(test);
-         Vehicle v1 = new Car(test, test.getFirstSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment()); 
-        test.addVehicle(v1);
+        test.add(RoadDesigner.getStraight(5, test));
+        // Vehicle v1 = new Car(test, test.getFirstSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment()); 
+       // test.addVehicle(v1);
         //registerLane(new Lane(300, 400, 180));
         
        // registerAllLanes();

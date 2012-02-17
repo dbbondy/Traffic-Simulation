@@ -26,7 +26,6 @@ public class Lane {
     private ArrayList<Vehicle> vehicles;
     
     public Lane(int xCoord, int yCoord, int initialAngle) {
-        
         vehicles = new ArrayList<>(32); 
         this.xCoord = xCoord;
         this.yCoord = yCoord;
@@ -71,11 +70,26 @@ public class Lane {
         return vehicles;
     }
     
-    public void add(Segment[] s){
+    public void add(Segment[] segments){
         if(laneSegments == null){
-            laneSegments = new Segment[s.length];
-            
+            laneSegments = new Segment[segments.length];
+            for(int i = 0; i < segments.length; i++) 
+                laneSegments[i] = segments[i];
+            return;
         }
+        int originArrSize = laneSegments.length;
+        int sArrSize = segments.length;
+        Segment[] newLaneSegments = new Segment[originArrSize + sArrSize];
+        for(int i = 0; i < originArrSize; i++)
+            newLaneSegments[i] = laneSegments[i];
+        for(int i = originArrSize + 1; i < newLaneSegments.length; i++)
+            newLaneSegments[i] = segments[i];
+        
+        newLaneSegments[originArrSize].setNextSegment(newLaneSegments[originArrSize+1]); //linking end to start
+        newLaneSegments[originArrSize+1].setPreviousSegment(newLaneSegments[originArrSize]);
+        
+        laneSegments = newLaneSegments;
+        
     }
     
     public Vehicle getVehicleAhead(Segment segment) {
