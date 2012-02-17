@@ -4,7 +4,7 @@
  */
 package model;
 
-import exceptions.NoLaneExistsException;
+
 import exceptions.SegmentCollectionEmptyException;
 
 /**
@@ -12,40 +12,43 @@ import exceptions.SegmentCollectionEmptyException;
  * @author Dan
  */
 public class RoadDesigner {
+    
+    private static double angleOfRotation = 5;
 
     public RoadDesigner() {
     }
 
-    public Segment[] build10Segments(Lane lane) throws NoLaneExistsException {
-        
-        if (lane == null) {
-            throw new NoLaneExistsException("You cannot assign segments to a null valued lane");
-        }
-
+   public static Segment[] getStraight(int lengthOfSection, Lane lane)throws IllegalArgumentException{
+      
+       if(lengthOfSection < 1){
+           throw new IllegalArgumentException("You cannot enter a number of 0 or less");
+       } 
+       Segment[] segments;
+       int l =  (int)(angleOfRotation / (2 * Math.PI)) * (Segment.WIDTH / 2);
+       if(lengthOfSection == 1){
+           segments = new Segment[1];
+           segments[0] = new Segment(lane, l, 0); 
+           
+       }else{
+            segments = new Segment[lengthOfSection];
+           for (int i = 0; i < lengthOfSection; i++){
+               segments[i] = new Segment(lane, l, 0);
+               if(i == 0){
+                   segments[i].setNextSegment(segments[i + 1]);
+                   continue;
+               }
+               if(i == lengthOfSection - 1){
+                   segments[i].setPreviousSegment(segments[i - 1]);
+                   break;
+               }
+               
+               segments[i].setNextSegment(segments[i + 1]);
+               segments[i].setPreviousSegment(segments[i - 1]);
+           }
+       }
+       return segments;
        
-        Segment[] set = new Segment[10];
-        for (int i = 0; i < set.length; i++) {
-            set[i] = new Segment(lane, 15, 0);
-        }
-
-        for (int i = 0; i < set.length; i++) {
-            
-            if (i == 0) { //if first element special case
-                set[i].setNextSegment(set[i + 1]);
-                continue;
-            }
-            if (i == set.length - 1) { //if end of list special case
-                set[i].setPreviousSegment(set[i - 1]);
-                break;
-            }
-            //else normal computation
-            set[i].setNextSegment(set[i + 1]);
-            set[i].setPreviousSegment(set[i - 1]);
-            
-        }
-
-        return set;
-    }
+   }
 
     /*public Segment[] buildLeftSection(Lane lane, Lane intersectingLane){
     

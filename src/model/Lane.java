@@ -1,10 +1,10 @@
 package model;
 
-import exceptions.NoLaneExistsException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.concurrent.Semaphore;
+
 
 //TODO: create classes for each invidividual junction and just create instances of Lane necessary amounts of times
 //TODO: split "buildLaneSegments" into "buildStraightSection(x)"  and "buildLeftCurve()" and "buildRightCurve()"
