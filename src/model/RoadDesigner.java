@@ -8,7 +8,7 @@ import exceptions.SegmentCollectionEmptyException;
  */
 public class RoadDesigner {
 
-    private static int lengthOfSegment = 1; //result of calculation 
+    private static int lengthOfSegment = 2; //result of calculation 
 
     public RoadDesigner() {
     }

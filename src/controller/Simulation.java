@@ -86,7 +86,7 @@ public class Simulation {
          Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
          int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
          int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
-         junc.distributeNewCars(carsRatio, trucksRatio); 
+        // junc.distributeNewCars(carsRatio, trucksRatio); 
          junc.manageJunction(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" 
          //junc.updateDeletions();
          //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.
@@ -133,7 +133,7 @@ public class Simulation {
                     }
                 }
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(100);
                     simulateOneStep();
                     ui.updateGUI(); // more precisely invoke the repaint() method
                 } catch (InterruptedException ie) {

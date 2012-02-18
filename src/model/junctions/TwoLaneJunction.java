@@ -32,6 +32,8 @@ public class TwoLaneJunction extends Junction{
     private Lane upDownwardsLane2;
     private Lane upUpwardsLane; //lane comes from center towards the upwards exit.
     private Lane upUpwardsLane2;
+    
+    private Lane test = new Lane(300, 300, 0);
 
     public TwoLaneJunction() {
         bottomUpwardsLane = new Lane(0, 0, 0);
@@ -51,16 +53,19 @@ public class TwoLaneJunction extends Junction{
         upUpwardsLane = new Lane(0, 0, 0);
         upUpwardsLane2 = new Lane(0, 0, 0);
         
-        Lane test = new Lane(50, 200, 0);
+        
         registerLane(test);
-        test.add(RoadDesigner.getStraight(5, test));
-        //Vehicle v1 = new Car(test, test.getFirstSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment()); 
-        //test.addVehicle(v1);
+        test.add(RoadDesigner.getStraight(150, test));
+        Vehicle v1 = new Car(test, test.getFirstSegment());
+        test.addVehicle(v1);
         //registerLane(new Lane(300, 400, 180));
         
        // registerAllLanes();
-        //TODO once a car is on the screen, change these (0,0) coords to be correct. JUST A TEMPORARY MEASURE AT THE MOMENT.
-                
+        //TODO once a car is on the screen, change these (0,0) coords to be correct. JUST A TEMPORARY MEASURE AT THE MOMENT.      
+    }
+    
+    private void setUpLanes(){
+        
     }
     
     private void registerAllLanes(){
@@ -94,7 +99,9 @@ public class TwoLaneJunction extends Junction{
     @Override
     public void manageJunction(){
         //deal with cars at ends of junctions and either put them into new lanes, or remove them from the simulation altogether
-        bottomUpwardsLane.updateVehicles();
+        //bottomUpwardsLane.updateVehicles();
+        
+        test.updateVehicles();
     }
     
     

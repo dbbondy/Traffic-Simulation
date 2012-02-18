@@ -46,6 +46,7 @@ public class UserInterface extends JFrame {
         detailPanel.setRatioCarsText("Current ratio of Cars is :" + Simulation.getOption(Simulation.CAR_RATIO));
         detailPanel.setRatioTrucksText("Current ratio of Trucks is: " + Simulation.getOption(Simulation.TRUCK_RATIO));
         detailPanel.setVehicleAggressionText("Current vehicle aggression is: " + Simulation.getOption(Simulation.AGGRESSION));
+        simPanel.repaint();
     }
 
     private void initComponents() {

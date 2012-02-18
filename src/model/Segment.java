@@ -12,7 +12,7 @@ public class Segment {
     
     private int length;
     private int angle;
-    public static final int WIDTH = 22;
+    public static final int WIDTH = 46;
     private Segment next;
     private Segment previous;
     private List<Segment> connectedSegments;

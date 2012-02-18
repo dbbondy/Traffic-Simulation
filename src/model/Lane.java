@@ -19,7 +19,6 @@ public class Lane {
     private int xCoord;
     private int yCoord;
     private Segment[] laneSegments; 
-    public static final int SEGMENT_DENSITY = 1;
     
     private int initialAngle;
     

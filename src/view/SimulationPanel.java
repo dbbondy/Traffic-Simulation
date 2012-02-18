@@ -23,8 +23,7 @@ import model.junctions.Junction;
  */
 public class SimulationPanel extends JPanel {
 
-    private BufferedImage image;
-    private boolean imageIsInvalid;
+    private BufferedImage image; //junction image
     private Junction currentJunction;
 
     public SimulationPanel() {
@@ -39,10 +38,6 @@ public class SimulationPanel extends JPanel {
         currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
     }
 
-    private boolean imageIsInvalid() {
-        return imageIsInvalid;
-    }
-    
     private void drawVehicles(Graphics g){
         Graphics2D graphics = (Graphics2D) g;
         ArrayList<Lane> lanes = currentJunction.getLanes();
@@ -53,9 +48,7 @@ public class SimulationPanel extends JPanel {
                 double currentY = head.getRenderY();
                 double angle = head.getRenderAngle();
                 
-                System.out.println(currentX);
-                System.out.println(currentY);
-                System.out.println();
+                
                 graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
                 graphics.fillRect((int) currentX - 13, (int) currentY - 46, 26, 46);
                 graphics.rotate(-(Math.PI * (angle/180)), currentX, currentY);
@@ -65,9 +58,7 @@ public class SimulationPanel extends JPanel {
     }
 
     private void renderToImage() {
-
         image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        
         // create a graphics object from the buffered image object
         Graphics2D graphics = image.createGraphics();
         ArrayList<Lane> lanes = currentJunction.getLanes();         
@@ -93,7 +84,6 @@ public class SimulationPanel extends JPanel {
                     
                 // draw a straight segment
                 } else {
-                    
                     graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
                     graphics.fillRect((int) (currentX - (Segment.WIDTH / 2)), (int) (currentY), Segment.WIDTH, next.getLength());
                     graphics.rotate(-(Math.PI * (angle/180)), currentX, currentY);
@@ -104,10 +94,7 @@ public class SimulationPanel extends JPanel {
                     
                     currentX -= Math.sin((Math.PI * (angle/180))) * next.getLength();
                     currentY += Math.cos((Math.PI * (angle/180))) * next.getLength();
-                    
-                    
                 }     
-                
                 next = next.getNextSegment();
             }
         }
