@@ -135,7 +135,7 @@ public class Simulation {
                 try {
                     Thread.sleep(100);
                     simulateOneStep();
-                    ui.updateGUI(); // more precisely invoke the repaint() method
+                    ui.updateGUI(); 
                 } catch (InterruptedException ie) {
                     ie.printStackTrace();
                 }
