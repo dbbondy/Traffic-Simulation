@@ -77,7 +77,6 @@ public class SimulationPanel extends JPanel {
         
         graphics.setColor(Color.GRAY);   
         
-        graphics.fillRect(50, 50, 3, 3);
         
         for (Lane lane : lanes) {
             // the rendering is from top/bottom left not from center
@@ -105,6 +104,7 @@ public class SimulationPanel extends JPanel {
                     
                     currentX -= Math.sin((Math.PI * (angle/180))) * next.getLength();
                     currentY += Math.cos((Math.PI * (angle/180))) * next.getLength();
+                    
                     
                 }     
                 

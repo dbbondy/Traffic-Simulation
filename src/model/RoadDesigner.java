@@ -1,4 +1,3 @@
-
 package model;
 
 import exceptions.SegmentCollectionEmptyException;
@@ -20,12 +19,12 @@ public class RoadDesigner {
             throw new IllegalArgumentException("You cannot enter a number of 0 or less");
         }
         Segment[] segments;
-        
+
         segments = buildSection(lengthOfSection, 0, lane);
         return segments;
     }
 
-    public static Segment[] buildLeftTurn(int lengthOfSection, Lane lane, boolean isClockwise) throws IllegalArgumentException{
+    public static Segment[] buildLeftTurn(int lengthOfSection, Lane lane, boolean isClockwise) throws IllegalArgumentException {
         if (lengthOfSection < 1) {
             throw new IllegalArgumentException("You cannot enter a number of 0 or less");
         }
@@ -33,41 +32,41 @@ public class RoadDesigner {
         if (isClockwise == true) {
             segments = buildSection(lengthOfSection, -5, lane);
             return segments;
-        } else{
-           segments = buildSection(lengthOfSection, 5, lane);
-           return segments;
+        } else {
+            segments = buildSection(lengthOfSection, 5, lane);
+            return segments;
         }
     }
-    
-    private static Segment[] buildSection(int numOfSections, int angle, Lane l){
-         Segment[] segments;
+
+    private static Segment[] buildSection(int numOfSections, int angle, Lane l) {
+        Segment[] segments;
         if (numOfSections == 1) {
-                segments = new Segment[1];
-                segments[0] = new Segment(l, lengthOfSegment, angle);
+            segments = new Segment[1];
+            segments[0] = new Segment(l, lengthOfSegment, angle);
 
-            } else {
-                segments = new Segment[numOfSections];
-                for (int i = 0; i < numOfSections; i++) {
-
-                    segments[i] = new Segment(l, lengthOfSegment, angle);
-                    if (i == 0) {
-                        segments[i].setNextSegment(segments[i + 1]);
-                        continue;
-                    }
-                    if (i == numOfSections - 1) {
-                        segments[i].setPreviousSegment(segments[i - 1]);
-                        break;
-                    }
-
-                    segments[i].setNextSegment(segments[i + 1]);
-                    segments[i].setPreviousSegment(segments[i - 1]);
-                }
+        } else {
+            segments = new Segment[numOfSections];
+            for (int i = 0; i < numOfSections; i++) {
+                segments[i] = new Segment(l, lengthOfSegment, angle);
             }
-            return segments;
+            for (int i = 0; i < numOfSections; i++) {
+                if (i == 0) {
+                    segments[i].setNextSegment(segments[i + 1]);
+                    continue;
+                }
+                if (i == numOfSections - 1) {
+                    segments[i].setPreviousSegment(segments[i - 1]);
+                    break;
+                }
+
+                segments[i].setNextSegment(segments[i + 1]);
+                segments[i].setPreviousSegment(segments[i - 1]);
+            }
+        }
+        return segments;
     }
-    
-    
-    public static Segment[] buildRightTurn(int lengthOfSection, Lane lane, boolean isClockwise)throws IllegalArgumentException{
+
+    public static Segment[] buildRightTurn(int lengthOfSection, Lane lane, boolean isClockwise) throws IllegalArgumentException {
         if (lengthOfSection < 1) {
             throw new IllegalArgumentException("You cannot enter a number of 0 or less");
         }
@@ -75,13 +74,11 @@ public class RoadDesigner {
         if (isClockwise == true) {
             segments = buildSection(lengthOfSection, 5, lane);
             return segments;
-        } else{
-           segments = buildSection(lengthOfSection, -5, lane);
-           return segments;
+        } else {
+            segments = buildSection(lengthOfSection, -5, lane);
+            return segments;
         }
     }
-    
-    
 
     public void setUpConnectionsAdjacent(Segment[] firstSet, Segment[] secondSet) throws SegmentCollectionEmptyException {
 

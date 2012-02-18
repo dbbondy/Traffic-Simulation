@@ -51,11 +51,11 @@ public class TwoLaneJunction extends Junction{
         upUpwardsLane = new Lane(0, 0, 0);
         upUpwardsLane2 = new Lane(0, 0, 0);
         
-        Lane test = new Lane(50, 200, 270);
+        Lane test = new Lane(50, 200, 0);
         registerLane(test);
         test.add(RoadDesigner.getStraight(5, test));
-        // Vehicle v1 = new Car(test, test.getFirstSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment()); 
-       // test.addVehicle(v1);
+        //Vehicle v1 = new Car(test, test.getFirstSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment().getNextSegment()); 
+        //test.addVehicle(v1);
         //registerLane(new Lane(300, 400, 180));
         
        // registerAllLanes();
