@@ -26,7 +26,7 @@ public class Simulation {
     private static SimulationThread simulationThread;
 
     public Simulation() {
-        settings = new HashMap<String, Object>();
+        settings = new HashMap<>();
         settings.put(DENSITY, 0);
         settings.put(AGGRESSION, 0);
         settings.put(CAR_RATIO, 0);
