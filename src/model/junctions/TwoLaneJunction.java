@@ -37,10 +37,10 @@ public class TwoLaneJunction extends Junction{
 
     public TwoLaneJunction() {
         bottomUpwardsLane = new Lane(400, 700, 180);
-        /*bottomUpwardsLane2 = new Lane(355, 700, 180);
+        bottomUpwardsLane2 = new Lane(355, 700, 180);
         bottomDownwardsLane = new Lane(320, 400, 0);
         bottomDownwardsLane2 = new Lane(285, 400, 0);
-        leftRightwardsLane = new Lane(0, 0, 0);
+        /*leftRightwardsLane = new Lane(0, 0, 0);
         leftRightwardsLane2 = new Lane(0, 0, 0);
         leftLeftwardsLane = new Lane(0, 0, 0);
         leftLeftwardsLane2 = new Lane(0, 0, 0);
@@ -56,7 +56,7 @@ public class TwoLaneJunction extends Junction{
         setUpLanes();
         registerAllLanes();
         
-        /*Vehicle v1 = new Car(bottomUpwardsLane, bottomUpwardsLane.getFirstSegment());
+        Vehicle v1 = new Car(bottomUpwardsLane, bottomUpwardsLane.getFirstSegment());
         Vehicle v2 = new Car(bottomUpwardsLane2, bottomUpwardsLane2.getFirstSegment());
         Vehicle v3 = new Car(bottomDownwardsLane, bottomDownwardsLane.getFirstSegment());
         Vehicle v4 = new Car(bottomDownwardsLane2, bottomDownwardsLane2.getFirstSegment());
@@ -64,27 +64,27 @@ public class TwoLaneJunction extends Junction{
         bottomUpwardsLane2.addVehicle(v2);
         bottomDownwardsLane.addVehicle(v3);
         bottomDownwardsLane2.addVehicle(v4);
-        */
+        
         //registerAllLanes();
         //TODO once a car is on the screen, change these (0,0) coords to be correct. JUST A TEMPORARY MEASURE AT THE MOMENT.      
     }
     
     private void setUpLanes(){
         bottomUpwardsLane.add(RoadDesigner.getStraight(150, bottomUpwardsLane));
-        bottomUpwardsLane.add(RoadDesigner.buildLeftTurn(100, bottomUpwardsLane, true));
-       /* bottomUpwardsLane2.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));
+        //bottomUpwardsLane.add(RoadDesigner.buildLeftTurn(100, bottomUpwardsLane, true));
+        bottomUpwardsLane2.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));
         bottomDownwardsLane.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));
-        bottomDownwardsLane2.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));*/
+        bottomDownwardsLane2.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));
     }
     
     
     
     private void registerAllLanes(){
         registerLane(bottomUpwardsLane);
-        /*registerLane(bottomUpwardsLane2);
+        registerLane(bottomUpwardsLane2);
         registerLane(bottomDownwardsLane);
         registerLane(bottomDownwardsLane2);
-        registerLane(leftRightwardsLane);
+        /*registerLane(leftRightwardsLane);
         registerLane(leftRightwardsLane2);
         registerLane(leftLeftwardsLane);
         registerLane(leftLeftwardsLane2);
@@ -109,10 +109,10 @@ public class TwoLaneJunction extends Junction{
     @Override
     public void manageJunction(){
         //deal with cars at ends of junctions and either put them into new lanes, or remove them from the simulation altogether
-       /* bottomUpwardsLane.updateVehicles();
+        bottomUpwardsLane.updateVehicles();
         bottomUpwardsLane2.updateVehicles();
         bottomDownwardsLane.updateVehicles();
-        bottomDownwardsLane2.updateVehicles();*/
+        bottomDownwardsLane2.updateVehicles();
     }
     
     

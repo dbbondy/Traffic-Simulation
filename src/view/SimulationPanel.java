@@ -75,15 +75,17 @@ public class SimulationPanel extends JPanel {
             currentY = lane.getYStart();
             angle = lane.getInitialAngle();
             
+            
+            
             Segment next = lane.getFirstSegment();
             
             while (next != null) { // while more segments
                 
                 // draw an angle segment
                 if (next.getAngle() != 0) {
-                    graphics.rotate(next.getAngle(), currentX, currentY);
+                   /* graphics.rotate(next.getAngle(), currentX, currentY);
                     graphics.fillRect(WIDTH, WIDTH, WIDTH, WIDTH);
-                    
+                    */
                 // draw a straight segment
                 } else {
                     graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
