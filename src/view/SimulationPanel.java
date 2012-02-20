@@ -81,6 +81,8 @@ public class SimulationPanel extends JPanel {
                 
                 // draw an angle segment
                 if (next.getAngle() != 0) {
+                    graphics.rotate(next.getAngle(), currentX, currentY);
+                    graphics.fillRect(WIDTH, WIDTH, WIDTH, WIDTH);
                     
                 // draw a straight segment
                 } else {

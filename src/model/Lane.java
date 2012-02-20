@@ -18,13 +18,14 @@ public class Lane {
 
     private int xCoord;
     private int yCoord;
-    private Segment[] laneSegments; 
+    private ArrayList<Segment> laneSegments; 
     
     private int initialAngle;
     
     private ArrayList<Vehicle> vehicles;
     
     public Lane(int xCoord, int yCoord, int initialAngle) {
+        laneSegments = new ArrayList<>(32);
         vehicles = new ArrayList<>(32); 
         this.xCoord = xCoord;
         this.yCoord = yCoord;
@@ -36,11 +37,11 @@ public class Lane {
     }
         
     public Segment getFirstSegment() {
-        return laneSegments[0];
+        return laneSegments.get(0);
     }
     
     public Segment getLastSegment(){
-        return laneSegments[laneSegments.length - 1];
+        return laneSegments.get(laneSegments.size()-1);
     }
     
     public int findSegmentPosition(Vehicle vehicle){
@@ -54,41 +55,15 @@ public class Lane {
         return index;
     }
     
-    // 
-    //    3 ZxZ straight bits
-    //    1 30 degree left
-    //    1 30 degree left
-    //    1 45 degree right
-    //    3 ZvZ straight bits
-    //    
-    //    // build10Xsegments(x)
-    //
-    //
-    
     public ArrayList<Vehicle> getVehicles(){
+        
         return vehicles;
     }
     
-    public void add(Segment[] segments){
-        if(laneSegments == null){
-            laneSegments = new Segment[segments.length];
-            for(int i = 0; i < segments.length; i++) 
-                laneSegments[i] = segments[i];
-            return;
+    public void add(Segment[] segment){
+        for(int i = 0; i < segment.length; i++){
+            laneSegments.add(segment[i]);
         }
-        int originArrSize = laneSegments.length;
-        int sArrSize = segments.length;
-        Segment[] newLaneSegments = new Segment[originArrSize + sArrSize];
-        for(int i = 0; i < originArrSize; i++)
-            newLaneSegments[i] = laneSegments[i];
-        for(int i = originArrSize + 1; i < newLaneSegments.length; i++)
-            newLaneSegments[i] = segments[i];
-        
-        newLaneSegments[originArrSize].setNextSegment(newLaneSegments[originArrSize+1]); //linking end to start
-        newLaneSegments[originArrSize+1].setPreviousSegment(newLaneSegments[originArrSize]);
-        
-        laneSegments = newLaneSegments;
-        
     }
     
     public Vehicle getVehicleAhead(Segment segment) {
