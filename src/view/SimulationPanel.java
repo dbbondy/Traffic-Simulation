@@ -78,14 +78,26 @@ public class SimulationPanel extends JPanel {
             
             
             Segment next = lane.getFirstSegment();
-            
+            int x = 0;
             while (next != null) { // while more segments
+                System.out.println(x++);
+                if(next.getAngle() == 5 || next.getAngle() == -5){
+                    System.out.println("it has an angle");
+                }
                 
                 // draw an angle segment
                 if (next.getAngle() != 0) {
-                   /* graphics.rotate(next.getAngle(), currentX, currentY);
-                    graphics.fillRect(WIDTH, WIDTH, WIDTH, WIDTH);
-                    */
+                    graphics.rotate(next.getAngle(), currentX, currentY);
+                    graphics.fillArc((int)(currentX),(int)(currentY - (next.getLength()/2)) , Segment.WIDTH, next.getLength(), next.getAngle(), next.getAngle());
+                    graphics.rotate(-(next.getAngle()), currentX, currentY);
+                    
+                    next.setRenderX(currentX);
+                    next.setRenderY(currentY);
+                    next.setRenderAngle(angle);
+                    
+                    currentX -= (Math.sin(5) * next.getLength());
+                    currentY -= (Math.cos(5) * next.getLength());
+                    
                 // draw a straight segment
                 } else {
                     graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
