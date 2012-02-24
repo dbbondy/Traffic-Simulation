@@ -24,16 +24,16 @@ public class RoadDesigner {
         return segments;
     }
 
-    public static Segment[] buildLeftTurn(int lengthOfSection, Lane lane, boolean isClockwise) throws IllegalArgumentException {
+    public static Segment[] buildTurn(int lengthOfSection, Lane lane, boolean isClockwise) throws IllegalArgumentException {
         if (lengthOfSection < 1) {
             throw new IllegalArgumentException("You cannot enter a number of 0 or less");
         }
         Segment[] segments;
         if (isClockwise == true) {
-            segments = buildSection(lengthOfSection, -5, lane);
+            segments = buildSection(lengthOfSection, 5, lane);
             return segments;
         } else {
-            segments = buildSection(lengthOfSection, 5, lane);
+            segments = buildSection(lengthOfSection, -5, lane);
             return segments;
         }
     }
@@ -65,21 +65,7 @@ public class RoadDesigner {
         }
         return segments;
     }
-
-    public static Segment[] buildRightTurn(int lengthOfSection, Lane lane, boolean isClockwise) throws IllegalArgumentException {
-        if (lengthOfSection < 1) {
-            throw new IllegalArgumentException("You cannot enter a number of 0 or less");
-        }
-        Segment[] segments;
-        if (isClockwise == true) {
-            segments = buildSection(lengthOfSection, 5, lane);
-            return segments;
-        } else {
-            segments = buildSection(lengthOfSection, -5, lane);
-            return segments;
-        }
-    }
-
+    
     public void setUpConnectionsAdjacent(Segment[] firstSet, Segment[] secondSet) throws SegmentCollectionEmptyException {
 
         if (firstSet.length == 0 || secondSet.length == 0) {

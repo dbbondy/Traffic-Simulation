@@ -71,7 +71,8 @@ public class TwoLaneJunction extends Junction{
     
     private void setUpLanes(){
         bottomUpwardsLane.add(RoadDesigner.getStraight(150, bottomUpwardsLane));
-        bottomUpwardsLane.add(RoadDesigner.buildLeftTurn(100, bottomUpwardsLane, true));
+        bottomUpwardsLane.add(RoadDesigner.buildTurn(30, bottomUpwardsLane, true));
+        bottomUpwardsLane.add(RoadDesigner.getStraight(30, bottomUpwardsLane));
         /*bottomUpwardsLane2.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));
         bottomDownwardsLane.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));
         bottomDownwardsLane2.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));*/

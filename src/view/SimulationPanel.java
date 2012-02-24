@@ -5,10 +5,7 @@
 package view;
 
 import controller.Simulation;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -66,6 +63,10 @@ public class SimulationPanel extends JPanel {
         double angle;
         double currentX, currentY;
         
+        graphics.setRenderingHint(
+            RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_OFF);
+        
         graphics.setColor(Color.GRAY);   
         
         
@@ -75,38 +76,49 @@ public class SimulationPanel extends JPanel {
             currentY = lane.getYStart();
             angle = lane.getInitialAngle();
             
-            
+            boolean cornerLast = false;
             
             Segment next = lane.getFirstSegment();
             int x = 0;
             while (next != null) { // while more segments
-                System.out.println(x++);
-                if(next.getAngle() == 5 || next.getAngle() == -5){
-                    System.out.println("it has an angle");
-                }
+                
+                next.setRenderX(currentX);
+                next.setRenderY(currentY);
+                next.setRenderAngle(angle);
                 
                 // draw an angle segment
                 if (next.getAngle() != 0) {
-                    graphics.rotate(next.getAngle(), currentX, currentY);
-                    graphics.fillArc((int)(currentX),(int)(currentY - (next.getLength()/2)) , Segment.WIDTH, next.getLength(), next.getAngle(), next.getAngle());
-                    graphics.rotate(-(next.getAngle()), currentX, currentY);
                     
-                    next.setRenderX(currentX);
-                    next.setRenderY(currentY);
-                    next.setRenderAngle(angle);
+                    graphics.setColor(Color.DARK_GRAY);
                     
-                    currentX -= (Math.sin(5) * next.getLength());
-                    currentY -= (Math.cos(5) * next.getLength());
+                    if (next.getAngle() > 0) {
+                        graphics.fillArc((int) (currentX - (Segment.WIDTH / 2)), (int) (currentY - Segment.WIDTH), 
+                            Segment.WIDTH*2, Segment.WIDTH*2, (int) -angle, -next.getAngle());
+                        angle += next.getAngle();
+                    } else {
+                        graphics.fillArc((int) (currentX - (Segment.WIDTH * 1.5)), (int) (currentY - Segment.WIDTH), 
+                            Segment.WIDTH*2, Segment.WIDTH*2, 180 + (int) -angle, -next.getAngle());
+                        angle += next.getAngle();
+                    }
+                    
+                    cornerLast = true;
                     
                 // draw a straight segment
                 } else {
+                    
+                    if (cornerLast) {
+                        // currentX = currentX + (Segment.WIDTH * Math.cos(90 - ((next.getAngle() + angle) % 360)));
+                        // currentY = currentY + (Segment.WIDTH * Math.sin(90 - ((next.getAngle() + angle) % 360)));
+                        graphics.setColor(Color.red);
+                        graphics.fillRect((int) currentX - 1, (int) currentY - 1, 3, 3);
+                        cornerLast = false;
+                    }
+                    
+                    graphics.setColor(Color.gray);
+                    
                     graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
                     graphics.fillRect((int) (currentX - (Segment.WIDTH / 2)), (int) (currentY), Segment.WIDTH, next.getLength());
                     graphics.rotate(-(Math.PI * (angle/180)), currentX, currentY);
-                    
-                    next.setRenderX(currentX);
-                    next.setRenderY(currentY);
-                    next.setRenderAngle(angle);
                     
                     currentX -= Math.sin((Math.PI * (angle/180))) * next.getLength();
                     currentY += Math.cos((Math.PI * (angle/180))) * next.getLength();
