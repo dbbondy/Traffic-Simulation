@@ -43,87 +43,132 @@ public class SimulationPanel extends JPanel {
                 Segment head = v.getHeadSegment();
                 double currentX = head.getRenderX();
                 double currentY = head.getRenderY();
-                double angle = head.getRenderAngle();
+                int angle = head.getRenderAngle();                
                 
-                
-                graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
+                graphics.rotate((Math.PI * (angle/180.0)), currentX, currentY);
                 graphics.fillRect((int) currentX - 13, (int) currentY - 46, 26, 46);
-                graphics.rotate(-(Math.PI * (angle/180)), currentX, currentY);
+                graphics.rotate(-(Math.PI * (angle/180.0)), currentX, currentY);
                 
             }
         }
     }
 
+    private void renderStraightToImage(Graphics2D graphics, int angle, double x, double y, int length) {
+        // convert the angle to radians
+        double angleRadians = Math.PI * (angle/180.0);
+        int width = Segment.WIDTH;
+        int startX = (int) (x - (width / 2));
+        int startY = (int) (y);
+        graphics.rotate(angleRadians, x, y);
+        graphics.fillRect(startX, startY, width, length);
+        graphics.rotate(-angleRadians, x, y);
+    }
+    
+    private void renderCornerToImage(Graphics2D graphics, int angle, double x, double y, int cornerAngle) {
+        
+        // convert the angle to radians
+        double angleRadians = Math.PI * (angle/180.0);          
+        double centerX;
+        double centerY;
+        
+        if (cornerAngle >= 0) {
+            centerX = x - Math.cos(angleRadians) * (Segment.WIDTH / 2);
+            centerY = y - Math.sin(angleRadians) * (Segment.WIDTH / 2);
+        } else {
+            centerX = x + Math.cos(angleRadians) * (Segment.WIDTH / 2);
+            centerY = y + Math.sin(angleRadians) * (Segment.WIDTH / 2);
+        }
+        
+        int startX = (int) centerX - Segment.WIDTH;
+        int startY = (int) centerY - Segment.WIDTH;
+        int boxSize = Segment.WIDTH * 2;
+        int startAngle = (-angle) - 90;
+        
+        graphics.setColor(Color.DARK_GRAY); 
+        graphics.fillArc(startX, startY, boxSize, boxSize, startAngle, cornerAngle);
+    }
+    
     private void renderToImage() {
+        
         image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         // create a graphics object from the buffered image object
         Graphics2D graphics = image.createGraphics();
         ArrayList<Lane> lanes = currentJunction.getLanes();         
         
-        double angle;
+        int angle;
         double currentX, currentY;
         
         graphics.setRenderingHint(
             RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_OFF);
+            RenderingHints.VALUE_ANTIALIAS_ON);
         
         graphics.setColor(Color.GRAY);   
         
-        
         for (Lane lane : lanes) {
-            // the rendering is from top/bottom left not from center
+            
             currentX = lane.getXStart(); 
             currentY = lane.getYStart();
             angle = lane.getInitialAngle();
             
-            boolean cornerLast = false;
-            
             Segment next = lane.getFirstSegment();
-            int x = 0;
-            while (next != null) { // while more segments
+            boolean currentTypeStraight;
+            boolean positiveAngle;
+            
+            int concatValue = 0;            
+            
+            if (next.getAngle() == 0) {
+                currentTypeStraight = true;
+                concatValue = next.getLength();
+                positiveAngle = true;
+            } else {
+                currentTypeStraight = false;
+                positiveAngle = next.getAngle() >= 0;
+                concatValue = next.getAngle();
+            }
+                    
+            while ((next = next.getNextSegment()) != null) { // while more segments
                 
-                next.setRenderX(currentX);
-                next.setRenderY(currentY);
-                next.setRenderAngle(angle);
+                // we need to render the corner as we are now moving to straight
+                if (next.getAngle() == 0 && !currentTypeStraight) {
+                    renderCornerToImage(graphics, angle, currentX, currentY, concatValue);
+                    // currentX = 
+                    // currentY = 
+                    concatValue = next.getLength();
+                    return;
+                }
                 
-                // draw an angle segment
-                if (next.getAngle() != 0) {
-                    
-                    graphics.setColor(Color.DARK_GRAY);
-                    
-                    if (next.getAngle() > 0) {
-                        graphics.fillArc((int) (currentX - (Segment.WIDTH / 2)), (int) (currentY - Segment.WIDTH), 
-                            Segment.WIDTH*2, Segment.WIDTH*2, (int) -angle, -next.getAngle());
-                        angle += next.getAngle();
-                    } else {
-                        graphics.fillArc((int) (currentX - (Segment.WIDTH * 1.5)), (int) (currentY - Segment.WIDTH), 
-                            Segment.WIDTH*2, Segment.WIDTH*2, 180 + (int) -angle, -next.getAngle());
-                        angle += next.getAngle();
-                    }
-                    
-                    cornerLast = true;
-                    
-                // draw a straight segment
-                } else {
-                    
-                    if (cornerLast) {
-                        // currentX = currentX + (Segment.WIDTH * Math.cos(90 - ((next.getAngle() + angle) % 360)));
-                        // currentY = currentY + (Segment.WIDTH * Math.sin(90 - ((next.getAngle() + angle) % 360)));
-                        graphics.setColor(Color.red);
-                        graphics.fillRect((int) currentX - 1, (int) currentY - 1, 3, 3);
-                        cornerLast = false;
-                    }
-                    
-                    graphics.setColor(Color.gray);
-                    
-                    graphics.rotate((Math.PI * (angle/180)), currentX, currentY);
-                    graphics.fillRect((int) (currentX - (Segment.WIDTH / 2)), (int) (currentY), Segment.WIDTH, next.getLength());
-                    graphics.rotate(-(Math.PI * (angle/180)), currentX, currentY);
-                    
-                    currentX -= Math.sin((Math.PI * (angle/180))) * next.getLength();
-                    currentY += Math.cos((Math.PI * (angle/180))) * next.getLength();
-                }     
-                next = next.getNextSegment();
+                // we need to render the straight as we are now moving to corner
+                if (next.getAngle() != 0 && currentTypeStraight) {
+                    renderStraightToImage(graphics, angle, currentX, currentY, concatValue); 
+                    currentX -= Math.sin((Math.PI * (angle/180.0))) * concatValue;
+                    currentY += Math.cos((Math.PI * (angle/180.0))) * concatValue;
+                    concatValue = next.getAngle();
+                    currentTypeStraight = false;
+                    continue;
+                }
+                
+                // we need to do another corner because we changed from
+                // clockwise to anti-clockwise or the reverse
+                if (next.getAngle() != 0 && next.getAngle() >= 0 != positiveAngle) {
+                    renderCornerToImage(graphics, angle, currentX, currentY, concatValue);
+                    // currentX = 
+                    // currentY = 
+                    concatValue = next.getAngle();
+                    continue;
+                }
+                
+                if (next.getAngle() == 0 && currentTypeStraight) {
+                    concatValue += next.getLength();
+                    continue;
+                }
+                
+                if (next.getAngle() != 0 && !currentTypeStraight) {
+                    concatValue += next.getAngle();
+                    currentTypeStraight = false;
+                    positiveAngle = next.getAngle() >= 0;
+                    continue;
+                }
+                
             }
         }
 

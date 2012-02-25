@@ -36,7 +36,7 @@ public class TwoLaneJunction extends Junction{
     
 
     public TwoLaneJunction() {
-        bottomUpwardsLane = new Lane(400, 700, 180);
+        bottomUpwardsLane = new Lane(400, 100, 30);
        /* bottomUpwardsLane2 = new Lane(355, 700, 180);
         bottomDownwardsLane = new Lane(320, 400, 0);
         bottomDownwardsLane2 = new Lane(285, 400, 0);
@@ -71,7 +71,9 @@ public class TwoLaneJunction extends Junction{
     
     private void setUpLanes(){
         bottomUpwardsLane.add(RoadDesigner.getStraight(150, bottomUpwardsLane));
-        bottomUpwardsLane.add(RoadDesigner.buildTurn(30, bottomUpwardsLane, true));
+        bottomUpwardsLane.add(RoadDesigner.buildTurn(18, bottomUpwardsLane, true));
+        bottomUpwardsLane.add(RoadDesigner.getStraight(30, bottomUpwardsLane));
+        bottomUpwardsLane.add(RoadDesigner.buildTurn(2, bottomUpwardsLane, false));
         bottomUpwardsLane.add(RoadDesigner.getStraight(30, bottomUpwardsLane));
         /*bottomUpwardsLane2.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));
         bottomDownwardsLane.add(RoadDesigner.getStraight(150, bottomUpwardsLane2));

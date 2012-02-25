@@ -22,7 +22,7 @@ public class Segment {
     private int id;
     private double renderX; // known after rendering
     private double renderY; // known after rendering
-    private double renderAngle;
+    private int renderAngle;
 
     public Segment(Lane lane, int length, int angle){
         this.length = length;
@@ -32,11 +32,11 @@ public class Segment {
         connectedSegments = new ArrayList<Segment>();
     }
 
-    public double getRenderAngle() {
+    public int getRenderAngle() {
         return renderAngle;
     }
 
-    public void setRenderAngle(double renderAngle) {
+    public void setRenderAngle(int renderAngle) {
         this.renderAngle = renderAngle;
     }
 
