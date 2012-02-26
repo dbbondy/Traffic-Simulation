@@ -8,8 +8,6 @@ import exceptions.SegmentCollectionEmptyException;
  */
 public class RoadDesigner {
 
-    private static int lengthOfSegment = 2; //result of calculation 
-
     public RoadDesigner() {
     }
 
@@ -24,10 +22,9 @@ public class RoadDesigner {
         return segments;
     }
 
-    public static Segment[] buildTurn(int lengthOfSection, Lane lane, boolean isClockwise) throws IllegalArgumentException {
-        if (lengthOfSection < 1) {
-            throw new IllegalArgumentException("You cannot enter a number of 0 or less");
-        }
+    public static Segment[] buildTurn(int angle, Lane lane) throws IllegalArgumentException {
+        boolean isClockwise = angle > 0;
+        int lengthOfSection = Math.abs(angle) / 5;
         Segment[] segments;
         if (isClockwise == true) {
             segments = buildSection(lengthOfSection, 5, lane);
@@ -42,12 +39,12 @@ public class RoadDesigner {
         Segment[] segments;
         if (numOfSections == 1) {
             segments = new Segment[1];
-            segments[0] = new Segment(l, lengthOfSegment, angle);
+            segments[0] = new Segment(l, Segment.LENGTH, angle);
 
         } else {
             segments = new Segment[numOfSections];
             for (int i = 0; i < numOfSections; i++) {
-                segments[i] = new Segment(l, lengthOfSegment, angle);
+                segments[i] = new Segment(l, Segment.LENGTH, angle);
             }
             for (int i = 0; i < numOfSections; i++) {
                 if (i == 0) {

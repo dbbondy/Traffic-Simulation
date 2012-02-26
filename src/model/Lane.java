@@ -27,6 +27,10 @@ public class Lane {
         this.yCoord = yCoord;
         this.initialAngle = initialAngle;
     }
+    
+    public ArrayList<Segment> getLaneSegments() {
+        return this.laneSegments;
+    }
 
     public int getInitialAngle() {
         return this.initialAngle;

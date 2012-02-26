@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +14,7 @@ public class Segment {
     private int length;
     private int angle;
     public static final int WIDTH = 46;
+    public static final int LENGTH = 2;
     private Segment next;
     private Segment previous;
     private List<Segment> connectedSegments;
@@ -20,9 +22,6 @@ public class Segment {
     private ConnectionType connType;
     private static int segmentCounter = 0;
     private int id;
-    private double renderX; // known after rendering
-    private double renderY; // known after rendering
-    private int renderAngle;
 
     public Segment(Lane lane, int length, int angle){
         this.length = length;
@@ -30,30 +29,6 @@ public class Segment {
         this.lane = lane;
         this.id = segmentCounter++;
         connectedSegments = new ArrayList<Segment>();
-    }
-
-    public int getRenderAngle() {
-        return renderAngle;
-    }
-
-    public void setRenderAngle(int renderAngle) {
-        this.renderAngle = renderAngle;
-    }
-
-    public double getRenderX() {
-        return renderX;
-    }
-
-    public void setRenderX(double renderX) {
-        this.renderX = renderX;
-    }
-
-    public double getRenderY() {
-        return renderY;
-    }
-
-    public void setRenderY(double renderY) {
-        this.renderY = renderY;
     }
     
     public int id() {

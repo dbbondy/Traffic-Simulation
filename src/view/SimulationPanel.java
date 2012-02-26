@@ -6,6 +6,8 @@ package view;
 
 import controller.Simulation;
 import java.awt.*;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -41,14 +43,12 @@ public class SimulationPanel extends JPanel {
         for(Lane l : lanes){
             for(Vehicle v : l.getVehicles()){
                 Segment head = v.getHeadSegment();
-                double currentX = head.getRenderX();
-                double currentY = head.getRenderY();
-                int angle = head.getRenderAngle();                
-                
-                graphics.rotate((Math.PI * (angle/180.0)), currentX, currentY);
-                graphics.fillRect((int) currentX - 13, (int) currentY - 46, 26, 46);
-                graphics.rotate(-(Math.PI * (angle/180.0)), currentX, currentY);
-                
+                ArrayList<Segment> laneSegments = l.getLaneSegments();
+                int startX = l.getXStart();
+                int startY = l.getYStart();
+                int endX = startX * (Segment.LENGTH * laneSegments.size());
+                int endY = startY * (Segment.LENGTH * laneSegments.size());
+                // TODO: this                
             }
         }
     }
@@ -57,14 +57,15 @@ public class SimulationPanel extends JPanel {
         // convert the angle to radians
         double angleRadians = Math.PI * (angle/180.0);
         int width = Segment.WIDTH;
-        int startX = (int) (x - (width / 2));
-        int startY = (int) (y);
+        double startX = (x - (width / 2));
+        double startY = (y);
         graphics.rotate(angleRadians, x, y);
-        graphics.fillRect(startX, startY, width, length);
+        Shape straight = new Rectangle2D.Double(startX, startY, width, length);
+        graphics.fill(straight);
         graphics.rotate(-angleRadians, x, y);
     }
     
-    private void renderCornerToImage(Graphics2D graphics, int angle, double x, double y, int cornerAngle) {
+    private double[] renderCornerToImage(Graphics2D graphics, int angle, double x, double y, int cornerAngle) {
         
         // convert the angle to radians
         double angleRadians = Math.PI * (angle/180.0);          
@@ -79,13 +80,24 @@ public class SimulationPanel extends JPanel {
             centerY = y + Math.sin(angleRadians) * (Segment.WIDTH / 2);
         }
         
-        int startX = (int) centerX - Segment.WIDTH;
-        int startY = (int) centerY - Segment.WIDTH;
+        double startX = centerX - Segment.WIDTH;
+        double startY = centerY - Segment.WIDTH;
         int boxSize = Segment.WIDTH * 2;
-        int startAngle = (-angle) - 90;
+        int startAngle = angle;
+        
+        if (cornerAngle < 0) {
+            startAngle += 180;
+        }
         
         graphics.setColor(Color.DARK_GRAY); 
-        graphics.fillArc(startX, startY, boxSize, boxSize, startAngle, cornerAngle);
+        Rectangle2D bounds = new Rectangle2D.Double(startX, startY, boxSize, boxSize);
+        Shape corner = new Arc2D.Double(bounds, -startAngle, -cornerAngle, Arc2D.Double.PIE);
+        graphics.fill(corner);
+        graphics.setColor(Color.GRAY); 
+        
+        // return the center co-ords so we can calculate
+        // the new currentX currentY outside 
+        return new double[] { centerX, centerY };       
     }
     
     private void renderToImage() {
@@ -111,6 +123,18 @@ public class SimulationPanel extends JPanel {
             angle = lane.getInitialAngle();
             
             Segment next = lane.getFirstSegment();
+            Segment last = lane.getLastSegment();
+            
+            // we create a "dummy" segment that is opposite 
+            // to the last segment (angle => straight, straight => angle)
+            // so that the code detects the change and renders
+            // everything up until that point. this allows
+            // us to avoid duplicating code outside the 
+            // while loop block.
+            int voidAngle = last.getAngle() == 0 ? 1 : 0;
+            Segment voidSegment = new Segment(lane, 0, voidAngle);
+            last.setNextSegment(voidSegment);
+            
             boolean currentTypeStraight;
             boolean positiveAngle;
             
@@ -119,7 +143,7 @@ public class SimulationPanel extends JPanel {
             if (next.getAngle() == 0) {
                 currentTypeStraight = true;
                 concatValue = next.getLength();
-                positiveAngle = true;
+                positiveAngle = next.getAngle() >= 0;
             } else {
                 currentTypeStraight = false;
                 positiveAngle = next.getAngle() >= 0;
@@ -128,32 +152,39 @@ public class SimulationPanel extends JPanel {
                     
             while ((next = next.getNextSegment()) != null) { // while more segments
                 
-                // we need to render the corner as we are now moving to straight
-                if (next.getAngle() == 0 && !currentTypeStraight) {
-                    renderCornerToImage(graphics, angle, currentX, currentY, concatValue);
-                    // currentX = 
-                    // currentY = 
-                    concatValue = next.getLength();
-                    return;
-                }
-                
                 // we need to render the straight as we are now moving to corner
                 if (next.getAngle() != 0 && currentTypeStraight) {
                     renderStraightToImage(graphics, angle, currentX, currentY, concatValue); 
+                    
+                    // startX = currentX,
+                    // startY = currentY,
+                    
+                    
                     currentX -= Math.sin((Math.PI * (angle/180.0))) * concatValue;
                     currentY += Math.cos((Math.PI * (angle/180.0))) * concatValue;
+                    
+                    // endX = currentX,
+                    // endY = currentY,
+                    
+                    // relative = (index/total)
+                    
                     concatValue = next.getAngle();
                     currentTypeStraight = false;
+                    positiveAngle = next.getAngle() >= 0;
                     continue;
                 }
                 
-                // we need to do another corner because we changed from
-                // clockwise to anti-clockwise or the reverse
-                if (next.getAngle() != 0 && next.getAngle() >= 0 != positiveAngle) {
-                    renderCornerToImage(graphics, angle, currentX, currentY, concatValue);
-                    // currentX = 
-                    // currentY = 
-                    concatValue = next.getAngle();
+                // we need to render the corner as we are now moving to straight or a corner in the opposite direction
+                if ((next.getAngle() == 0 && !currentTypeStraight) || next.getAngle() >= 0 != positiveAngle) {
+                    double[] center = renderCornerToImage(graphics, angle, currentX, currentY, concatValue);                    
+                    double za = 360 - (concatValue + (concatValue < 0 ? angle + 180 : angle));
+                    double zaRadians = (Math.PI * (za/180.0));
+                    currentX = center[0] + (Math.cos(zaRadians) * (Segment.WIDTH/2));
+                    currentY = center[1] - (Math.sin(zaRadians) * (Segment.WIDTH/2));
+                    angle += concatValue;
+                    concatValue = next.getLength();
+                    currentTypeStraight = next.getAngle() == 0;
+                    positiveAngle = next.getAngle() >= 0;
                     continue;
                 }
                 
@@ -164,8 +195,6 @@ public class SimulationPanel extends JPanel {
                 
                 if (next.getAngle() != 0 && !currentTypeStraight) {
                     concatValue += next.getAngle();
-                    currentTypeStraight = false;
-                    positiveAngle = next.getAngle() >= 0;
                     continue;
                 }
                 
