@@ -37,17 +37,20 @@ public class SimulationPanel extends JPanel {
         currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
     }
 
-    private void drawVehicles(Graphics g){
+    private void drawVehicles(Graphics g, int angle, double startX, double startY, double endX, double endY){
         Graphics2D graphics = (Graphics2D) g;
+        graphics.setColor(Color.red);
         ArrayList<Lane> lanes = currentJunction.getLanes();
         for(Lane l : lanes){
+            ArrayList<Segment> laneSegments = l.getLaneSegments();
             for(Vehicle v : l.getVehicles()){
                 Segment head = v.getHeadSegment();
-                ArrayList<Segment> laneSegments = l.getLaneSegments();
-                int startX = l.getXStart();
-                int startY = l.getYStart();
-                int endX = startX * (Segment.LENGTH * laneSegments.size());
-                int endY = startY * (Segment.LENGTH * laneSegments.size());
+                
+                double relativePos = (double)laneSegments.indexOf(head) / (double)laneSegments.size();
+                double vehicleX = (endX == startX ? startX : ((endX - startX) * relativePos)); //if road is vertically straight.
+                double vehicleY = (endY == startY ? startY : ((endY - startY) * relativePos)); //if road is horizontally straight
+               
+                graphics.fillRect((int)vehicleX,(int) vehicleY, Segment.WIDTH - 10, 10);
                 // TODO: this                
             }
         }
@@ -156,17 +159,16 @@ public class SimulationPanel extends JPanel {
                 if (next.getAngle() != 0 && currentTypeStraight) {
                     renderStraightToImage(graphics, angle, currentX, currentY, concatValue); 
                     
-                    // startX = currentX,
-                    // startY = currentY,
-                    
+                    double startX = currentX - (Segment.WIDTH / 2);
+                    double startY = currentY;
                     
                     currentX -= Math.sin((Math.PI * (angle/180.0))) * concatValue;
                     currentY += Math.cos((Math.PI * (angle/180.0))) * concatValue;
                     
-                    // endX = currentX,
-                    // endY = currentY,
+                    double endX = currentX - (Segment.WIDTH / 2);
+                    double endY = currentY;
                     
-                    // relative = (index/total)
+                    drawVehicles(graphics, angle, startX, startY, endX, endY);
                     
                     concatValue = next.getAngle();
                     currentTypeStraight = false;
@@ -219,6 +221,6 @@ public class SimulationPanel extends JPanel {
         
         // redraw the junction from the image cache
         graphics.drawImage(image, 0, 0, null);        
-        drawVehicles(graphics);
+        //drawVehicles(graphics);
     }
 }

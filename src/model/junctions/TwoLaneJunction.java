@@ -22,10 +22,7 @@ public class TwoLaneJunction extends Junction {
     public TwoLaneJunction() {        
         bottomUpwardsLane = new Lane(400, 0, 0);        
         bottomUpwardsLane.add(RoadDesigner.getStraight(100, bottomUpwardsLane));
-        bottomUpwardsLane.add(RoadDesigner.buildTurn(90, bottomUpwardsLane));    
-        bottomUpwardsLane.add(RoadDesigner.getStraight(100, bottomUpwardsLane));
-        bottomUpwardsLane.add(RoadDesigner.buildTurn(-90, bottomUpwardsLane));   
-        bottomUpwardsLane.add(RoadDesigner.getStraight(100, bottomUpwardsLane));
+        
         registerLane(bottomUpwardsLane);
         
         ArrayList<Segment> segments = bottomUpwardsLane.getLaneSegments();
