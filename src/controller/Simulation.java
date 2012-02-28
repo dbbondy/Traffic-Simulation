@@ -1,7 +1,11 @@
 package controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import model.Lane;
+import model.Segment;
+import model.Vehicle;
 import model.junctions.Junction;
 import view.SettingsWindow;
 import view.UserInterface;
@@ -20,12 +24,12 @@ public class Simulation {
     public static final String TIME_STEP = "time step";
     private static boolean paused;
     private static boolean started;
-    private SettingsWindow settingsWindow;
+    private static SettingsWindow settingsWindow;
     private static UserInterface ui;
     private static Map<String, Object> settings;
     private static SimulationThread simulationThread;
 
-    public Simulation() {
+    public static void init() {
         settings = new HashMap<>();
         settings.put(DENSITY, 0);
         settings.put(AGGRESSION, 0);
@@ -37,7 +41,6 @@ public class Simulation {
         started = false;
         simulationThread = new SimulationThread();
         settingsWindow = new SettingsWindow();
-
     }
 
     //how to create a proper MVC compliant instantiation
@@ -57,14 +60,16 @@ public class Simulation {
     }
 
     public static boolean isPaused() {
-
         return paused;
     }
 
     public static void Simulate() {
-        if (!simulationThread.isAlive()) {
-            simulationThread = new SimulationThread();
+        if (simulationThread != null) {
+            // tells the thread to terminate
+            simulationThread.terminate();
         }
+        // creates a new thread
+        simulationThread = new SimulationThread();
         simulationThread.start();
         //SimulationStats.publishStats();
     }
@@ -80,17 +85,33 @@ public class Simulation {
     }
 
     private static void simulateOneStep() {
-        //core simulation step progress.
-
         
-         Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
+        /*
+        //core simulation step progress.
+         //Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
          int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
          int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
         // junc.distributeNewCars(carsRatio, trucksRatio); 
          junc.manageJunction(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" 
          //junc.updateDeletions();
-         //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.
-         
+         //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.   
+         */
+        
+        
+        // test code
+        Junction currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
+        ArrayList<Lane> lanes = currentJunction.getLanes();
+        for(Lane l : lanes){
+            for(Vehicle v : l.getVehicles()){
+                Segment head = v.getHeadSegment();
+                if (head.getNextSegment() != null) {
+                    v.setHeadSegment(head.getNextSegment());
+                } else {
+                    v.setHeadSegment(l.getFirstSegment());
+                }
+            }
+        }
+        
         int currentStep = (Integer) getOption(TIME_STEP);
         currentStep++;
         setOption(TIME_STEP, currentStep);
@@ -114,15 +135,21 @@ public class Simulation {
         
     }
 
-    public static SimulationThread getPausedThread() {
+    public static SimulationThread getSimulationThread() {
         return simulationThread;
     }
 
     public static class SimulationThread extends Thread {
+        
+        private boolean terminate = false;
+        
+        public void terminate() {
+            this.terminate = true;
+        }
 
         @Override
         public void run() {
-            while (isStarted()) {
+            while (isStarted() && !terminate) {
                 synchronized (this) {
                     while (isPaused()) {
                         try {
@@ -133,7 +160,7 @@ public class Simulation {
                     }
                 }
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(30);
                     simulateOneStep();
                     ui.updateGUI(); 
                 } catch (InterruptedException ie) {

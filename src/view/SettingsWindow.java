@@ -211,8 +211,8 @@ public class SettingsWindow {
                 
                 determineJuncInit();
                 
-                synchronized(Simulation.getPausedThread()){ //notifying simulation thread that we are done with waiting.
-                    Simulation.getPausedThread().notify();
+                synchronized(Simulation.getSimulationThread()){ //notifying simulation thread that we are done with waiting.
+                    Simulation.getSimulationThread().notify();
                 }
                 
                 Simulation.settingsChanged();

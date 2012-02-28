@@ -53,7 +53,7 @@ public class SimulationPanel extends JPanel {
                 // so that it looks better going round corners. 
                 double startY = vehicleY - (v.getLength() - Segment.VEHICLE_HEAD_OFFSET);
                 graphics.setColor(v.getColor());
-                Shape rect = new RoundRectangle2D.Double(startX, startY, v.getWidth(), v.getLength(), 5, 5);
+                Shape rect = new RoundRectangle2D.Double(startX, startY, v.getWidth(), v.getLength(), 8, 8);
                 graphics.fill(rect);
                 graphics.rotate(-(Math.PI * (vehicleAngle / 180.0)), vehicleX, vehicleY);
             }
@@ -221,6 +221,10 @@ public class SimulationPanel extends JPanel {
                     currentX = center[0] + (Math.cos(zaRadians) * (Segment.WIDTH/2));
                     currentY = center[1] - (Math.sin(zaRadians) * (Segment.WIDTH/2));
                     
+                    next.setRenderX(currentX);
+                    next.setRenderY(currentY);
+                    next.setRenderAngle(angle);
+                    
                     angle += concatValue;
                     concatValue = next.getLength();
                     currentTypeStraight = next.getAngle() == 0;
@@ -242,7 +246,26 @@ public class SimulationPanel extends JPanel {
                 
                 // as above (for a corner)
                 if (next.getAngle() != 0 && !currentTypeStraight) {
-                    concatValue += next.getAngle();
+                    concatValue += next.getAngle();      
+                    double angleRadians = Math.PI * (angle/180.0);
+                    double centerX, centerY;
+                    
+                    if (concatValue >= 0) { // clockwise direction
+                        centerX = currentX - Math.cos(angleRadians) * (Segment.WIDTH / 2);
+                        centerY = currentY - Math.sin(angleRadians) * (Segment.WIDTH / 2);
+                    } else { // anti-clockwise direction
+                        centerX = currentX + Math.cos(angleRadians) * (Segment.WIDTH / 2);
+                        centerY = currentY + Math.sin(angleRadians) * (Segment.WIDTH / 2);
+                    }
+                    
+                    double za = 360 - (concatValue + (concatValue < 0 ? angle + 180 : angle));
+                    double zaRadians = (Math.PI * (za/180.0));
+                    double renderX = centerX + (Math.cos(zaRadians) * (Segment.WIDTH/2));
+                    double renderY = centerY - (Math.sin(zaRadians) * (Segment.WIDTH/2));
+                    int renderAngle = angle + concatValue;
+                    next.setRenderX(renderX);
+                    next.setRenderY(renderY);
+                    next.setRenderAngle(renderAngle);
                     continue;
                 }
                 
@@ -274,5 +297,7 @@ public class SimulationPanel extends JPanel {
         // redraw the junction from the image cache
         graphics.drawImage(image, 0, 0, null);        
         drawVehicles(graphics);
+        
+        System.out.println("a");
     }
 }
