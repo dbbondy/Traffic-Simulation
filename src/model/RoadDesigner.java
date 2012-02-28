@@ -1,6 +1,9 @@
 package model;
 
 import exceptions.SegmentCollectionEmptyException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -34,34 +37,32 @@ public class RoadDesigner {
             return segments;
         }
     }
+    
+    public static Segment[] buildLargeTurn(int angle, Lane lane, int spacing) throws IllegalArgumentException {
+        boolean isClockwise = angle > 0;
+        int lengthOfSection = Math.abs(angle) / 15;
+        ArrayList<Segment> segments = new ArrayList<>();
+        for (int i = 0; i < lengthOfSection; i++) {
+            Segment[] corner = buildSection(3, isClockwise ? 5 : -5, lane);
+            if (i > 0) segments.get(segments.size()-1).setNextSegment(corner[0]);
+            segments.addAll(Arrays.asList(corner));
+            if (i + 1 == lengthOfSection) break;
+            Segment[] straight = buildSection(spacing, 0, lane);
+            segments.get(segments.size()-1).setNextSegment(straight[0]);
+            segments.addAll(Arrays.asList(straight));
+        }
+        return segments.toArray(new Segment[] {});
+    }
 
     private static Segment[] buildSection(int numOfSections, int angle, Lane l) {
-        Segment[] segments;
-        if (numOfSections == 1) {
-            segments = new Segment[1];
-            segments[0] = new Segment(l, Segment.LENGTH, angle);
-
-        } else {
-            segments = new Segment[numOfSections];
-            for (int i = 0; i < numOfSections; i++) {
-                segments[i] = new Segment(l, Segment.LENGTH, angle);
-            }
-            for (int i = 0; i < numOfSections; i++) {
-                if (i == 0) {
-                    segments[i].setNextSegment(segments[i + 1]);
-                    continue;
-                }
-                if (i == numOfSections - 1) {
-                    segments[i].setPreviousSegment(segments[i - 1]);
-                    break;
-                }
-
-                segments[i].setNextSegment(segments[i + 1]);
-                segments[i].setPreviousSegment(segments[i - 1]);
-            }
+        Segment[] segments = new Segment[numOfSections];
+        for (int i = 0; i < numOfSections; i++) {
+            Segment seg = new Segment(l, Segment.LENGTH, angle);
+            if (i > 0) seg.setPreviousSegment(segments[i-1]);
+            segments[i] = seg;
         }
         return segments;
-    }
+    } 
     
     public void setUpConnectionsAdjacent(Segment[] firstSet, Segment[] secondSet) throws SegmentCollectionEmptyException {
 

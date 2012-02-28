@@ -4,14 +4,18 @@
  */
 package model;
 
+import java.awt.Color;
+
 /**
  *
  * @author Dan
  */
-public class GhostVehicle extends Vehicle{
+
+public class GhostVehicle extends Vehicle {
     
-    public GhostVehicle(Segment segment){
-        headSegment = segment;
+    public GhostVehicle(Lane lane, Segment segment) {
+        super(lane, segment, Color.BLACK);
+        setDimensions(0, 0);                
     }
 
     @Override

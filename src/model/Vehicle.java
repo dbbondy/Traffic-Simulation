@@ -1,16 +1,49 @@
 package model;
+
+import java.awt.Color;
+
 /**
  *
  * @author Daniel Bond
  */
 public abstract class Vehicle {
 
+    protected int width = 14;
+    protected int length = 22;
+    
+    protected Color color;
+    
     protected int currentSpeed;
     protected Segment headSegment;
-    protected static final int LENGTH_OF_VEHICLE = 3;
         
     protected Vehicle vehicleInFront;
     protected Vehicle vehicleBehind;
+    
+    protected Lane currentLane;
+    
+    protected void setDimensions(int w, int l) {
+        this.width = w;
+        this.length = l;
+    }
+    
+    public Vehicle(Lane lane, Segment segment, Color c) {
+        currentLane = lane;
+        headSegment = segment;
+        lane.addVehicle(this);
+        color = c;
+    }
+    
+    public int getWidth() {
+        return this.width;
+    }
+    
+    public int getLength() {
+        return this.length;
+    }
+    
+    public Color getColor() {
+        return this.color;
+    }
     
     public abstract void act();
 

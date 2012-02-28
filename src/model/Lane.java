@@ -65,21 +65,16 @@ public class Lane {
             Segment endSegment = laneSegments.get(laneSegments.size() - 1);
             laneSegments.addAll(Arrays.asList(segment));
             endSegment.setNextSegment(segment[0]);
-            segment[0].setPreviousSegment(endSegment);
         }else{
             laneSegments.addAll(Arrays.asList(segment));
         }
-
-
-
-
     }
 
     public Vehicle getVehicleAhead(Segment segment) {
         Comparator com = VehicleComparator.getInstance();
 
         // ghost vehicle represents imaginary vehicle positioned at the desired segment
-        Vehicle ghostVehicle = new GhostVehicle(segment);
+        Vehicle ghostVehicle = new GhostVehicle(this, segment);
         int index = Collections.binarySearch(vehicles, ghostVehicle, com);
 
         // when index returned is negative it represents the location the object would be inserted in but made negative to indicate that it wasn't found
@@ -98,7 +93,7 @@ public class Lane {
         Comparator com = VehicleComparator.getInstance();
 
         // ghost vehicle represents imaginary vehicle positioned at the desired segment
-        Vehicle ghostVehicle = new GhostVehicle(segment);
+        Vehicle ghostVehicle = new GhostVehicle(this, segment);
         int index = Collections.binarySearch(vehicles, ghostVehicle, com);
 
         // when index returned is negative it represents the location the object would be inserted in but made negative to indicate that it wasn't found
