@@ -45,13 +45,19 @@ public class SimulationPanel extends JPanel {
             ArrayList<Segment> laneSegments = l.getLaneSegments();
             for(Vehicle v : l.getVehicles()){
                 Segment head = v.getHeadSegment();
+                head.
                 
-                double relativePos = (double)laneSegments.indexOf(head) / (double)laneSegments.size();
-                double vehicleX = (endX == startX ? startX : ((endX - startX) * relativePos)); //if road is vertically straight.
-                double vehicleY = (endY == startY ? startY : ((endY - startY) * relativePos)); //if road is horizontally straight
-               
-                graphics.fillRect((int)vehicleX,(int) vehicleY, Segment.WIDTH - 10, 10);
-                // TODO: this                
+                
+                /* TODO: 1. do a road at an angle
+                    2. add corner bits in between straights
+                    the cars on straights
+                    after a corner
+                    are broken
+                    roads coming from the left, right, bottom
+                    are classed as angles
+                    the cars are in the right position
+                    but facing the wrong way*/
+              
             }
         }
     }

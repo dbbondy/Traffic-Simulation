@@ -20,7 +20,7 @@ public class TwoLaneJunction extends Junction {
     private Lane bottomUpwardsLane;  
 
     public TwoLaneJunction() {        
-        bottomUpwardsLane = new Lane(400, 0, 0);        
+        bottomUpwardsLane = new Lane(400, 0, 30);        
         bottomUpwardsLane.add(RoadDesigner.getStraight(100, bottomUpwardsLane));
         
         registerLane(bottomUpwardsLane);
