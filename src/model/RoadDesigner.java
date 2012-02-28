@@ -40,10 +40,10 @@ public class RoadDesigner {
     
     public static Segment[] buildLargeTurn(int angle, Lane lane, int spacing) throws IllegalArgumentException {
         boolean isClockwise = angle > 0;
-        int lengthOfSection = Math.abs(angle) / 15;
+        int lengthOfSection = Math.abs(angle) / 5;
         ArrayList<Segment> segments = new ArrayList<>();
         for (int i = 0; i < lengthOfSection; i++) {
-            Segment[] corner = buildSection(3, isClockwise ? 5 : -5, lane);
+            Segment[] corner = buildSection(1, isClockwise ? 5 : -5, lane);
             if (i > 0) segments.get(segments.size()-1).setNextSegment(corner[0]);
             segments.addAll(Arrays.asList(corner));
             if (i + 1 == lengthOfSection) break;

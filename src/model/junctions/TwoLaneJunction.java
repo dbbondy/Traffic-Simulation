@@ -18,20 +18,20 @@ public class TwoLaneJunction extends Junction {
     public TwoLaneJunction() {        
         Lane l1 = new Lane(400, 0, 0);        
         l1.add(RoadDesigner.getStraight(100, l1));
-        l1.add(RoadDesigner.buildLargeTurn(90, l1, 2));
+        l1.add(RoadDesigner.buildLargeTurn(90, l1, 1));
         l1.add(RoadDesigner.getStraight(100, l1));
-        l1.add(RoadDesigner.buildLargeTurn(-90, l1, 8));
+        l1.add(RoadDesigner.buildLargeTurn(-90, l1, 3));
         l1.add(RoadDesigner.getStraight(100, l1));
-        l1.add(RoadDesigner.buildLargeTurn(-90, l1, 8));
+        l1.add(RoadDesigner.buildLargeTurn(-90, l1, 3));
         l1.add(RoadDesigner.getStraight(400, l1));        
         
         Lane l2 = new Lane(400 + Segment.WIDTH + 2, 0, 0);        
-        l2.add(RoadDesigner.getStraight(105, l2));
-        l2.add(RoadDesigner.buildLargeTurn(90, l2, 8));
+        l2.add(RoadDesigner.getStraight(102, l2));
+        l2.add(RoadDesigner.buildLargeTurn(90, l2, 3));
         l2.add(RoadDesigner.getStraight(100, l2));
-        l2.add(RoadDesigner.buildLargeTurn(-90, l2, 2));
-        l2.add(RoadDesigner.getStraight(90, l2));
-        l2.add(RoadDesigner.buildLargeTurn(-90, l2, 2));
+        l2.add(RoadDesigner.buildLargeTurn(-90, l2, 1));
+        l2.add(RoadDesigner.getStraight(96, l2));
+        l2.add(RoadDesigner.buildLargeTurn(-90, l2, 1));
         l2.add(RoadDesigner.getStraight(400, l2));
         
         registerLane(l1);

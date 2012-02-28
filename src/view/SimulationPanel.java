@@ -221,32 +221,32 @@ public class SimulationPanel extends JPanel {
                     currentX = center[0] + (Math.cos(zaRadians) * (Segment.WIDTH/2));
                     currentY = center[1] - (Math.sin(zaRadians) * (Segment.WIDTH/2));
                     
-                    next.setRenderX(currentX);
-                    next.setRenderY(currentY);
-                    next.setRenderAngle(angle);
-                    
                     angle += concatValue;
                     concatValue = next.getLength();
                     currentTypeStraight = next.getAngle() == 0;
                     positiveAngle = next.getAngle() >= 0;
+                    
+                    next.setRenderX(currentX);
+                    next.setRenderY(currentY);
+                    next.setRenderAngle(angle);
+                    
                     continue;
                 }
                 
                 // step over additional segments that make up 
                 // the straight section currently being processed
                 if (next.getAngle() == 0 && currentTypeStraight) {
-                    concatValue += next.getLength();
                     double renderX = currentX - Math.sin((Math.PI * (angle/180.0))) * concatValue;
                     double renderY = currentY + Math.cos((Math.PI * (angle/180.0))) * concatValue;
                     next.setRenderX(renderX);
                     next.setRenderY(renderY);
                     next.setRenderAngle(angle);
+                    concatValue += next.getLength();
                     continue;
                 }
                 
                 // as above (for a corner)
                 if (next.getAngle() != 0 && !currentTypeStraight) {
-                    concatValue += next.getAngle();      
                     double angleRadians = Math.PI * (angle/180.0);
                     double centerX, centerY;
                     
@@ -266,6 +266,7 @@ public class SimulationPanel extends JPanel {
                     next.setRenderX(renderX);
                     next.setRenderY(renderY);
                     next.setRenderAngle(renderAngle);
+                    concatValue += next.getAngle();    
                     continue;
                 }
                 
@@ -296,8 +297,6 @@ public class SimulationPanel extends JPanel {
         
         // redraw the junction from the image cache
         graphics.drawImage(image, 0, 0, null);        
-        drawVehicles(graphics);
-        
-        System.out.println("a");
+        drawVehicles(graphics);        
     }
 }
