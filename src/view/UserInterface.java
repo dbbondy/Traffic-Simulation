@@ -48,6 +48,10 @@ public class UserInterface extends JFrame {
         detailPanel.setVehicleAggressionText("Current vehicle aggression is: " + Simulation.getOption(Simulation.AGGRESSION));
         simPanel.repaint();
     }
+    
+    public void reloadGUI() {
+        simPanel.clearCache();
+    }
 
     private void initComponents() {
 
@@ -60,10 +64,7 @@ public class UserInterface extends JFrame {
         buttonPanel.setLayout(new FlowLayout());
 
         detailPanel = new DetailsPanel();
-       
-
         simPanel = new SimulationPanel();
-
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(1024, 768));
 
@@ -74,16 +75,13 @@ public class UserInterface extends JFrame {
         buttonPanel.add(startSim);
         buttonPanel.add(pauseSim);
         buttonPanel.add(changeSettings);
-
-
         contentPane.add(detailPanel, BorderLayout.EAST);
         contentPane.add(buttonPanel, BorderLayout.SOUTH);
         contentPane.add(simPanel, BorderLayout.CENTER);
         this.pack();
-
     }
     
-    
+    //TODO
 
     private void addListeners() {
 

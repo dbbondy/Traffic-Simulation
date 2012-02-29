@@ -211,11 +211,12 @@ public class SettingsWindow {
                 
                 determineJuncInit();
                 
+                Simulation.settingsChanged();
+                
                 synchronized(Simulation.getSimulationThread()){ //notifying simulation thread that we are done with waiting.
                     Simulation.getSimulationThread().notify();
                 }
                 
-                Simulation.settingsChanged();
                 SettingsWindow.this.frame.dispose();
             }
         });

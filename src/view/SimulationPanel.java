@@ -35,7 +35,6 @@ public class SimulationPanel extends JPanel {
     private void initPanel() {
         this.setPreferredSize(new Dimension(600, 600));
         this.setBackground(Color.white);
-        currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
     }
 
     private void drawVehicles(Graphics g){
@@ -118,6 +117,9 @@ public class SimulationPanel extends JPanel {
     }
     
     private void renderToImage() {
+        
+        // we reload the current junction every time we have to render it again
+        currentJunction = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
         
         image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         // create a graphics object from the buffered image object
@@ -274,9 +276,14 @@ public class SimulationPanel extends JPanel {
         }
 
     }
+    
+    public synchronized void clearCache() {
+        currentJunction = null;
+        image = null;        
+    }
 
     @Override
-    public void paintComponent(Graphics graphics1) {
+    public synchronized void paintComponent(Graphics graphics1) {
         super.paintComponent(graphics1);        
         
         // no need to paint if we can't see it
@@ -297,6 +304,6 @@ public class SimulationPanel extends JPanel {
         
         // redraw the junction from the image cache
         graphics.drawImage(image, 0, 0, null);        
-        drawVehicles(graphics);        
+        drawVehicles(graphics);  
     }
 }
