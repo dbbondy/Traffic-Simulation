@@ -210,13 +210,12 @@ public class SettingsWindow {
                 }
                 
                 determineJuncInit();
-                
                 Simulation.settingsChanged();
                 
                 synchronized(Simulation.getSimulationThread()){ //notifying simulation thread that we are done with waiting.
                     Simulation.getSimulationThread().notify();
                 }
-                
+                Simulation.reset(); //reset all values for simulation // TODO bug with this
                 SettingsWindow.this.frame.dispose();
             }
         });

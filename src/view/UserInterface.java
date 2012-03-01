@@ -27,7 +27,6 @@ public class UserInterface extends JFrame {
     private JButton pauseSim;
     private JButton changeSettings;
     private DetailsPanel detailPanel;
-    
     private SimulationPanel simPanel;
 
     public UserInterface() {
@@ -39,7 +38,7 @@ public class UserInterface extends JFrame {
 
 
     }
-    
+
     public void updateGUI() {
         detailPanel.setTimeText("Current time step is: " + Simulation.getOption(Simulation.TIME_STEP));
         detailPanel.setVehicleDensityText("Current car density is: " + Simulation.getOption(Simulation.DENSITY));
@@ -48,9 +47,30 @@ public class UserInterface extends JFrame {
         detailPanel.setVehicleAggressionText("Current vehicle aggression is: " + Simulation.getOption(Simulation.AGGRESSION));
         simPanel.repaint();
     }
-    
+
     public void reloadGUI() {
         simPanel.clearCache();
+    }
+
+    private void updateButtonState() {
+        
+        if(Simulation.isPaused() && !Simulation.isStarted()){ //if paused and simulation stopped
+            pauseSim.setText("Pause Simulation");
+            startSim.setText("Start Simulation");
+            pauseSim.setEnabled(false);
+        }else if(Simulation.isPaused() && Simulation.isStarted()){ // if paused and simulated is running
+            pauseSim.setText("Resume Simulation");
+            startSim.setText("Stop Simulation");
+            pauseSim.setEnabled(true);
+        }else if(!Simulation.isPaused() && Simulation.isStarted()){ // if not paused and simulation is running
+            pauseSim.setText("Pause Simulation");
+            startSim.setText("Stop Simulation");
+            pauseSim.setEnabled(true);
+        }else if(!Simulation.isPaused() && !Simulation.isStarted()){ //if not paused and not started
+            pauseSim.setText("Pause Simulation");
+            startSim.setText("Start Simulation");
+            pauseSim.setEnabled(false);
+        }
     }
 
     private void initComponents() {
@@ -80,28 +100,26 @@ public class UserInterface extends JFrame {
         contentPane.add(simPanel, BorderLayout.CENTER);
         this.pack();
     }
-    
-    //TODO
 
+    //TODO
     private void addListeners() {
 
         startSim.addActionListener(new ActionListener() { //maybe change this to be just a stop button and make the simulation run automatically. 
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Simulation.isStarted()) {
+                if (Simulation.isStarted()) { //if it has already started. we are now in a stop simulation state
                     Simulation.start();
+                    updateButtonState();
                     Simulation.reset();
-                    startSim.setText("Start Simulation");
-                    pauseSim.setText("Pause Simulation");
-                    pauseSim.setEnabled(false);
-                    return;
+                    Simulation.pause(); //not paused anymore because we have stopped
+                    System.out.println(Simulation.isStarted());
+                    System.out.println(Simulation.isPaused());
+                } else { //else start
+                    Simulation.start();
+                    updateButtonState();
+                    Simulation.Simulate();
                 }
-                Simulation.start();
-                startSim.setText("Stop Simulation");
-                pauseSim.setEnabled(true);
-                Simulation.Simulate();
-
             }
         });
 
@@ -109,17 +127,16 @@ public class UserInterface extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Simulation.isPaused()) {
+                if (Simulation.isPaused()) { //if we are already paused. unpause
                     Simulation.pause();
-                    pauseSim.setText("Pause Simulation");
+                    updateButtonState();
                     detailPanel.repaint();
                     onUnPauseButtonPress();
-                    return;
+                } else { //pause the simulation
+                    Simulation.pause();
+                    updateButtonState();
+                    detailPanel.repaint();
                 }
-
-                Simulation.pause();
-                pauseSim.setText("Resume Simulation");
-                detailPanel.repaint();
             }
         });
 
@@ -129,6 +146,7 @@ public class UserInterface extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 new SettingsWindow();
                 Simulation.pause();
+                updateButtonState();
             }
         });
 
@@ -139,6 +157,4 @@ public class UserInterface extends JFrame {
             Simulation.getSimulationThread().notify();
         }
     }
-    //TODO: move details panel into it's own class, have the paintComponent override handle updates to the details on itself. then have this class' updateGUI call repaint()
-    //TODO: the pause button listener on the interface will have
 }
