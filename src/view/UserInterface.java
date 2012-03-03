@@ -145,10 +145,10 @@ public class UserInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new SettingsWindow();
-                if(!Simulation.isPaused()){
+                if(!Simulation.isPaused()){ //if it's not paused, we need to change the state of the interface and the simulation
                     Simulation.pause();
                     updateButtonState();
-                }
+                } // else we do nothing
                 
             }
         });
