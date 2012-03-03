@@ -14,9 +14,23 @@ import model.*;
  * @author Dan
  */
 public class TwoLaneJunction extends Junction {
+    
+    private Lane bottomUpwardsLane;
+    private Lane topDownwardsLane;
 
-    public TwoLaneJunction() {        
-        Lane l1 = new Lane(400, 0, 0);        
+    public TwoLaneJunction() {     
+        
+        bottomUpwardsLane = new Lane(400, 650, 180);
+        bottomUpwardsLane.add(RoadDesigner.buildStraight(300, bottomUpwardsLane));
+        bottomUpwardsLane.add(RoadDesigner.buildLargeTurn(90, bottomUpwardsLane, 2));
+        bottomUpwardsLane.add(RoadDesigner.buildStraight(350, bottomUpwardsLane));
+        
+        topDownwardsLane = new Lane(400 - Segment.WIDTH - 2, 0, 0);
+        
+        registerLane(bottomUpwardsLane);
+        
+        randomCars(bottomUpwardsLane);
+        /*Lane l1 = new Lane(400, 0, 0);        
         l1.add(RoadDesigner.getStraight(100, l1));
         l1.add(RoadDesigner.buildLargeTurn(90, l1, 1));
         l1.add(RoadDesigner.getStraight(100, l1));
@@ -38,7 +52,7 @@ public class TwoLaneJunction extends Junction {
         registerLane(l2);
         
         randomCars(l1);
-        randomCars(l2);
+       randomCars(l2);*/
     }
     
     private void randomCars(Lane lane) {

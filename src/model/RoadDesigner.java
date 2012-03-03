@@ -14,7 +14,7 @@ public class RoadDesigner {
     public RoadDesigner() {
     }
 
-    public static Segment[] getStraight(int lengthOfSection, Lane lane) throws IllegalArgumentException {
+    public static Segment[] buildStraight(int lengthOfSection, Lane lane) throws IllegalArgumentException {
 
         if (lengthOfSection < 1) {
             throw new IllegalArgumentException("You cannot enter a number of 0 or less");
