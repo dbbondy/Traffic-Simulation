@@ -141,8 +141,6 @@ public class SettingsWindow {
         truckRatioField.setName(Simulation.TRUCK_RATIO);
         fields[3] = truckRatioField;
 
-        
-        
         frame.pack();
 
     }
@@ -194,8 +192,6 @@ public class SettingsWindow {
                 
                 if(((Integer)Simulation.getOption(Simulation.CAR_RATIO)) + ((Integer)Simulation.getOption(Simulation.TRUCK_RATIO)) > 100){
                     showErrMessage("The ratio of cars : trucks must sum to 100.", "Error");
-                    Simulation.setOption(Simulation.CAR_RATIO, 0);
-                    Simulation.setOption(Simulation.TRUCK_RATIO, 0);
                     return;
                 }
                 
@@ -215,7 +211,7 @@ public class SettingsWindow {
                 synchronized(Simulation.getSimulationThread()){ //notifying simulation thread that we are done with waiting.
                     Simulation.getSimulationThread().notify();
                 }
-                Simulation.reset(); //reset all values for simulation // TODO bug with this
+                
                 SettingsWindow.this.frame.dispose();
             }
         });

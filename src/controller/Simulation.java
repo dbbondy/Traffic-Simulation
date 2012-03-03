@@ -80,6 +80,7 @@ public class Simulation {
             return;
         }
         ui.reloadGUI();
+        ui.updateGUI();
         if(paused == true){
             paused = false;
         }
@@ -128,11 +129,10 @@ public class Simulation {
     }
     
     public static void reset(){
-        setOption(DENSITY, 0);
-        setOption(AGGRESSION, 0);
-        setOption(CAR_RATIO, 0);
-        setOption(TRUCK_RATIO, 0);
+
         setOption(TIME_STEP, -1); // for a strange reason, if set to 0, the UI shows the number "1" so the number "-1" shows 0.
+        started = false;
+        paused = false;
         
     }
 

@@ -40,11 +40,13 @@ public class UserInterface extends JFrame {
     }
 
     public void updateGUI() {
+        
         detailPanel.setTimeText("Current time step is: " + Simulation.getOption(Simulation.TIME_STEP));
         detailPanel.setVehicleDensityText("Current car density is: " + Simulation.getOption(Simulation.DENSITY));
         detailPanel.setRatioCarsText("Current ratio of Cars is :" + Simulation.getOption(Simulation.CAR_RATIO));
         detailPanel.setRatioTrucksText("Current ratio of Trucks is: " + Simulation.getOption(Simulation.TRUCK_RATIO));
         detailPanel.setVehicleAggressionText("Current vehicle aggression is: " + Simulation.getOption(Simulation.AGGRESSION));
+        updateButtonState();
         simPanel.repaint();
     }
 
@@ -109,10 +111,8 @@ public class UserInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (Simulation.isStarted()) { //if it has already started. we are now in a stop simulation state
-                    Simulation.start();
-                    updateButtonState();
                     Simulation.reset();
-                    Simulation.pause(); //not paused anymore because we have stopped
+                    updateButtonState();
                     System.out.println(Simulation.isStarted());
                     System.out.println(Simulation.isPaused());
                 } else { //else start
@@ -145,8 +145,11 @@ public class UserInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new SettingsWindow();
-                Simulation.pause();
-                updateButtonState();
+                if(!Simulation.isPaused()){
+                    Simulation.pause();
+                    updateButtonState();
+                }
+                
             }
         });
 
