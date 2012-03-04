@@ -3,6 +3,8 @@ package controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import model.Lane;
 import model.Segment;
 import model.Vehicle;
@@ -57,9 +59,12 @@ public class Simulation {
 
     public static void pause() {
         paused = !paused;
+        if (ui != null) {
+            ui.updateGUI();
+        }
     }
 
-    public static boolean isPaused() {
+    public static synchronized boolean isPaused() {
         return paused;
     }
 

@@ -23,11 +23,10 @@ import javax.swing.JTextField;
  *
  * @author Dan
  */
-public class SettingsWindow {
+public class SettingsWindow extends JFrame {
 
     //TODO: the settings window closes even if an error occurs, fix this logic. 
     //TODO: there are todo's in the user interface class. do those too.
-    private JFrame frame;
     private Container contentPane;
     private JLabel densityLbl;
     private JLabel aggressionLbl;
@@ -47,14 +46,13 @@ public class SettingsWindow {
     public SettingsWindow() {
         initComponents();
         addComponents();
-        addListeners();
-        frame.setVisible(true);
-        
+        addListeners();  
+        this.setTitle("Settings");
+        this.setVisible(true); 
     }
 
     private void initComponents() {
-        frame = new JFrame("Settings");
-        contentPane = frame.getContentPane();
+        contentPane = this.getContentPane();
         densityLbl = new JLabel("Density of cars (number of cars created per second)");
         aggressionLbl = new JLabel("Aggression of drivers in simulation");
         carRatioLbl = new JLabel("Ratio of Cars");
@@ -67,16 +65,16 @@ public class SettingsWindow {
         cons = new GridBagConstraints();
         submitBtn = new JButton("Submit");
         defaultBtn = new JButton("Default Values");
-        frame.setResizable(false);
+        this.setResizable(false);
         contentPane.setLayout(new GridBagLayout());
         fields = new JTextField[4];
 
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         String[] junctionOptions = {"<<please enter a choice>>", "Two-Lane Junction", "Roundabout Junction", "Traffic light Junction", "Flyover Junction", "Plain Junction"};
         junctions = new JComboBox<String>(junctionOptions);
 
-        frame.setLocationRelativeTo(null); //centers the frame in the screen
+        this.setLocationRelativeTo(null); //centers the frame in the screen
         
         
 
@@ -141,7 +139,7 @@ public class SettingsWindow {
         truckRatioField.setName(Simulation.TRUCK_RATIO);
         fields[3] = truckRatioField;
 
-        frame.pack();
+        this.pack();
 
     }
 
@@ -212,7 +210,7 @@ public class SettingsWindow {
                     Simulation.getSimulationThread().notify();
                 }
                 
-                SettingsWindow.this.frame.dispose();
+                SettingsWindow.this.dispose();
             }
         });
 
@@ -251,18 +249,10 @@ public class SettingsWindow {
     }
 
     private void showErrMessage(String message, String title) {
-        JOptionPane.showMessageDialog(frame,
+        JOptionPane.showMessageDialog(this,
                 message,
                 title,
                 JOptionPane.ERROR_MESSAGE);
-    }
-    
-    boolean isVisible(){
-        return frame.isVisible();
-    }
-    
-    void setVisible(boolean visible){
-        frame.setVisible(visible);
     }
     
     

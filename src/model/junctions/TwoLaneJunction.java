@@ -23,36 +23,17 @@ public class TwoLaneJunction extends Junction {
 
     public TwoLaneJunction() {     
         
-        bottomRightwardsLane = new Lane(400, 685, 180);
-        bottomRightwardsLane.add(RoadDesigner.buildStraight(300, bottomRightwardsLane));
-        //bottomRightwardsLane.add(RoadDesigner.buildLargeTurn(90, bottomRightwardsLane, 1));
-        //bottomRightwardsLane.add(RoadDesigner.buildStraight(350, bottomRightwardsLane));
-        
-        bottomLeftwardsLane = new Lane(400 - Segment.WIDTH - 2, 685, 180);
-        bottomLeftwardsLane.add(RoadDesigner.buildStraight(300, bottomLeftwardsLane));
-        //bottomLeftwardsLane.add(RoadDesigner.buildLargeTurn(-90, bottomLeftwardsLane, 2));
-        //bottomLeftwardsLane.add(RoadDesigner.buildStraight(350, bottomLeftwardsLane));
-        
-        leftRightwardsLane = new Lane(0, 350, 270);
-        leftRightwardsLane.add(RoadDesigner.buildStraight(290, leftRightwardsLane));
-        leftRightwardsLane.add(RoadDesigner.buildLargeTurn(90, bottomLeftwardsLane, 2));
-        leftRightwardsLane.add(RoadDesigner.buildStraight(350, leftRightwardsLane));
-        
-        
-        rightLeftwardsLane = new Lane(700, 350, 90);
-        //topRightwardsLane = new Lane(400, 0, 0);
-        //topRightwardsLane.add(RoadDesigner.buildStraight(300, topRightwardsLane));
-        //topRightwardsLane.add(RoadDesigner.buildLargeTurn(90, topRightwardsLane, 2));
-        //topRightwardsLane.add(RoadDesigner.buildStraight(350, topRightwardsLane));
         
         registerLane(bottomRightwardsLane);
         //registerLane(topRightwardsLane);
         registerLane(bottomLeftwardsLane);
         registerLane(leftRightwardsLane);
+        registerLane(rightLeftwardsLane);
         
         randomCars(bottomRightwardsLane);
         randomCars(bottomLeftwardsLane);
         randomCars(leftRightwardsLane);
+        randomCars(rightLeftwardsLane);
         //randomCars(topRightwardsLane);
         /*Lane l1 = new Lane(400, 0, 0);        
         l1.add(RoadDesigner.getStraight(100, l1));

@@ -25,16 +25,32 @@ public class SimulationPanel extends JPanel {
 
     private BufferedImage image; //junction image
     private Junction currentJunction;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 680;
+    private Dimension size;
 
     public SimulationPanel() {
-        super();
-        initPanel();
-
+        initPanel();        
     }
 
     private void initPanel() {
-        this.setPreferredSize(new Dimension(600, 600));
-        this.setBackground(Color.white);
+        size = new Dimension(WIDTH, HEIGHT);
+        this.setBackground(new Color(10*16+5, 13*16+6, 10*16+3)); // 5B8059   A5 D6 A3    A=10
+    }
+    
+    @Override
+    public Dimension getPreferredSize() {
+        return size;
+    }
+    
+    @Override
+    public Dimension getMaximumSize() {
+        return size;
+    }
+    
+    @Override
+    public Dimension getMinimumSize() {
+        return size;
     }
 
     private void drawVehicles(Graphics g){
@@ -72,7 +88,7 @@ public class SimulationPanel extends JPanel {
         // rotate the canvas about the "bottom center" of the section
         graphics.rotate(angleRadians, x, y);
         
-        Shape straight = new Rectangle2D.Double(startX, startY, width, length);
+        Shape straight = new Rectangle2D.Double(startX, startY, width, length + 1);
         graphics.fill(straight);
         
         // undo rotation of canvas
@@ -106,6 +122,9 @@ public class SimulationPanel extends JPanel {
         if (cornerAngle < 0) {
             startAngle += 180;
         }
+        
+        // fix for bad corner anti aliasing / inaccuracy
+        cornerAngle = cornerAngle >= 0 ? cornerAngle + 1 : cornerAngle - 1;
         
         Rectangle2D bounds = new Rectangle2D.Double(startX, startY, boxSize, boxSize);
         Shape corner = new Arc2D.Double(bounds, -startAngle, -cornerAngle, Arc2D.Double.PIE);
@@ -305,5 +324,12 @@ public class SimulationPanel extends JPanel {
         // redraw the junction from the image cache
         graphics.drawImage(image, 0, 0, null);        
         drawVehicles(graphics);  
+        
+        if (Simulation.isPaused()) {
+            graphics.setColor(new Color(1*16+13, 4*16+0, 1*16+13)); // 1D401D
+            graphics.fillRect(this.getWidth() - 50, 20, 10, 40);
+            graphics.fillRect(this.getWidth() - 30, 20, 10, 40);
+        }
     }
 }
+ 

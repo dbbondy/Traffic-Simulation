@@ -5,15 +5,10 @@
 package view;
 
 import controller.Simulation;
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  *
@@ -35,17 +30,15 @@ public class UserInterface extends JFrame {
         addComponents();
         addListeners();
         this.setVisible(true);
-
-
     }
 
     public void updateGUI() {
         
-        detailPanel.setTimeText("Current time step is: " + Simulation.getOption(Simulation.TIME_STEP));
-        detailPanel.setVehicleDensityText("Current car density is: " + Simulation.getOption(Simulation.DENSITY));
-        detailPanel.setRatioCarsText("Current ratio of Cars is :" + Simulation.getOption(Simulation.CAR_RATIO));
-        detailPanel.setRatioTrucksText("Current ratio of Trucks is: " + Simulation.getOption(Simulation.TRUCK_RATIO));
-        detailPanel.setVehicleAggressionText("Current vehicle aggression is: " + Simulation.getOption(Simulation.AGGRESSION));
+        detailPanel.setTimeText(Simulation.getOption(Simulation.TIME_STEP).toString());
+        detailPanel.setVehicleDensityText(Simulation.getOption(Simulation.DENSITY).toString());
+        detailPanel.setRatioCarsText(Simulation.getOption(Simulation.CAR_RATIO).toString());
+        detailPanel.setRatioTrucksText(Simulation.getOption(Simulation.TRUCK_RATIO).toString());
+        detailPanel.setVehicleAggressionText(Simulation.getOption(Simulation.AGGRESSION).toString());
         updateButtonState();
         simPanel.repaint();
     }
@@ -82,13 +75,27 @@ public class UserInterface extends JFrame {
         pauseSim = new JButton("Pause Simulation");
         pauseSim.setEnabled(false);
         changeSettings = new JButton("Change Settings");
+        
         buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         detailPanel = new DetailsPanel();
         simPanel = new SimulationPanel();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(1024, 768));
+        
+        int width = SimulationPanel.WIDTH + 220;
+        width += this.getInsets().left;
+        width += this.getInsets().right;
+        
+        int height = SimulationPanel.HEIGHT;
+        height += this.getInsets().top;
+        height += this.getInsets().bottom;
+        
+        Dimension size = new Dimension(width, height);
+        
+        this.getContentPane().setPreferredSize(size);
+        this.getContentPane().setMaximumSize(size);
+        this.setResizable(false);
 
     }
 
@@ -97,9 +104,27 @@ public class UserInterface extends JFrame {
         buttonPanel.add(startSim);
         buttonPanel.add(pauseSim);
         buttonPanel.add(changeSettings);
-        contentPane.add(detailPanel, BorderLayout.EAST);
-        contentPane.add(buttonPanel, BorderLayout.SOUTH);
-        contentPane.add(simPanel, BorderLayout.CENTER);
+        buttonPanel.setBackground(new Color(235, 235, 235));
+        
+        JPanel simulationContainer = new JPanel();
+        simulationContainer.setLayout(new BoxLayout(simulationContainer, BoxLayout.X_AXIS));
+        simulationContainer.add(simPanel);        
+        
+        JPanel sideBar = new JPanel() {
+            public Dimension getPreferredSize() {
+                return new Dimension(220, 0);
+            }
+        };
+        
+        sideBar.setLayout(new BoxLayout(sideBar, BoxLayout.Y_AXIS));
+        sideBar.setBackground(new Color(250, 250, 250));
+        sideBar.add(detailPanel); 
+        // put something else in sidebar LIKE THE SETTINGS!
+        
+        contentPane.add(simulationContainer, BorderLayout.CENTER);
+        contentPane.add(sideBar, BorderLayout.LINE_END);
+        contentPane.add(buttonPanel, BorderLayout.PAGE_START);
+        
         this.pack();
     }
 
