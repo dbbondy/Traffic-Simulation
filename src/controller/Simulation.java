@@ -84,6 +84,11 @@ public class Simulation {
             ui = new UserInterface();
             return;
         }
+        if(settingsWindow.isJuncDifferent()){
+            reset();
+            ui.reloadGUI();
+            ui.updateGUI();
+        }
         ui.reloadGUI();
         ui.updateGUI();
         if(paused == true){
@@ -129,13 +134,13 @@ public class Simulation {
         started = (!started);
     }
 
-    public static boolean isStarted() {
+    public static synchronized boolean isStarted() {
         return started;
     }
     
     public static void reset(){
 
-        setOption(TIME_STEP, -1); // for a strange reason, if set to 0, the UI shows the number "1" so the number "-1" shows 0.
+        setOption(TIME_STEP, -1); 
         started = false;
         paused = false;
         
@@ -146,7 +151,6 @@ public class Simulation {
     }
 
     public static class SimulationThread extends Thread {
-        
         private boolean terminate = false;
         
         public void terminate() {

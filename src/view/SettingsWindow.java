@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import model.junctions.Junction;
 
 
 
@@ -206,6 +207,8 @@ public class SettingsWindow extends JFrame {
                 determineJuncInit();
                 Simulation.settingsChanged();
                 
+               
+                
                 synchronized(Simulation.getSimulationThread()){ //notifying simulation thread that we are done with waiting.
                     Simulation.getSimulationThread().notify();
                 }
@@ -225,6 +228,16 @@ public class SettingsWindow extends JFrame {
                 junctions.setSelectedIndex(1);
             }
         });
+    }
+    
+    public boolean isJuncDifferent(){
+         String junction = (String)junctions.getSelectedItem();
+         Junction currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
+         
+         if(currentJunction.toString().equals(junction)){
+             return false;
+         }
+         return true;
     }
     
     private void determineJuncInit(){

@@ -138,8 +138,7 @@ public class UserInterface extends JFrame {
                 if (Simulation.isStarted()) { //if it has already started. we are now in a stop simulation state
                     Simulation.reset();
                     updateButtonState();
-                    System.out.println(Simulation.isStarted());
-                    System.out.println(Simulation.isPaused());
+                    updateGUI();
                 } else { //else start
                     Simulation.start();
                     updateButtonState();
@@ -171,6 +170,9 @@ public class UserInterface extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 new SettingsWindow();
                 if(!Simulation.isPaused()){ //if it's not paused, we need to change the state of the interface and the simulation
+                    if(!Simulation.isStarted()){ //if not started, we don't need to change buttons or pause the simulation.
+                        return;
+                    }
                     Simulation.pause();
                     updateButtonState();
                 } // else we do nothing

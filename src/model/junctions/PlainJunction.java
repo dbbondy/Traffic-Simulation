@@ -22,4 +22,8 @@ public class PlainJunction extends Junction{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public String toString(){
+        return "Plain Junction";
+    }
 }

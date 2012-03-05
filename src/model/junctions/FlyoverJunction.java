@@ -20,4 +20,9 @@ public class FlyoverJunction extends Junction{
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
+    @Override
+    public String toString(){
+        return "Flyover Junction";
+    }
+    
 }

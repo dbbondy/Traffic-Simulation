@@ -22,4 +22,8 @@ public class TrafficLightJunction extends Junction{
         throw new UnsupportedOperationException("Not supported yet.");
     }
  
+    @Override
+    public String toString(){
+        return "Traffic light Junction";
+    }
 }

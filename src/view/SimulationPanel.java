@@ -326,6 +326,7 @@ public class SimulationPanel extends JPanel {
         drawVehicles(graphics);  
         
         if (Simulation.isPaused()) {
+            
             graphics.setColor(new Color(1*16+13, 4*16+0, 1*16+13)); // 1D401D
             graphics.fillRect(this.getWidth() - 50, 20, 10, 40);
             graphics.fillRect(this.getWidth() - 30, 20, 10, 40);
