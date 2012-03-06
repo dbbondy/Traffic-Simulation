@@ -23,33 +23,22 @@ public class TwoLaneJunction extends Junction {
     private Lane leftRightwardsLane2;
     private Lane rightLeftwardsLane;
     private Lane rightLeftwardsLane2;
+     
+
 
     public TwoLaneJunction() {
 
 
         bottomUpwardsLane = new Lane(400, 645, 180);
-        bottomUpwardsLane.add(RoadDesigner.buildStraight(685, bottomUpwardsLane));
-
         bottomUpwardsLane2 = new Lane(400 - Segment.WIDTH - 2, 645, 180);
-        bottomUpwardsLane2.add(RoadDesigner.buildStraight(685, bottomUpwardsLane2));
-
         topDownwardsLane = new Lane((400 - (Segment.WIDTH * 2)) - 6, 0, 0);
-        topDownwardsLane.add(RoadDesigner.buildStraight(685, topDownwardsLane));
-
         topDownwardsLane2 = new Lane((400 - Segment.WIDTH * 3) - 8, 0, 0);
-        topDownwardsLane2.add(RoadDesigner.buildStraight(685, topDownwardsLane2));
-
         leftRightwardsLane = new Lane(0, 250, 270);
-        leftRightwardsLane.add(RoadDesigner.buildStraight(800, leftRightwardsLane));
-
         leftRightwardsLane2 = new Lane(0, 250 + Segment.WIDTH + 2, 270);
-        leftRightwardsLane2.add(RoadDesigner.buildStraight(800, leftRightwardsLane2));
-
-        rightLeftwardsLane = new Lane(800, (250 + (Segment.WIDTH * 2) + 4), 90);
-        rightLeftwardsLane.add(RoadDesigner.buildStraight(800, rightLeftwardsLane));
-
-        rightLeftwardsLane2 = new Lane(800, (250 + (Segment.WIDTH * 3) + 6), 90);
-        rightLeftwardsLane2.add(RoadDesigner.buildStraight(800, rightLeftwardsLane2));
+        rightLeftwardsLane = new Lane(800, (250 + (Segment.WIDTH * 2) + 6), 90);
+        rightLeftwardsLane2 = new Lane(800, (250 + (Segment.WIDTH * 3) + 8), 90);
+        
+        buildRoads();
 
         registerLane(bottomUpwardsLane);
         registerLane(bottomUpwardsLane2);
@@ -83,7 +72,34 @@ public class TwoLaneJunction extends Junction {
          * randomCars(l1); randomCars(l2);
          */
     }
-
+    
+    private void buildRoads(){
+         
+        Segment[] s1 = RoadDesigner.buildStraight(685, bottomUpwardsLane);
+        Segment[] s2 = RoadDesigner.buildStraight(685, bottomUpwardsLane2);
+        RoadDesigner.setUpConnectionsAdjacent(s1, s2);
+        bottomUpwardsLane.add(s1);
+        bottomUpwardsLane2.add(s2);
+        s1 = RoadDesigner.buildStraight(685, topDownwardsLane);
+        s2 = RoadDesigner.buildStraight(685, topDownwardsLane2);
+        RoadDesigner.setUpConnectionsAdjacent(s1, s2);
+        topDownwardsLane.add(s1);
+        topDownwardsLane2.add(s2);
+        
+        s1 = RoadDesigner.buildStraight(800, leftRightwardsLane);
+        s2 = RoadDesigner.buildStraight(800, leftRightwardsLane2);
+        RoadDesigner.setUpConnectionsAdjacent(s1, s2);
+        leftRightwardsLane.add(s1);
+        leftRightwardsLane2.add(s2);
+        
+        s1 = RoadDesigner.buildStraight(800, rightLeftwardsLane);
+        s2 = RoadDesigner.buildStraight(800, rightLeftwardsLane2);
+        RoadDesigner.setUpConnectionsAdjacent(s1, s2);
+        rightLeftwardsLane.add(s1);
+        rightLeftwardsLane2.add(s2);
+    }
+    
+   
     private void randomCars(Lane lane) {
         ArrayList<Segment> segments = lane.getLaneSegments();
         Random r = new Random();

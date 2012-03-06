@@ -180,12 +180,3 @@ public class Simulation {
         }
     }
 }
-
-/*
- * TODO
- * 1. create automatic pausing when click on "change settings" and automatic unpausing when the change settings window is closed
- *
- *
- *
- * 
- */
