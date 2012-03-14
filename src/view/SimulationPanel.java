@@ -149,8 +149,14 @@ public class SimulationPanel extends JPanel {
         }
     }
     
-    public void deserialiseJunction(String filepath){
-        
+    public boolean deserialiseJunction(String filepath){
+        try{
+            image = ImageIO.read(new File(filepath));
+            this.repaint();
+            return true;
+        }catch(IOException ioe){
+            return false;
+        }
     }
 
     private void renderToImage() {

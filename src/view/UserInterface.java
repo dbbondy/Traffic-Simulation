@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -206,10 +207,21 @@ public class UserInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 final JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                fileChooser.addChoosableFileFilter(new CustomImageFilter());
+                
                 int returnOption = fileChooser.showOpenDialog(loadJunc);
                 if(returnOption == JFileChooser.APPROVE_OPTION){
                     File selectedFile = fileChooser.getSelectedFile();
-                    
+                    String filePath = selectedFile.getAbsolutePath();
+                    boolean result = simPanel.deserialiseJunction(filePath);
+                    if(result == true){
+                        displayNotification("Image loaded successfully!");
+                    }else{
+                        displayNotification("Image was not loaded correctly!");
+                        
+                    }
                 }
             }
         });
@@ -224,7 +236,52 @@ public class UserInterface extends JFrame {
     private void displayNotification(String message){
        JOptionPane.showMessageDialog(this,
                 message,
-                "notification",
+                "Notification",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 }
+
+ class CustomImageFilter extends FileFilter{
+
+    @Override
+    public boolean accept(File f) {
+        if(f.isDirectory()){
+            return true;
+        }
+        String fileExt = getExtension(f);
+        if(fileExt != null){
+            switch(fileExt){
+                case "jpeg":
+                    return true;
+                case "gif":
+                    return true;
+                case "png":
+                    return true;
+                case "jpg":
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Image types";
+    }
+     
+      /*
+     * Get the extension of a file.
+     */  
+    public String getExtension(File f) {
+        String ext = null;
+        String s = f.getName();
+        int i = s.lastIndexOf('.');
+
+        if (i > 0 &&  i < s.length() - 1) {
+            ext = s.substring(i+1).toLowerCase();
+        }
+        return ext;
+    }
+    
+    
+ }
