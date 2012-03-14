@@ -49,14 +49,14 @@ public class TwoLaneJunction extends Junction {
         registerLane(rightLeftwardsLane2);
 
 
-       /* randomCars(bottomUpwardsLane);
+        randomCars(bottomUpwardsLane);
         randomCars(bottomUpwardsLane2);
         randomCars(topDownwardsLane);
         randomCars(topDownwardsLane2);
         randomCars(leftRightwardsLane);
         randomCars(leftRightwardsLane2);
         randomCars(rightLeftwardsLane);
-        randomCars(rightLeftwardsLane2);*/
+        randomCars(rightLeftwardsLane2);
 
 
         //randomCars(topRightwardsLane);
@@ -75,7 +75,7 @@ public class TwoLaneJunction extends Junction {
     
      private void buildRoads(){
        
-         /*
+         
         Segment[] s1 = RoadDesigner.buildStraight(685, bottomUpwardsLane);
         Segment[] s2 = RoadDesigner.buildStraight(685, bottomUpwardsLane2);
         RoadDesigner.setUpConnectionsAdjacent(s1, s2);
@@ -98,8 +98,8 @@ public class TwoLaneJunction extends Junction {
         RoadDesigner.setUpConnectionsAdjacent(s1, s2);
         rightLeftwardsLane.add(s1);
         rightLeftwardsLane2.add(s2);
-         */
-       
+         
+       /*
          //setting initial roads before adding corner turning segments
         Segment[] s1 = RoadDesigner.buildStraight(282, bottomUpwardsLane);
         Segment[] s2 = RoadDesigner.buildStraight(282, bottomUpwardsLane2);

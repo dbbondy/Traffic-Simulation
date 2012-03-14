@@ -8,6 +8,7 @@ import controller.Simulation;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import javax.swing.*;
 
 /**
@@ -191,7 +192,11 @@ public class UserInterface extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+                if(simPanel.serialiseJunction()){
+                    displayNotification("Junction saved successfully!");
+                }else{
+                    displayNotification("Junction not saved successfully!");
+                }
             }
         });
         
@@ -200,7 +205,12 @@ public class UserInterface extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+                final JFileChooser fileChooser = new JFileChooser();
+                int returnOption = fileChooser.showOpenDialog(loadJunc);
+                if(returnOption == JFileChooser.APPROVE_OPTION){
+                    File selectedFile = fileChooser.getSelectedFile();
+                    
+                }
             }
         });
     }
@@ -209,5 +219,12 @@ public class UserInterface extends JFrame {
         synchronized (Simulation.getSimulationThread()) {
             Simulation.getSimulationThread().notify();
         }
+    }
+    
+    private void displayNotification(String message){
+       JOptionPane.showMessageDialog(this,
+                message,
+                "notification",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 }

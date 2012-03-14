@@ -3,8 +3,6 @@ package controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import model.Lane;
 import model.Segment;
 import model.Vehicle;
@@ -140,7 +138,7 @@ public class Simulation {
     
     public static void reset(){
 
-        setOption(TIME_STEP, -1); 
+        setOption(TIME_STEP, 0); 
         started = false;
         paused = false;
         
