@@ -21,6 +21,8 @@ public class UserInterface extends JFrame {
     private JButton startSim;
     private JButton pauseSim;
     private JButton changeSettings;
+    private JButton saveJunc;
+    private JButton loadJunc;
     private DetailsPanel detailPanel;
     private SimulationPanel simPanel;
 
@@ -33,7 +35,7 @@ public class UserInterface extends JFrame {
     }
 
     public void updateGUI() {
-        
+
         detailPanel.setTimeText(Simulation.getOption(Simulation.TIME_STEP).toString());
         detailPanel.setVehicleDensityText(Simulation.getOption(Simulation.DENSITY).toString());
         detailPanel.setRatioCarsText(Simulation.getOption(Simulation.CAR_RATIO).toString());
@@ -48,20 +50,20 @@ public class UserInterface extends JFrame {
     }
 
     private void updateButtonState() {
-        
-        if(Simulation.isPaused() && !Simulation.isStarted()){ //if paused and simulation stopped
+
+        if (Simulation.isPaused() && !Simulation.isStarted()) { //if paused and simulation stopped
             pauseSim.setText("Pause Simulation");
             startSim.setText("Start Simulation");
             pauseSim.setEnabled(false);
-        }else if(Simulation.isPaused() && Simulation.isStarted()){ // if paused and simulated is running
+        } else if (Simulation.isPaused() && Simulation.isStarted()) { // if paused and simulated is running
             pauseSim.setText("Resume Simulation");
             startSim.setText("Stop Simulation");
             pauseSim.setEnabled(true);
-        }else if(!Simulation.isPaused() && Simulation.isStarted()){ // if not paused and simulation is running
+        } else if (!Simulation.isPaused() && Simulation.isStarted()) { // if not paused and simulation is running
             pauseSim.setText("Pause Simulation");
             startSim.setText("Stop Simulation");
             pauseSim.setEnabled(true);
-        }else if(!Simulation.isPaused() && !Simulation.isStarted()){ //if not paused and not started
+        } else if (!Simulation.isPaused() && !Simulation.isStarted()) { //if not paused and not started
             pauseSim.setText("Pause Simulation");
             startSim.setText("Start Simulation");
             pauseSim.setEnabled(false);
@@ -75,24 +77,26 @@ public class UserInterface extends JFrame {
         pauseSim = new JButton("Pause Simulation");
         pauseSim.setEnabled(false);
         changeSettings = new JButton("Change Settings");
-        
+        saveJunc = new JButton("Save Junction");
+        loadJunc = new JButton("Load Junction");
+
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         detailPanel = new DetailsPanel();
         simPanel = new SimulationPanel();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         int width = SimulationPanel.WIDTH + 220;
         width += this.getInsets().left;
         width += this.getInsets().right;
-        
+
         int height = SimulationPanel.HEIGHT;
         height += this.getInsets().top;
         height += this.getInsets().bottom;
-        
+
         Dimension size = new Dimension(width, height);
-        
+
         this.getContentPane().setPreferredSize(size);
         this.getContentPane().setMaximumSize(size);
         this.setResizable(false);
@@ -104,27 +108,30 @@ public class UserInterface extends JFrame {
         buttonPanel.add(startSim);
         buttonPanel.add(pauseSim);
         buttonPanel.add(changeSettings);
+        buttonPanel.add(saveJunc);
+        buttonPanel.add(loadJunc);
         buttonPanel.setBackground(new Color(235, 235, 235));
-        
+
         JPanel simulationContainer = new JPanel();
         simulationContainer.setLayout(new BoxLayout(simulationContainer, BoxLayout.X_AXIS));
-        simulationContainer.add(simPanel);        
-        
+        simulationContainer.add(simPanel);
+
         JPanel sideBar = new JPanel() {
+            @Override
             public Dimension getPreferredSize() {
                 return new Dimension(220, 0);
             }
         };
-        
+
         sideBar.setLayout(new BoxLayout(sideBar, BoxLayout.Y_AXIS));
         sideBar.setBackground(new Color(250, 250, 250));
-        sideBar.add(detailPanel); 
+        sideBar.add(detailPanel);
         // put something else in sidebar LIKE THE SETTINGS!
-        
+
         contentPane.add(simulationContainer, BorderLayout.CENTER);
         contentPane.add(sideBar, BorderLayout.LINE_END);
         contentPane.add(buttonPanel, BorderLayout.PAGE_START);
-        
+
         this.pack();
     }
 
@@ -169,17 +176,33 @@ public class UserInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new SettingsWindow();
-                if(!Simulation.isPaused()){ //if it's not paused, we need to change the state of the interface and the simulation
-                    if(!Simulation.isStarted()){ //if not started, we don't need to change buttons or pause the simulation.
+                if (!Simulation.isPaused()) { //if it's not paused, we need to change the state of the interface and the simulation
+                    if (!Simulation.isStarted()) { //if not started, we don't need to change buttons or pause the simulation.
                         return;
                     }
                     Simulation.pause();
                     updateButtonState();
                 } // else we do nothing
+
+            }
+        });
+        
+        saveJunc.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 
             }
         });
+        
+        
+        loadJunc.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
     }
 
     private void onUnPauseButtonPress() {
