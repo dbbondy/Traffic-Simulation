@@ -64,6 +64,10 @@ public class Segment {
         return this.angle;
     }
     
+    public ConnectionType getConnectionType(){
+        return connType;
+    }
+    
     public void setConnectionType(ConnectionType type){
         connType = type;
     }

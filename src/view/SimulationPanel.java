@@ -6,6 +6,7 @@ package view;
 
 import controller.Simulation;
 import java.awt.*;
+
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -13,8 +14,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import model.ConnectionType;
 import model.Lane;
 import model.Segment;
 import model.Vehicle;
@@ -149,6 +152,7 @@ public class SimulationPanel extends JPanel {
         }
     }
     
+    //TODO: incorrect
     public boolean deserialiseJunction(String filepath){
         try{
             image = ImageIO.read(new File(filepath));
@@ -231,7 +235,19 @@ public class SimulationPanel extends JPanel {
             next.setRenderY(currentY);
 
             while ((next = next.getNextSegment()) != null) { // while more segments
-
+                
+               List<Segment> se = next.getConnectedSegments();
+               for(Segment s : se){
+                   if(s.getConnectionType() == ConnectionType.OVERLAP){
+                       double x = s.getRenderX();
+                       double y = s.getRenderY();
+                       graphics.setColor(Color.red);
+                       graphics.drawRect((int)x, (int) y, 5, 5);
+                       graphics.setColor(Color.GRAY);
+                       System.out.println("print a line");
+                   }
+               }
+               
                 // we need to render the straight section we were just
                 // looping over as the next section is a corner
                 if (next.getAngle() != 0 && currentTypeStraight) {

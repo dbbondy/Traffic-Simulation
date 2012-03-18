@@ -64,6 +64,19 @@ public class RoadDesigner {
         return segments;
     } 
     
+    public static void buildLane(int length, Lane lane){
+        Segment[] s = RoadDesigner.buildStraight(length, lane);
+        lane.add(s);
+    }
+    
+    public static void buildLanes(int length, Lane lane1, Lane lane2){
+        Segment[] s1 = RoadDesigner.buildStraight(length, lane1);
+        Segment[] s2 = RoadDesigner.buildStraight(length, lane2);
+        RoadDesigner.setUpConnectionsAdjacent(s1, s2);
+        lane1.add(s1);
+        lane2.add(s2);
+    }
+    
     public static void setUpConnectionsAdjacent(Segment[] firstSet, Segment[] secondSet) throws SegmentCollectionEmptyException {
         if (firstSet.length == 0 || secondSet.length == 0) {
             throw new SegmentCollectionEmptyException("Collection is empty");
