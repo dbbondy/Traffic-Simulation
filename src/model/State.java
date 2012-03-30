@@ -38,7 +38,7 @@ public final class State implements Serializable {
         return carRatio;
     }
 
-    public String getCurrentJunction() {
+    public String getJunction() {
         return currentJunction;
     }
 

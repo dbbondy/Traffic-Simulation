@@ -7,7 +7,7 @@ import model.Lane;
 import model.Segment;
 import model.State;
 import model.Vehicle;
-import model.junctions.Junction;
+import model.junctions.*;
 import view.SettingsWindow;
 import view.UserInterface;
 
@@ -64,7 +64,24 @@ public class Simulation {
     }
     
     public static void setSimulationState(State state){
+        Simulation.setOption(DENSITY, state.getDensity());
+        Simulation.setOption(AGGRESSION, state.getAggression());
+        Simulation.setOption(CAR_RATIO, state.getCarRatio());
+        Simulation.setOption(TRUCK_RATIO, state.getTruckRatio());
+        Simulation.setOption(TIME_STEP, state.getTimeStep());
         
+        switch(state.getJunction()){
+            case "Two-Lane Junction":
+                Simulation.setOption(JUNCTION_TYPE, new TwoLaneJunction());
+            case "Flyover Junction":
+                Simulation.setOption(JUNCTION_TYPE, new FlyoverJunction());
+            case "Plain Junction":
+                Simulation.setOption(JUNCTION_TYPE, new PlainJunction());
+            case "Traffic Light Junction":
+                Simulation.setOption(JUNCTION_TYPE, new TrafficLightJunction());
+            case "Roundabout Junction":
+                Simulation.setOption(JUNCTION_TYPE, new RoundaboutJunction());
+        }
     }
 
     public static synchronized boolean isPaused() {

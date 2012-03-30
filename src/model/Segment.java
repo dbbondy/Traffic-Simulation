@@ -1,6 +1,6 @@
 package model;
 
-import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author Dan
  */
-public class Segment {
+public class Segment{
     
     private int length;
     private int angle;

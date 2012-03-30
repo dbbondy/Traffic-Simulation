@@ -154,32 +154,39 @@ public class SimulationPanel extends JPanel {
             ObjectOutputStream out = new ObjectOutputStream(fos);
             out.writeObject(currentSystemState);
             out.close();
-            return true; //image  and system state wrote successfully, so return true
+            return true; //image and system state wrote successfully, so return true
         } catch (IOException e) {
+            e.printStackTrace();
             return false; //something went wrong. return false
         }
     }
 
     //TODO: incorrect
     public boolean deserialiseJunction(String filePath) {
-        int x = filePath.lastIndexOf("\\");
-        String fileDir = filePath.substring(0, x);
+        int lastSepIndex = filePath.lastIndexOf("\\");
+        String fileDir = filePath.substring(0, lastSepIndex);
         File dir = new File(fileDir);
-        String[] children = dir.list();
-
+        
         FilenameFilter filter = new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 return name.endsWith(".st");
             }
         };
-        children = dir.list(filter);
-        State incomingState;
+        String[] children = dir.list(filter);
+        State incomingState = null;
         try {
             FileInputStream fis = new FileInputStream(children[0]);
             ObjectInputStream in = new ObjectInputStream(fis);
             incomingState = (State) in.readObject();
             in.close();
-
+            if(!(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString()))){ //if incoming state junction differs from our current junction
+                Simulation.reset();
+                Simulation.setSimulationState(incomingState);
+            }
+            
+            //TODO: examine the behaviour of this more. does it work perfectly as intended? no? why?
+            
             image = ImageIO.read(new File(filePath));
             this.repaint();
             return true;

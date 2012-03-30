@@ -24,6 +24,6 @@ public class TrafficLightJunction extends Junction{
  
     @Override
     public String toString(){
-        return "Traffic light Junction";
+        return "Traffic Light Junction";
     }
 }
