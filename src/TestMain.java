@@ -1,6 +1,6 @@
 
-import model.RoadDesigner;
-import model.Segment;
+import java.io.File;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -9,16 +9,19 @@ import model.Segment;
 public class TestMain {
 
     public static void main(String[] args) {
-        double x = 300;
-        System.out.println("x is: " + x);
-        for(int i = 0; i < 18; i++){
-            x = x - Math.cos(5);
-            double result = x - Math.cos(5);
-            System.out.println("result is: " + result);
-        }
-        
-      
-      
-    }
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        fileChooser.setAcceptAllFileFilterUsed(false);
 
+        int returnOption = fileChooser.showOpenDialog(null);
+        if (returnOption == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String filePath = selectedFile.getAbsolutePath();
+            int i = filePath.lastIndexOf("\\");
+            String testDir = filePath.substring(0, i);
+
+            System.out.println(filePath);
+            System.out.println(testDir);
+        }
+    }
 }

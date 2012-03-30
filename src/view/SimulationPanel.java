@@ -6,21 +6,19 @@ package view;
 
 import controller.Simulation;
 import java.awt.*;
-
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import model.ConnectionType;
-import model.Lane;
-import model.Segment;
-import model.Vehicle;
+import model.*;
 import model.junctions.Junction;
 
 /**
@@ -144,21 +142,35 @@ public class SimulationPanel extends JPanel {
     public boolean serialiseJunction() {
 
         try {
-            File outputfile = new File("currentJunction.png");
-            ImageIO.write(image, "png", outputfile);
-            return true; //image wrote successfully, so return true
+            //write out the image
+            File outputFile = new File("currentJunction.png");
+            ImageIO.write(image, "png", outputFile);
+
+            //write out the corresponding state object
+            State currentSystemState = new State((int) Simulation.getOption(Simulation.TIME_STEP),
+                    Simulation.getOption(Simulation.JUNCTION_TYPE).toString(),
+                    (int) Simulation.getOption(Simulation.DENSITY),
+                    (int) Simulation.getOption(Simulation.AGGRESSION),
+                    (int) Simulation.getOption(Simulation.CAR_RATIO),
+                    (int) Simulation.getOption(Simulation.TRUCK_RATIO));
+            FileOutputStream fos = new FileOutputStream("current_simulation_state.st");
+            ObjectOutputStream out = new ObjectOutputStream(fos);
+            out.writeObject(currentSystemState);
+            out.close();
+            return true; //image  and system state wrote successfully, so return true
         } catch (IOException e) {
+            
             return false; //something went wrong. return false
         }
     }
-    
+
     //TODO: incorrect
-    public boolean deserialiseJunction(String filepath){
-        try{
+    public boolean deserialiseJunction(String filepath) {
+        try {
             image = ImageIO.read(new File(filepath));
             this.repaint();
             return true;
-        }catch(IOException ioe){
+        } catch (IOException ioe) {
             return false;
         }
     }
@@ -235,19 +247,19 @@ public class SimulationPanel extends JPanel {
             next.setRenderY(currentY);
 
             while ((next = next.getNextSegment()) != null) { // while more segments
-                
-               List<Segment> se = next.getConnectedSegments();
-               for(Segment s : se){
-                   if(s.getConnectionType() == ConnectionType.OVERLAP){
-                       double x = s.getRenderX();
-                       double y = s.getRenderY();
-                       graphics.setColor(Color.red);
-                       graphics.drawRect((int)x, (int) y, 5, 5);
-                       graphics.setColor(Color.GRAY);
-                       System.out.println("print a line");
-                   }
-               }
-               
+
+                List<Segment> se = next.getConnectedSegments();
+                for (Segment s : se) {
+                    if (s.getConnectionType() == ConnectionType.OVERLAP) {
+                        double x = s.getRenderX();
+                        double y = s.getRenderY();
+                        graphics.setColor(Color.red);
+                        graphics.drawRect((int) x, (int) y, 5, 5);
+                        graphics.setColor(Color.GRAY);
+                        System.out.println("print a line");
+                    }
+                }
+
                 // we need to render the straight section we were just
                 // looping over as the next section is a corner
                 if (next.getAngle() != 0 && currentTypeStraight) {

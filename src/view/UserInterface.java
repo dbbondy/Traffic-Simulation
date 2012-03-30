@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
@@ -119,6 +120,7 @@ public class UserInterface extends JFrame {
         simulationContainer.add(simPanel);
 
         JPanel sideBar = new JPanel() {
+
             @Override
             public Dimension getPreferredSize() {
                 return new Dimension(220, 0);
@@ -188,20 +190,20 @@ public class UserInterface extends JFrame {
 
             }
         });
-        
+
         saveJunc.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(simPanel.serialiseJunction()){
+                if (simPanel.serialiseJunction()) {
                     displayNotification("Junction saved successfully!");
-                }else{
+                } else {
                     displayNotification("Junction not saved successfully!");
                 }
             }
         });
-        
-        
+
+
         loadJunc.addActionListener(new ActionListener() {
 
             @Override
@@ -209,18 +211,21 @@ public class UserInterface extends JFrame {
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fileChooser.setAcceptAllFileFilterUsed(false);
-                fileChooser.addChoosableFileFilter(new CustomImageFilter());
-                
+                fileChooser.addChoosableFileFilter(new CustomFilter());
+
                 int returnOption = fileChooser.showOpenDialog(loadJunc);
-                if(returnOption == JFileChooser.APPROVE_OPTION){
+                if (returnOption == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     String filePath = selectedFile.getAbsolutePath();
+                    int i = filePath.lastIndexOf("\\");
+                    String currentDir = filePath.substring(0, i);
+
                     boolean result = simPanel.deserialiseJunction(filePath);
-                    if(result == true){
+                    if (result == true) {
                         displayNotification("Image loaded successfully!");
-                    }else{
+                    } else {
                         displayNotification("Image was not loaded correctly!");
-                        
+
                     }
                 }
             }
@@ -232,25 +237,25 @@ public class UserInterface extends JFrame {
             Simulation.getSimulationThread().notify();
         }
     }
-    
-    private void displayNotification(String message){
-       JOptionPane.showMessageDialog(this,
+
+    private void displayNotification(String message) {
+        JOptionPane.showMessageDialog(this,
                 message,
                 "Notification",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 }
 
- class CustomImageFilter extends FileFilter{
+class CustomFilter extends FileFilter {
 
     @Override
     public boolean accept(File f) {
-        if(f.isDirectory()){
+        if (f.isDirectory()) {
             return true;
         }
         String fileExt = getExtension(f);
-        if(fileExt != null){
-            switch(fileExt){
+        if (fileExt != null) {
+            switch (fileExt) {
                 case "jpeg":
                     return true;
                 case "gif":
@@ -259,6 +264,8 @@ public class UserInterface extends JFrame {
                     return true;
                 case "jpg":
                     return true;
+                case "st":
+                    return true;
             }
         }
         return false;
@@ -266,22 +273,20 @@ public class UserInterface extends JFrame {
 
     @Override
     public String getDescription() {
-        return "Image types";
+        return "Image and Simulation state types";
     }
-     
-      /*
+
+    /*
      * Get the extension of a file.
-     */  
+     */
     public String getExtension(File f) {
         String ext = null;
         String s = f.getName();
         int i = s.lastIndexOf('.');
 
-        if (i > 0 &&  i < s.length() - 1) {
-            ext = s.substring(i+1).toLowerCase();
+        if (i > 0 && i < s.length() - 1) {
+            ext = s.substring(i + 1).toLowerCase();
         }
         return ext;
     }
-    
-    
- }
+}
