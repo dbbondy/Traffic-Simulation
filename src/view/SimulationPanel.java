@@ -10,10 +10,7 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -159,18 +156,34 @@ public class SimulationPanel extends JPanel {
             out.close();
             return true; //image  and system state wrote successfully, so return true
         } catch (IOException e) {
-            
             return false; //something went wrong. return false
         }
     }
 
     //TODO: incorrect
-    public boolean deserialiseJunction(String filepath) {
+    public boolean deserialiseJunction(String filePath) {
+        int x = filePath.lastIndexOf("\\");
+        String fileDir = filePath.substring(0, x);
+        File dir = new File(fileDir);
+        String[] children = dir.list();
+
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".st");
+            }
+        };
+        children = dir.list(filter);
+        State incomingState;
         try {
-            image = ImageIO.read(new File(filepath));
+            FileInputStream fis = new FileInputStream(children[0]);
+            ObjectInputStream in = new ObjectInputStream(fis);
+            incomingState = (State) in.readObject();
+            in.close();
+
+            image = ImageIO.read(new File(filePath));
             this.repaint();
             return true;
-        } catch (IOException ioe) {
+        } catch (IOException | ClassNotFoundException ioe) {
             return false;
         }
     }

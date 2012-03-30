@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import model.Lane;
 import model.Segment;
+import model.State;
 import model.Vehicle;
 import model.junctions.Junction;
 import view.SettingsWindow;
@@ -60,6 +61,10 @@ public class Simulation {
         if (ui != null) {
             ui.updateGUI();
         }
+    }
+    
+    public static void setSimulationState(State state){
+        
     }
 
     public static synchronized boolean isPaused() {
