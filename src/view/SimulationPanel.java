@@ -163,11 +163,15 @@ public class SimulationPanel extends JPanel {
 
     //TODO: incorrect
     public boolean deserialiseJunction(String filePath) {
-        int lastSepIndex = filePath.lastIndexOf("\\");
-        String fileDir = filePath.substring(0, lastSepIndex);
-        File dir = new File(fileDir);
-        
+        File f = new File(filePath);
+        if (!f.isDirectory()) { //if the path is not already a directory, get the current directory the filepath is contained within.
+            File fileDir = f.getParentFile();
+            File dir = new File(fileDir.getAbsolutePath()); //parent directory path of the selected file
+        }
+        File dir = new File(f.getAbsolutePath());
+
         FilenameFilter filter = new FilenameFilter() {
+
             @Override
             public boolean accept(File dir, String name) {
                 return name.endsWith(".st");
@@ -180,13 +184,13 @@ public class SimulationPanel extends JPanel {
             ObjectInputStream in = new ObjectInputStream(fis);
             incomingState = (State) in.readObject();
             in.close();
-            if(!(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString()))){ //if incoming state junction differs from our current junction
-                Simulation.reset();
+            if (!(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString()))) { //if incoming state junction differs from our current junction
                 Simulation.setSimulationState(incomingState);
+                Simulation.reset();
             }
-            
+
             //TODO: examine the behaviour of this more. does it work perfectly as intended? no? why?
-            
+
             image = ImageIO.read(new File(filePath));
             this.repaint();
             return true;

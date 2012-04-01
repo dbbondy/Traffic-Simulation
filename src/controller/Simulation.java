@@ -163,7 +163,8 @@ public class Simulation {
         setOption(TIME_STEP, 0); 
         started = false;
         paused = false;
-        
+        ui.updateGUI();
+        ui.reloadGUI();
     }
 
     public static SimulationThread getSimulationThread() {

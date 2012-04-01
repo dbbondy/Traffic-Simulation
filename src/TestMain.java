@@ -18,9 +18,11 @@ public class TestMain {
         if (returnOption == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             String filePath = selectedFile.getAbsolutePath();
-            int x = filePath.lastIndexOf("\\");
-            String fileDir = filePath.substring(0, x);
-            File dir = new File(fileDir);
+            File f = selectedFile.getParentFile();
+            System.out.println(selectedFile.getAbsolutePath());
+            System.out.println(f.getAbsolutePath());
+            
+            File dir = new File(f.getAbsolutePath());
             String[] children = dir.list();
             if (children == null) {
                 // Either dir does not exist or is not a directory

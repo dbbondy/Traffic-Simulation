@@ -217,9 +217,7 @@ public class UserInterface extends JFrame {
                 if (returnOption == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     String filePath = selectedFile.getAbsolutePath();
-                    int i = filePath.lastIndexOf("\\");
-                    String currentDir = filePath.substring(0, i);
-
+                    
                     boolean result = simPanel.deserialiseJunction(filePath);
                     if (result == true) {
                         displayNotification("Image loaded successfully!");
