@@ -63,7 +63,7 @@ public class Simulation {
         }
     }
     
-    public static void setSimulationState(State state){
+    public static synchronized void setSimulationState(State state){
         Simulation.setOption(DENSITY, state.getDensity());
         Simulation.setOption(AGGRESSION, state.getAggression());
         Simulation.setOption(CAR_RATIO, state.getCarRatio());
@@ -73,14 +73,19 @@ public class Simulation {
         switch(state.getJunction()){
             case "Two-Lane Junction":
                 Simulation.setOption(JUNCTION_TYPE, new TwoLaneJunction());
+                break;
             case "Flyover Junction":
                 Simulation.setOption(JUNCTION_TYPE, new FlyoverJunction());
+                break;
             case "Plain Junction":
                 Simulation.setOption(JUNCTION_TYPE, new PlainJunction());
+                break;
             case "Traffic Light Junction":
                 Simulation.setOption(JUNCTION_TYPE, new TrafficLightJunction());
+                break;
             case "Roundabout Junction":
                 Simulation.setOption(JUNCTION_TYPE, new RoundaboutJunction());
+                break;
         }
     }
 
@@ -165,6 +170,7 @@ public class Simulation {
         paused = false;
         ui.updateGUI();
         ui.reloadGUI();
+        
     }
 
     public static SimulationThread getSimulationThread() {

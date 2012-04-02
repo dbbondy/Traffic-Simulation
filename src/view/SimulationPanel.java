@@ -54,9 +54,10 @@ public class SimulationPanel extends JPanel {
         return size;
     }
 
-    private void drawVehicles(Graphics g) {
+    private synchronized void drawVehicles(Graphics g) {
         Graphics2D graphics = (Graphics2D) g;
         ArrayList<Lane> lanes = currentJunction.getLanes();
+        System.out.println(lanes.size());
         for (Lane l : lanes) {
             for (Vehicle v : l.getVehicles()) {
                 Segment head = v.getHeadSegment();
@@ -164,12 +165,14 @@ public class SimulationPanel extends JPanel {
     //TODO: incorrect
     public boolean deserialiseJunction(String filePath) {
         File f = new File(filePath);
+        File dir;
         if (!f.isDirectory()) { //if the path is not already a directory, get the current directory the filepath is contained within.
             File fileDir = f.getParentFile();
-            File dir = new File(fileDir.getAbsolutePath()); //parent directory path of the selected file
+            dir = new File(fileDir.getAbsolutePath()); //parent directory path of the selected file
+        }else{
+            dir = new File(f.getAbsolutePath());
         }
-        File dir = new File(f.getAbsolutePath());
-
+     
         FilenameFilter filter = new FilenameFilter() {
 
             @Override
@@ -280,7 +283,7 @@ public class SimulationPanel extends JPanel {
                         graphics.setColor(Color.red);
                         graphics.drawRect((int) x, (int) y, 5, 5);
                         graphics.setColor(Color.GRAY);
-                        System.out.println("print a line");
+                        //System.out.println("print a line");
                     }
                 }
 
@@ -375,6 +378,10 @@ public class SimulationPanel extends JPanel {
     public synchronized void clearCache() {
         currentJunction = null;
         image = null;
+    }
+    
+    public synchronized void updatePanel(Junction j){
+        currentJunction = j;
     }
 
     @Override

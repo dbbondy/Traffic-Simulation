@@ -9,9 +9,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import model.junctions.Junction;
 
 /**
  *
@@ -50,6 +50,7 @@ public class UserInterface extends JFrame {
 
     public void reloadGUI() {
         simPanel.clearCache();
+        simPanel.updatePanel((Junction)Simulation.getOption(Simulation.JUNCTION_TYPE));
     }
 
     private void updateButtonState() {
