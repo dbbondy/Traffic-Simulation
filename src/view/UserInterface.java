@@ -50,7 +50,7 @@ public class UserInterface extends JFrame {
 
     public void reloadGUI() {
         simPanel.clearCache();
-        simPanel.updatePanel((Junction)Simulation.getOption(Simulation.JUNCTION_TYPE));
+        simPanel.updatePanel((Junction) Simulation.getOption(Simulation.JUNCTION_TYPE));
     }
 
     private void updateButtonState() {
@@ -192,18 +192,28 @@ public class UserInterface extends JFrame {
             }
         });
 
-        saveJunc.addActionListener(new ActionListener() {
+       saveJunc.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (simPanel.serialiseJunction()) {
-                    displayNotification("Junction saved successfully!");
-                } else {
-                    displayNotification("Junction not saved successfully!");
+                final JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                fileChooser.addChoosableFileFilter(new CustomFilter());
+
+                int returnOption = fileChooser.showSaveDialog(saveJunc);
+                if (returnOption == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    String filePath = selectedFile.getAbsolutePath();
+
+                    if (simPanel.serialiseJunction(filePath)) {
+                        displayNotification("Junction saved successfully!");
+                    } else {
+                        displayNotification("Junction not saved successfully!");
+                    }
                 }
             }
-        });
-
+       });
 
         loadJunc.addActionListener(new ActionListener() {
 
@@ -218,9 +228,7 @@ public class UserInterface extends JFrame {
                 if (returnOption == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     String filePath = selectedFile.getAbsolutePath();
-                    
-                    boolean result = simPanel.deserialiseJunction(filePath);
-                    if (result == true) {
+                    if (simPanel.deserialiseJunction(filePath)) {
                         displayNotification("Image loaded successfully!");
                     } else {
                         displayNotification("Image was not loaded correctly!");

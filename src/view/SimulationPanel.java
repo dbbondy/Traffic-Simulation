@@ -137,13 +137,13 @@ public class SimulationPanel extends JPanel {
         return new double[]{centerX, centerY};
     }
 
-    public boolean serialiseJunction() {
+    public boolean serialiseJunction(String filePath) {
 
         try {
             //write out the image
-            File outputFile = new File("currentJunction.png");
+            File outputFile = new File(filePath);
             ImageIO.write(image, "png", outputFile);
-
+            
             //write out the corresponding state object
             State currentSystemState = new State((int) Simulation.getOption(Simulation.TIME_STEP),
                     Simulation.getOption(Simulation.JUNCTION_TYPE).toString(),
@@ -151,7 +151,9 @@ public class SimulationPanel extends JPanel {
                     (int) Simulation.getOption(Simulation.AGGRESSION),
                     (int) Simulation.getOption(Simulation.CAR_RATIO),
                     (int) Simulation.getOption(Simulation.TRUCK_RATIO));
-            FileOutputStream fos = new FileOutputStream("current_simulation_state.st");
+            File outputFilePath = outputFile.getParentFile();
+            
+            FileOutputStream fos = new FileOutputStream(outputFilePath.getAbsolutePath() + File.separator + "current_simulation_state.st");
             ObjectOutputStream out = new ObjectOutputStream(fos);
             out.writeObject(currentSystemState);
             out.close();
@@ -161,7 +163,7 @@ public class SimulationPanel extends JPanel {
         }
     }
 
-    //TODO: incorrect
+    
     public boolean deserialiseJunction(String filePath) {
         File f = new File(filePath);
         File dir;
@@ -182,7 +184,7 @@ public class SimulationPanel extends JPanel {
         String[] children = dir.list(filter);
         State incomingState;
         try {
-            FileInputStream fis = new FileInputStream(children[0]);
+            FileInputStream fis = new FileInputStream(dir.getAbsolutePath() + File.separator + children[0]);
             ObjectInputStream in = new ObjectInputStream(fis);
             incomingState = (State) in.readObject();
             in.close();
@@ -192,9 +194,7 @@ public class SimulationPanel extends JPanel {
             }else if(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString())){ // if junction from incoming state and current are the same. just set values and resume processing.
                 Simulation.setSimulationState(incomingState);
             }
-
-            //TODO: examine the behaviour of this more. does it work perfectly as intended? no? why?
-
+            
             image = ImageIO.read(new File(filePath));
             this.repaint();
             return true;
