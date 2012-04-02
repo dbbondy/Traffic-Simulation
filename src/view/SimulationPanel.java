@@ -157,7 +157,6 @@ public class SimulationPanel extends JPanel {
             out.close();
             return true; //image and system state wrote successfully, so return true
         } catch (IOException e) {
-            e.printStackTrace();
             return false; //something went wrong. return false
         }
     }
@@ -181,7 +180,7 @@ public class SimulationPanel extends JPanel {
             }
         };
         String[] children = dir.list(filter);
-        State incomingState = null;
+        State incomingState;
         try {
             FileInputStream fis = new FileInputStream(children[0]);
             ObjectInputStream in = new ObjectInputStream(fis);
@@ -190,6 +189,8 @@ public class SimulationPanel extends JPanel {
             if (!(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString()))) { //if incoming state junction differs from our current junction
                 Simulation.setSimulationState(incomingState);
                 Simulation.reset();
+            }else if(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString())){ // if junction from incoming state and current are the same. just set values and resume processing.
+                Simulation.setSimulationState(incomingState);
             }
 
             //TODO: examine the behaviour of this more. does it work perfectly as intended? no? why?

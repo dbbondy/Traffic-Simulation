@@ -63,7 +63,7 @@ public class Simulation {
         }
     }
     
-    public static synchronized void setSimulationState(State state){
+    public static void setSimulationState(State state){
         Simulation.setOption(DENSITY, state.getDensity());
         Simulation.setOption(AGGRESSION, state.getAggression());
         Simulation.setOption(CAR_RATIO, state.getCarRatio());
@@ -87,6 +87,7 @@ public class Simulation {
                 Simulation.setOption(JUNCTION_TYPE, new RoundaboutJunction());
                 break;
         }
+        ui.updateGUI();
     }
 
     public static synchronized boolean isPaused() {

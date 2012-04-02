@@ -37,7 +37,7 @@ public class UserInterface extends JFrame {
         this.setVisible(true);
     }
 
-    public void updateGUI() {
+    public synchronized void updateGUI() {
 
         detailPanel.setTimeText(Simulation.getOption(Simulation.TIME_STEP).toString());
         detailPanel.setVehicleDensityText(Simulation.getOption(Simulation.DENSITY).toString());
