@@ -57,7 +57,6 @@ public class SimulationPanel extends JPanel {
     private synchronized void drawVehicles(Graphics g) {
         Graphics2D graphics = (Graphics2D) g;
         ArrayList<Lane> lanes = currentJunction.getLanes();
-        System.out.println(lanes.size());
         for (Lane l : lanes) {
             for (Vehicle v : l.getVehicles()) {
                 Segment head = v.getHeadSegment();
@@ -281,6 +280,8 @@ public class SimulationPanel extends JPanel {
                     if (s.getConnectionType() == ConnectionType.OVERLAP) {
                         double x = s.getRenderX();
                         double y = s.getRenderY();
+                       // System.out.println("x is: " + x);
+                       // System.out.println("y is: " + y);
                         graphics.setColor(Color.red);
                         graphics.drawRect((int) x, (int) y, 5, 5);
                         graphics.setColor(Color.GRAY);
