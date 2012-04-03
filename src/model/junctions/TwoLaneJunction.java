@@ -4,6 +4,7 @@
  */
 package model.junctions;
 
+import controller.Simulation;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
@@ -24,6 +25,8 @@ public class TwoLaneJunction extends Junction {
     private Lane leftRightwardsLane2;
     private Lane rightLeftwardsLane;
     private Lane rightLeftwardsLane2;
+    private int numberOfVehicles;
+    
     
 
 
@@ -53,8 +56,7 @@ public class TwoLaneJunction extends Junction {
         registerLane(rightLeftwardsLane);
         registerLane(rightLeftwardsLane2);
 
-       
- 
+ /*
         randomCars(bottomUpwardsLane);
         randomCars(bottomUpwardsLane2);
         randomCars(topDownwardsLane);
@@ -64,7 +66,7 @@ public class TwoLaneJunction extends Junction {
         randomCars(rightLeftwardsLane);
         randomCars(rightLeftwardsLane2);
 
-
+*/
       
     }
     
@@ -121,7 +123,7 @@ public class TwoLaneJunction extends Junction {
      }
      
    
-     // TODO: move somewhere more suitable
+    /* // TODO: move somewhere more suitable
     private void randomCars(Lane lane) {
         ArrayList<Segment> segments = lane.getLaneSegments();
         Random r = new Random();
@@ -134,11 +136,19 @@ public class TwoLaneJunction extends Junction {
                 new Truck(lane, s, new Color(9 * 16 + 9, 0, 0));
             }
         }
-    }
+    }*/
 
     @Override
     public void distributeNewCars(int cars, int trucks) {
         // TODO
+        int density = (int)Simulation.getOption(Simulation.DENSITY);
+        if(numberOfVehicles < density){
+            if(density - numberOfVehicles == density){
+                
+            }
+        }
+        
+       
     }
 
     @Override

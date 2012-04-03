@@ -159,6 +159,14 @@ public class SettingsWindow extends JFrame {
                                 showErrMessage("You have inputted negative values for 1 or more fields. Please enter sensible, positive values", "Error");
                                 return;
                             }
+                            
+                            if(field.getName().equals(Simulation.DENSITY)){
+                                if(value > 100){
+                                    showErrMessage("You cannot have an density level greater than 100", "Error");
+                                    return;
+                                }
+                            }
+                            
                             if (field.getName().equals(Simulation.AGGRESSION)) {
                                 if (value > 100) {
                                     showErrMessage("You cannot have an aggression level greater than 100", "Error");
@@ -167,15 +175,15 @@ public class SettingsWindow extends JFrame {
                             }
                             
                             if (field.getName().equals(Simulation.CAR_RATIO)) {
-                                if(value > 100){
-                                    showErrMessage("You cannot have a car ratio level greater than 100", "Error");
+                                if(value > 10){
+                                    showErrMessage("You cannot have a car ratio level greater than 10", "Error");
                                     return;
                                 }
                             }
                             
                             if (field.getName().equals(Simulation.TRUCK_RATIO)) {
-                                if(value > 100){
-                                    showErrMessage("You cannot have a truck ratio level greater than 100", "Error");
+                                if(value > 10){
+                                    showErrMessage("You cannot have a truck ratio level greater than 10", "Error");
                                     return;
                                 }
                             }
@@ -189,8 +197,8 @@ public class SettingsWindow extends JFrame {
                     }
                 }
                 
-                if(((Integer)Simulation.getOption(Simulation.CAR_RATIO)) + ((Integer)Simulation.getOption(Simulation.TRUCK_RATIO)) > 100){
-                    showErrMessage("The ratio of cars : trucks must sum to 100.", "Error");
+                if(((Integer)Simulation.getOption(Simulation.CAR_RATIO)) + ((Integer)Simulation.getOption(Simulation.TRUCK_RATIO)) > 10){
+                    showErrMessage("The ratio of cars : trucks must sum to 10.", "Error");
                     return;
                 }
                 
@@ -223,8 +231,8 @@ public class SettingsWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 densityField.setText("10");
                 aggressionField.setText("25");
-                carRatioField.setText("50");
-                truckRatioField.setText("50");
+                carRatioField.setText("5");
+                truckRatioField.setText("5");
                 junctions.setSelectedIndex(1);
             }
         });
