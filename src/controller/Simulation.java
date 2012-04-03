@@ -132,8 +132,8 @@ public class Simulation {
         // junc.distributeNewCars(carsRatio, trucksRatio); 
          junc.manageJunction(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" 
          //junc.updateDeletions();
-         //when cars go out of the end of the junction, they get "deleted" and statistics are incremented.   
-         */
+         //when cars go outof the end of the junction, they get "deleted" and statistics are incremented.   
+         */ 
         
         
         // test code
@@ -166,11 +166,15 @@ public class Simulation {
     
     public static void reset(){
 
-        setOption(TIME_STEP, 0); 
-        started = false;
-        paused = false;
-        ui.updateGUI();
-        ui.reloadGUI();
+        // cannot stop until the current step
+        // and rendering is complete
+        synchronized (ui) {
+            setOption(TIME_STEP, 0); 
+            started = false;
+            paused = false;
+            ui.updateGUI();
+            ui.reloadGUI();
+        }
         
     }
 
@@ -198,9 +202,14 @@ public class Simulation {
                     }
                 }
                 try {
+                    // synchronize on ui so that
+                    // we can prevent reset() etc 
+                    // while half-way through a step
+                    synchronized (ui) {
+                        simulateOneStep();
+                        ui.updateGUI(); 
+                    }
                     Thread.sleep(30);
-                    simulateOneStep();
-                    ui.updateGUI(); 
                 } catch (InterruptedException ie) {
                     ie.printStackTrace();
                 }

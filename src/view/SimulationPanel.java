@@ -7,12 +7,15 @@ package view;
 import controller.Simulation;
 import java.awt.*;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import model.*;
@@ -29,6 +32,8 @@ public class SimulationPanel extends JPanel {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 680;
     private Dimension size;
+    
+    private ArrayList<PostRenderGraphic> shapesForPostRender;
 
     public SimulationPanel() {
         initPanel();
@@ -37,6 +42,7 @@ public class SimulationPanel extends JPanel {
     private void initPanel() {
         size = new Dimension(WIDTH, HEIGHT);
         this.setBackground(new Color(10 * 16 + 5, 13 * 16 + 6, 10 * 16 + 3)); // 5B8059   A5 D6 A3    A=10
+        this.shapesForPostRender = new ArrayList<PostRenderGraphic>();
     }
 
     @Override
@@ -91,6 +97,11 @@ public class SimulationPanel extends JPanel {
 
         Shape straight = new Rectangle2D.Double(startX, startY, width, length + 1);
         graphics.fill(straight);
+        
+        Shape lineLeft = new Line2D.Double(startX, startY, startX, startY + length);
+        Shape lineRight = new Line2D.Double(startX + width, startY, startX + width, startY + length);
+        this.shapesForPostRender.add(new PostRenderGraphic(lineLeft, angleRadians, x, y));
+        this.shapesForPostRender.add(new PostRenderGraphic(lineRight, angleRadians, x, y));
 
         // undo rotation of canvas
         graphics.rotate(-angleRadians, x, y);
@@ -125,11 +136,14 @@ public class SimulationPanel extends JPanel {
         }
 
         // fix for bad corner anti aliasing / inaccuracy
-        cornerAngle = cornerAngle >= 0 ? cornerAngle + 1 : cornerAngle - 1;
+        double extraCornerAngle = cornerAngle >= 0 ? cornerAngle + 1 : cornerAngle - 1;
 
         Rectangle2D bounds = new Rectangle2D.Double(startX, startY, boxSize, boxSize);
-        Shape corner = new Arc2D.Double(bounds, -startAngle, -cornerAngle, Arc2D.Double.PIE);
+        Shape corner = new Arc2D.Double(bounds, -startAngle, -extraCornerAngle, Arc2D.Double.PIE);
         graphics.fill(corner);
+        
+        Shape cornerOuter = new Arc2D.Double(bounds, -startAngle, -cornerAngle, Arc2D.Double.OPEN);
+        this.shapesForPostRender.add(new PostRenderGraphic(cornerOuter, 0, 0, 0));
 
         // return the center co-ords so we can calculate
         // the new currentX currentY outside 
@@ -142,7 +156,7 @@ public class SimulationPanel extends JPanel {
             //write out the image
             File outputFile = new File(filePath);
             ImageIO.write(image, "png", outputFile);
-            
+
             //write out the corresponding state object
             State currentSystemState = new State((int) Simulation.getOption(Simulation.TIME_STEP),
                     Simulation.getOption(Simulation.JUNCTION_TYPE).toString(),
@@ -151,7 +165,7 @@ public class SimulationPanel extends JPanel {
                     (int) Simulation.getOption(Simulation.CAR_RATIO),
                     (int) Simulation.getOption(Simulation.TRUCK_RATIO));
             File outputFilePath = outputFile.getParentFile();
-            
+
             FileOutputStream fos = new FileOutputStream(outputFilePath.getAbsolutePath() + File.separator + "current_simulation_state.st");
             ObjectOutputStream out = new ObjectOutputStream(fos);
             out.writeObject(currentSystemState);
@@ -162,17 +176,16 @@ public class SimulationPanel extends JPanel {
         }
     }
 
-    
     public boolean deserialiseJunction(String filePath) {
         File f = new File(filePath);
         File dir;
         if (!f.isDirectory()) { //if the path is not already a directory, get the current directory the filepath is contained within.
             File fileDir = f.getParentFile();
             dir = new File(fileDir.getAbsolutePath()); //parent directory path of the selected file
-        }else{
+        } else {
             dir = new File(f.getAbsolutePath());
         }
-     
+
         FilenameFilter filter = new FilenameFilter() {
 
             @Override
@@ -190,10 +203,10 @@ public class SimulationPanel extends JPanel {
             if (!(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString()))) { //if incoming state junction differs from our current junction
                 Simulation.setSimulationState(incomingState);
                 Simulation.reset();
-            }else if(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString())){ // if junction from incoming state and current are the same. just set values and resume processing.
+            } else if (incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString())) { // if junction from incoming state and current are the same. just set values and resume processing.
                 Simulation.setSimulationState(incomingState);
             }
-            
+
             image = ImageIO.read(new File(filePath));
             this.repaint();
             return true;
@@ -204,6 +217,9 @@ public class SimulationPanel extends JPanel {
 
     private void renderToImage() {
 
+        // clear from post render
+        this.shapesForPostRender.clear();
+        
         // we reload the current junction every time we have to render it again
         currentJunction = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
 
@@ -274,20 +290,6 @@ public class SimulationPanel extends JPanel {
             next.setRenderY(currentY);
 
             while ((next = next.getNextSegment()) != null) { // while more segments
-
-                List<Segment> se = next.getConnectedSegments();
-                for (Segment s : se) {
-                    if (s.getConnectionType() == ConnectionType.OVERLAP) {
-                        double x = s.getRenderX();
-                        double y = s.getRenderY();
-                       // System.out.println("x is: " + x);
-                       // System.out.println("y is: " + y);
-                        graphics.setColor(Color.red);
-                        graphics.drawRect((int) x, (int) y, 5, 5);
-                        graphics.setColor(Color.GRAY);
-                        //System.out.println("print a line");
-                    }
-                }
 
                 // we need to render the straight section we were just
                 // looping over as the next section is a corner
@@ -374,15 +376,61 @@ public class SimulationPanel extends JPanel {
 
             }
         }
+        
+        graphics.setColor(new Color(80, 80, 80));
+        for (PostRenderGraphic over : this.shapesForPostRender) {
+            if (over.renderAngle != 0) {
+                graphics.rotate(over.renderAngle, over.rotateX, over.rotateY);
+                graphics.draw(over.shape);
+                graphics.rotate(-over.renderAngle, over.rotateX, over.rotateY);
+            } else {
+                graphics.draw(over.shape);
+            }
+        }
 
+       /* int colorIndex = 0;
+        
+        Color[] colors = new Color[] {
+            Color.RED, Color.BLUE, Color.GREEN,
+            Color.BLACK, Color.ORANGE, Color.PINK, Color.WHITE,
+            new Color(10*16+12, 4*16, 12*16+7)
+        };
+
+        for (Lane lane : lanes) {
+
+            Segment next = lane.getFirstSegment();
+
+            while (true) {
+
+                Set<Segment> segments = next.getConnectedSegments().keySet();
+                
+                for (Segment segment : segments) {
+                    ConnectionType ct = next.getConnectedSegments().get(segment);
+                    if (ct != ConnectionType.OVERLAP) continue;
+                    graphics.setColor(colors[colorIndex]);
+                    int x = (int) next.getRenderX();
+                    int y = (int) next.getRenderY();
+                    graphics.fillRect(x-2, y-2, 4, 4);
+                    x = (int) segment.getRenderX();
+                    y = (int) segment.getRenderY();
+                    graphics.fillRect(x-2, y-2, 4, 4);
+                    colorIndex++;
+                }
+                
+                // no more segments so we exit the loop
+                if ((next = next.getNextSegment()) == null) break;
+
+            }
+            
+        }*/
     }
 
     public synchronized void clearCache() {
         currentJunction = null;
         image = null;
     }
-    
-    public synchronized void updatePanel(Junction j){
+
+    public synchronized void updatePanel(Junction j) {
         currentJunction = j;
     }
 
@@ -401,6 +449,9 @@ public class SimulationPanel extends JPanel {
                 || image.getHeight() != getHeight()) {
             renderToImage();
         }
+        
+        System.out.println(getHeight());
+        System.out.println(getWidth());
 
         Graphics2D graphics = (Graphics2D) graphics1;
 
@@ -418,5 +469,18 @@ public class SimulationPanel extends JPanel {
             graphics.fillRect(this.getWidth() - 50, 20, 10, 40);
             graphics.fillRect(this.getWidth() - 30, 20, 10, 40);
         }
+    }
+}
+
+class PostRenderGraphic {
+    public Shape shape;
+    public double renderAngle;
+    public double rotateX;
+    public double rotateY;
+    public PostRenderGraphic(Shape shape, double renderAngle, double rotateX, double rotateY) {
+        this.shape = shape;
+        this.renderAngle = renderAngle;
+        this.rotateX = rotateX;
+        this.rotateY = rotateY;
     }
 }

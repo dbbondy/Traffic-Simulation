@@ -1,9 +1,9 @@
 package model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -17,9 +17,8 @@ public class Segment{
     public static final int LENGTH = 1;
     private Segment next;
     private Segment previous;
-    private List<Segment> connectedSegments;
+    private Map<Segment, ConnectionType> connectedSegments;
     private Lane lane;
-    private ConnectionType connType;
     private static int segmentCounter = 0;
     private int id;
     private int renderAngle;
@@ -33,7 +32,7 @@ public class Segment{
         this.angle = angle;
         this.lane = lane;
         this.id = segmentCounter++;
-        connectedSegments = new ArrayList<Segment>();
+        connectedSegments = new HashMap<>();
     }
     
     public int id() {
@@ -64,23 +63,15 @@ public class Segment{
         return this.angle;
     }
     
-    public ConnectionType getConnectionType(){
-        return connType;
+    public void addConnectedSegment(Segment segment, ConnectionType type){
+        connectedSegments.put(segment, type);
     }
     
-    public void setConnectionType(ConnectionType type){
-        connType = type;
+    public void addConnectedSegments(Segment[] segments, ConnectionType type){
+        for (Segment s : segments) addConnectedSegment(s, type);
     }
     
-    public void addConnectedSegment(Segment segment){
-        connectedSegments.add(segment);
-    }
-    
-    public void addConnectedSegments(Segment[] segments){
-        connectedSegments.addAll(Arrays.asList(segments));
-    }
-    
-    public List<Segment> getConnectedSegments(){
+    public Map<Segment, ConnectionType> getConnectedSegments(){
         return connectedSegments;
     }
     

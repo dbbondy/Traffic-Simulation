@@ -6,9 +6,9 @@ package model.junctions;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import model.*;
+import view.SimulationPanel;
 
 /**
  *
@@ -28,15 +28,18 @@ public class TwoLaneJunction extends Junction {
 
 
     public TwoLaneJunction() {
-        bottomUpwardsLane = new Lane(400, 648, 180);
-        bottomUpwardsLane2 = new Lane(400 - Segment.WIDTH - 2, 648, 180);
-        topDownwardsLane = new Lane((400 - (Segment.WIDTH * 2)) - 6, 0, 0);
-        topDownwardsLane2 = new Lane((400 - Segment.WIDTH * 3) - 8, 0, 0);
-        leftRightwardsLane = new Lane(0, 350, 270);
-        leftRightwardsLane2 = new Lane(0, 350 - Segment.WIDTH - 2, 270);
         
-        rightLeftwardsLane = new Lane(800, (350 - (Segment.WIDTH * 2) - 6), 90);
-        rightLeftwardsLane2 = new Lane(800, (350 - (Segment.WIDTH * 3) - 8), 90);
+        bottomUpwardsLane = new Lane(400, SimulationPanel.HEIGHT, 180);
+        bottomUpwardsLane2 = new Lane(400 - Segment.WIDTH, SimulationPanel.HEIGHT, 180);
+        
+        topDownwardsLane = new Lane((400 - (Segment.WIDTH * 2)), 0, 0);
+        topDownwardsLane2 = new Lane((400 - Segment.WIDTH * 3), 0, 0);
+        
+        leftRightwardsLane = new Lane(0, 350, 270);
+        leftRightwardsLane2 = new Lane(0, 350 - Segment.WIDTH, 270);
+        
+        rightLeftwardsLane = new Lane(800, (350 - (Segment.WIDTH * 2)), 90);
+        rightLeftwardsLane2 = new Lane(800, (350 - (Segment.WIDTH * 3)), 90);
         
         buildRoads();
         setUpIntersectionConnections();
@@ -50,9 +53,8 @@ public class TwoLaneJunction extends Junction {
         registerLane(rightLeftwardsLane);
         registerLane(rightLeftwardsLane2);
 
-        testRoad(bottomUpwardsLane);
-        testRoad(bottomUpwardsLane2);
-/*  
+       
+ 
         randomCars(bottomUpwardsLane);
         randomCars(bottomUpwardsLane2);
         randomCars(topDownwardsLane);
@@ -62,136 +64,64 @@ public class TwoLaneJunction extends Junction {
         randomCars(rightLeftwardsLane);
         randomCars(rightLeftwardsLane2);
 
-*/
+
       
     }
     
-    private void testRoad(Lane l){
-        ArrayList<Segment> s = l.getLaneSegments();
-        for(Segment x : s){
-            System.out.println(x.getRenderX());
-            System.out.println(x.getRenderY());
-        }
-    }
+
     
     
      private void buildRoads(){
-        RoadDesigner.buildLanes(685, bottomUpwardsLane, bottomUpwardsLane2);
-        RoadDesigner.buildLanes(685, topDownwardsLane, topDownwardsLane2);
-        RoadDesigner.buildLanes(800, leftRightwardsLane, leftRightwardsLane2);
-        RoadDesigner.buildLanes(800, rightLeftwardsLane, rightLeftwardsLane2);
-        
+        RoadDesigner.buildParallelLanes(SimulationPanel.HEIGHT, bottomUpwardsLane, bottomUpwardsLane2);
+        RoadDesigner.buildParallelLanes(SimulationPanel.HEIGHT, topDownwardsLane, topDownwardsLane2);
+        RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, leftRightwardsLane, leftRightwardsLane2);
+        RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, rightLeftwardsLane, rightLeftwardsLane2);
     }
      
      private void setUpIntersectionConnections(){
          
-         //bottom upwards lane intersections.
-         Segment s1 = bottomUpwardsLane.getLaneSegments().get(287);
-         Segment s2 = leftRightwardsLane.getLaneSegments().get(411);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
+         Segment s1;
+         Segment s2;
          
-         List<Segment> s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
+         int width50 = Segment.WIDTH / 2;
          
+         s1 = topDownwardsLane2.getLaneSegments().get(rightLeftwardsLane2.getYStart() - width50);
+         s2 = rightLeftwardsLane2.getLaneSegments().get(SimulationPanel.WIDTH - (topDownwardsLane2.getXStart() - width50));
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
          
-         s1 = bottomUpwardsLane.getLaneSegments().get(383);
-         s2 = rightLeftwardsLane2.getLaneSegments().get(389);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
+         s1 = rightLeftwardsLane2.getLaneSegments().get(SimulationPanel.WIDTH - (bottomUpwardsLane.getXStart() + width50));
+         s2 = bottomUpwardsLane.getLaneSegments().get(SimulationPanel.HEIGHT - (rightLeftwardsLane2.getYStart() - width50));
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
          
-         s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
+         s1 = leftRightwardsLane.getLaneSegments().get(topDownwardsLane2.getXStart() - width50);
+         s2 = topDownwardsLane2.getLaneSegments().get(leftRightwardsLane.getYStart() + width50);
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
          
-         s1 = bottomUpwardsLane2.getLaneSegments().get(337);
-         s2 = rightLeftwardsLane.getLaneSegments().get(435);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
+         s1 = bottomUpwardsLane.getLaneSegments().get(SimulationPanel.HEIGHT - (leftRightwardsLane.getYStart() + width50));
+         s2 = leftRightwardsLane.getLaneSegments().get(bottomUpwardsLane.getXStart() + width50);
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
          
-         s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
+         s1 = rightLeftwardsLane.getLaneSegments().get(SimulationPanel.WIDTH - (topDownwardsLane.getXStart() + width50));
+         s2 = topDownwardsLane.getLaneSegments().get(rightLeftwardsLane.getYStart() + width50);
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
          
-         //top downwards lane intersections
-         s1 = topDownwardsLane.getLaneSegments().get(339);
-         s2 = leftRightwardsLane.getLaneSegments().get(361);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
+         s1 = bottomUpwardsLane2.getLaneSegments().get(SimulationPanel.HEIGHT - (rightLeftwardsLane.getYStart() + width50));
+         s2 = rightLeftwardsLane.getLaneSegments().get(SimulationPanel.WIDTH - (bottomUpwardsLane2.getXStart() - width50));
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+
+         s1 = leftRightwardsLane2.getLaneSegments().get(bottomUpwardsLane2.getXStart() - width50);
+         s2 = bottomUpwardsLane2.getLaneSegments().get(SimulationPanel.HEIGHT - (leftRightwardsLane2.getYStart() - width50));
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
          
-         s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
+         s1 = topDownwardsLane.getLaneSegments().get(leftRightwardsLane2.getYStart() - width50);
+         s2 = leftRightwardsLane2.getLaneSegments().get(topDownwardsLane.getXStart() + width50);
+         s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
          
-         s1 = topDownwardsLane2.getLaneSegments().get(265);
-         s2 = rightLeftwardsLane2.getLaneSegments().get(484);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
-         
-         s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
-         
-         //left rightwards lane intersections
-         s1 = leftRightwardsLane.getLaneSegments().get(315);
-         s2 = topDownwardsLane2.getLaneSegments().get(361);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
-         
-          s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
-         
-         s1 = leftRightwardsLane2.getLaneSegments().get(365);
-         s2 = bottomUpwardsLane2.getLaneSegments().get(333);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
-         
-         s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
-         
-         //right leftwards lane intersections
-         s1 = rightLeftwardsLane.getLaneSegments().get(439);
-         s2 = topDownwardsLane.getLaneSegments().get(311);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
-         
-         s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
-         
-         s1 = rightLeftwardsLane2.getLaneSegments().get(389);
-         s2 = topDownwardsLane2.getLaneSegments().get(383);
-         RoadDesigner.setUpConnectionOverlap(s1, s2);
-         
-         s = s1.getConnectedSegments();
-         for(Segment x : s){
-             if(x.getConnectionType() == ConnectionType.OVERLAP){
-                 x.getRenderX();
-             }
-         }
          
      }
      
    
+     // TODO: move somewhere more suitable
     private void randomCars(Lane lane) {
         ArrayList<Segment> segments = lane.getLaneSegments();
         Random r = new Random();

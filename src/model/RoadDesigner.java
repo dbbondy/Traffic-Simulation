@@ -69,50 +69,13 @@ public class RoadDesigner {
         lane.add(s);
     }
     
-    public static void buildLanes(int length, Lane lane1, Lane lane2){
+    public static void buildParallelLanes(int length, Lane lane1, Lane lane2){
         Segment[] s1 = RoadDesigner.buildStraight(length, lane1);
         Segment[] s2 = RoadDesigner.buildStraight(length, lane2);
-        RoadDesigner.setUpConnectionsAdjacent(s1, s2);
+        for (int i = 0; i < s1.length; i++) {
+            s1[i].addConnectedSegment(s2[i], ConnectionType.NEXT_TO);
+        }
         lane1.add(s1);
         lane2.add(s2);
-    }
-    
-    public static void setUpConnectionsAdjacent(Segment[] firstSet, Segment[] secondSet) throws SegmentCollectionEmptyException {
-        if (firstSet.length == 0 || secondSet.length == 0) {
-            throw new SegmentCollectionEmptyException("Collection is empty");
-        }
-        for (int i = 0; i < firstSet.length; i++) {
-            setUpConnectionSingle(firstSet[i], secondSet[i], ConnectionType.NEXT_TO);
-        }
-    }
-    
-    public static void setUpConnectionsAdjacent(Segment s1, Segment s2)throws NullPointerException{
-        if(s1 == null || s2 == null){
-            throw new NullPointerException("One of the segments attempted to make a connection with a null reference");
-        }
-        setUpConnectionSingle(s1, s2, ConnectionType.NEXT_TO);
-    }
-    
-    public static void setUpConnectionOverlap(Segment s1, Segment s2)throws NullPointerException{
-        if(s1 == null || s2 == null){
-            throw new NullPointerException("One of the segments attempted to make a connection with a null reference");
-        }
-        setUpConnectionSingle(s1, s2, ConnectionType.OVERLAP);
-    }
-    
-    public static void setUpConnectionOverlap(Segment[] firstSet, Segment[] secondSet) throws SegmentCollectionEmptyException{
-        if (firstSet.length == 0 || secondSet.length == 0) {
-            throw new SegmentCollectionEmptyException("Collection is empty");
-        }
-        for (int i = 0; i < firstSet.length; i++) {
-            setUpConnectionSingle(firstSet[i], secondSet[i], ConnectionType.OVERLAP);
-        }
-    }
-
-    private static void setUpConnectionSingle(Segment seg1, Segment seg2, ConnectionType connType) { 
-        seg1.addConnectedSegment(seg2);
-        seg2.addConnectedSegment(seg1);
-        seg1.setConnectionType(connType);
-        seg2.setConnectionType(connType);
     }
 }

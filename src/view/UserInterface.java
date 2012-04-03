@@ -37,7 +37,7 @@ public class UserInterface extends JFrame {
         this.setVisible(true);
     }
 
-    public synchronized void updateGUI() {
+    public void updateGUI() {
 
         detailPanel.setTimeText(Simulation.getOption(Simulation.TIME_STEP).toString());
         detailPanel.setVehicleDensityText(Simulation.getOption(Simulation.DENSITY).toString());
@@ -84,7 +84,13 @@ public class UserInterface extends JFrame {
         saveJunc = new JButton("Save Junction");
         loadJunc = new JButton("Load Junction");
 
-        buttonPanel = new JPanel();
+        buttonPanel = new JPanel() {
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(0, 33);
+            }
+        };
+        
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         detailPanel = new DetailsPanel();
@@ -95,7 +101,7 @@ public class UserInterface extends JFrame {
         width += this.getInsets().left;
         width += this.getInsets().right;
 
-        int height = SimulationPanel.HEIGHT;
+        int height = SimulationPanel.HEIGHT + 33;
         height += this.getInsets().top;
         height += this.getInsets().bottom;
 
