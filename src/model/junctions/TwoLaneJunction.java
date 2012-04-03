@@ -143,12 +143,35 @@ public class TwoLaneJunction extends Junction {
         // TODO
         int density = (int)Simulation.getOption(Simulation.DENSITY);
         if(numberOfVehicles < density){
-            if(density - numberOfVehicles == density){
+            if(density - numberOfVehicles == density){ // if num of vehicles is 0.
+                for(Lane l : getLanes()){
+                    //BLAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+                }
+            }else if((density - numberOfVehicles) > getLanes().size()){ // if difference between density and number of vehicles on road is greater than the number of lanes
+                
+            }else{ //else the difference between density value and number of vehicles on road is less than the number of lanes.
                 
             }
+            
         }
+    }
+    
+    @Override
+    protected Lane chooseEmptyLane(){
         
-       
+        for(Lane l : getLanes()){
+            Segment firstSegment = l.getFirstSegment();
+            Vehicle closestVehicleToStart = l.getVehicleAhead(firstSegment);
+            Segment closestVehiclePosition = closestVehicleToStart.getHeadSegment();
+            if(closestVehicleToStart.equals(firstSegment)){ //if there is a vehicle in the first segment of this lane.
+                continue;
+            }else if(l.getLaneSegments().indexOf(closestVehicleToStart) - 1 > closestVehicleToStart.getLength()){ //if there is no vehicle immediately in front, but is long enough to occupy some space of where the vehicle is to be positioned
+                continue;
+            }else{
+                return l;
+            }
+        }
+        return null;
     }
 
     @Override

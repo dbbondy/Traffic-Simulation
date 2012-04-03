@@ -1,9 +1,9 @@
 
 package model.junctions;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import model.Lane;
+import model.Vehicle;
 
 /**
  *
@@ -15,6 +15,7 @@ public abstract class Junction{
     
     public abstract void distributeNewCars(int cars, int trucks);
     public abstract void manageJunction();
+    protected abstract Lane chooseEmptyLane();
         
     public ArrayList<Lane> getLanes(){
         return lanes;
