@@ -455,10 +455,7 @@ public class SimulationPanel extends JPanel {
                     || image.getHeight() != getHeight()) {
                 renderToImage();
             }
-            
-            System.out.println(getHeight());
-            System.out.println(getWidth());
-
+           
             Graphics2D graphics = (Graphics2D) graphics1;
 
             graphics.setRenderingHint(

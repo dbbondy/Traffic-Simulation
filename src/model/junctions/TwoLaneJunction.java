@@ -23,8 +23,7 @@ public class TwoLaneJunction extends Junction {
     private Lane leftRightwardsLane2;
     private Lane rightLeftwardsLane;
     private Lane rightLeftwardsLane2;
-    private int numberOfVehicles;
-    private Random rnd;
+    
 
     public TwoLaneJunction() {
 
@@ -53,7 +52,7 @@ public class TwoLaneJunction extends Junction {
         registerLane(rightLeftwardsLane2);
 
         numberOfVehicles = 0; // we start with 0 vehicles in the junction.
-        rnd = new Random(System.nanoTime());
+        
  /*
          * randomCars(bottomUpwardsLane); randomCars(bottomUpwardsLane2); randomCars(topDownwardsLane); randomCars(topDownwardsLane2); randomCars(leftRightwardsLane); randomCars(leftRightwardsLane2);
          * randomCars(rightLeftwardsLane); randomCars(rightLeftwardsLane2);
@@ -114,8 +113,13 @@ public class TwoLaneJunction extends Junction {
     @Override
     protected Lane chooseLane() {
         ArrayList<Lane> potentialLanes = new ArrayList<>(getLanes().size());
+        int lanes = 0;
         for (Lane l : getLanes()) {
-
+            System.out.println("lane " + lanes++ + "has " + l.getVehicles().size() + "vehicles");
+            if(l.getVehicles().isEmpty()){ //if lane is devoid of vehicles. it is obviously a potential lane.
+                potentialLanes.add(l);
+                continue;
+            }
             Segment firstSegment = l.getFirstSegment();
             Vehicle closestVehicleToStart = l.getVehicleAhead(firstSegment);
             Segment closestVehiclePosition = closestVehicleToStart.getHeadSegment();
@@ -127,10 +131,15 @@ public class TwoLaneJunction extends Junction {
             } else if (closestVehicleIndex - firstIndex > (closestVehicleToStart.getLength() + 5)) { //if there is no vehicle immediately in front, but is long enough to occupy some space of where the vehicle is to be positioned
                 continue;
             } else {
-                return l;
+                potentialLanes.add(l);
             }
         }
-        return null;
+     
+        if(potentialLanes.isEmpty()){
+            return null;
+        }else{
+            return potentialLanes.get(rnd.nextInt(potentialLanes.size()));
+        }
     }
 
     @Override
