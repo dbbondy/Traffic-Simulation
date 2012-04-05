@@ -24,6 +24,7 @@ import model.junctions.Junction;
 /**
  *
  * @author Dan
+ * @author Jonathan Pike ( contact: mats@staite.net )
  */
 public class SimulationPanel extends JPanel {
 
@@ -160,7 +161,8 @@ public class SimulationPanel extends JPanel {
             //write out the corresponding state object
             State currentSystemState = new State((int) Simulation.getOption(Simulation.TIME_STEP),
                     Simulation.getOption(Simulation.JUNCTION_TYPE).toString(),
-                    (int) Simulation.getOption(Simulation.DENSITY),
+                    (int) Simulation.getOption(Simulation.MIN_DENSITY),
+                    (int) Simulation.getOption(Simulation.MAX_DENSITY),
                     (int) Simulation.getOption(Simulation.AGGRESSION),
                     (int) Simulation.getOption(Simulation.CAR_RATIO),
                     (int) Simulation.getOption(Simulation.TRUCK_RATIO));

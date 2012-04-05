@@ -17,7 +17,8 @@ import view.UserInterface;
  */
 public class Simulation {
 
-    public static final String DENSITY = "density";
+    public static final String MIN_DENSITY = "min-density";
+    public static final String MAX_DENSITY = "max-density";
     public static final String AGGRESSION = "aggression";
     public static final String CAR_RATIO = "car ratio";
     public static final String TRUCK_RATIO = "truck ratio";
@@ -32,7 +33,8 @@ public class Simulation {
 
     public static void init() {
         settings = new HashMap<>();
-        settings.put(DENSITY, 0);
+        settings.put(MIN_DENSITY, 0);
+        settings.put(MAX_DENSITY, 0);
         settings.put(AGGRESSION, 0);
         settings.put(CAR_RATIO, 0);
         settings.put(TRUCK_RATIO, 0);
@@ -64,7 +66,8 @@ public class Simulation {
     }
     
     public static void setSimulationState(State state){
-        Simulation.setOption(DENSITY, state.getDensity());
+        Simulation.setOption(MIN_DENSITY, state.getMinDensity());
+        Simulation.setOption(MAX_DENSITY, state.getMaxDensity());
         Simulation.setOption(AGGRESSION, state.getAggression());
         Simulation.setOption(CAR_RATIO, state.getCarRatio());
         Simulation.setOption(TRUCK_RATIO, state.getTruckRatio());
@@ -124,7 +127,7 @@ public class Simulation {
 
     private static void simulateOneStep() {
         
-        // prevent rendering while AI
+        // prevent rendering while AI processes
         synchronized (Simulation.class) {
             
             //core simulation step progress.

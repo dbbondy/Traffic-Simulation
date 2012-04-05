@@ -18,7 +18,8 @@ import javax.swing.border.Border;
  */
 public class DetailsPanel extends JPanel {
 
-    private JLabel carDensityDetail;
+    private JLabel vehicleMinDensityDetail;
+    private JLabel vehicleMaxDensityDetail;
     private JLabel carAggressiveDetail;
     private JLabel ratioCarsDetail;
     private JLabel ratioTrucksDetail;
@@ -35,13 +36,22 @@ public class DetailsPanel extends JPanel {
 
     private void initComponents() {
         
-        JLabel carDensityDetailL = new JLabel("Car Density");
-        carDensityDetail = new JLabel(Simulation.getOption(Simulation.DENSITY).toString());
-        JPanel carDensityDetailP = new JPanel();
-        carDensityDetailP.setBackground(null);
-        carDensityDetailP.setLayout(new BorderLayout());
-        carDensityDetailP.add(carDensityDetailL, BorderLayout.LINE_START);
-        carDensityDetailP.add(carDensityDetail, BorderLayout.LINE_END);
+        JLabel vehicleMinDensityDetailL = new JLabel("Vehicle Minimum Density");
+        vehicleMinDensityDetail = new JLabel(Simulation.getOption(Simulation.MIN_DENSITY).toString());
+        vehicleMaxDensityDetail = new JLabel(Simulation.getOption(Simulation.MAX_DENSITY).toString());
+        JPanel vehicleMinDensityP = new JPanel();
+        vehicleMinDensityP.setBackground(null);
+        vehicleMinDensityP.setLayout(new BorderLayout());
+        vehicleMinDensityP.add(vehicleMinDensityDetailL, BorderLayout.LINE_START);
+        vehicleMinDensityP.add(vehicleMinDensityDetail, BorderLayout.LINE_END);
+        
+        JLabel vehicleMaxDensityDetailL = new JLabel("Vehicle Maximum Density");
+        vehicleMaxDensityDetail = new JLabel(Simulation.getOption(Simulation.MAX_DENSITY).toString());
+        JPanel vehicleMaxDensityP = new JPanel();
+        vehicleMaxDensityP.setBackground(null);
+        vehicleMaxDensityP.setLayout(new BorderLayout());
+        vehicleMaxDensityP.add(vehicleMaxDensityDetailL, BorderLayout.LINE_START);
+        vehicleMaxDensityP.add(vehicleMaxDensityDetail, BorderLayout.LINE_END);
         
         JLabel carAggressiveDetailL = new JLabel("Vehicle Aggression"); // + Simulation.getOption(Simulation.AGGRESSION));
         carAggressiveDetail = new JLabel(Simulation.getOption(Simulation.AGGRESSION).toString());
@@ -77,13 +87,15 @@ public class DetailsPanel extends JPanel {
         
         Border padding = BorderFactory.createEmptyBorder(0, 10, 0, 10);
         
-        carDensityDetail.setBorder(padding);
+        vehicleMinDensityDetail.setBorder(padding);
+        vehicleMaxDensityDetail.setBorder(padding);
         carAggressiveDetail.setBorder(padding);
         ratioCarsDetail.setBorder(padding);
         ratioTrucksDetail.setBorder(padding);
         time.setBorder(padding);
         
-        carDensityDetailL.setBorder(padding);
+        vehicleMinDensityDetailL.setBorder(padding);
+        vehicleMaxDensityDetailL.setBorder(padding);
         carAggressiveDetailL.setBorder(padding);
         ratioCarsDetailL.setBorder(padding);
         ratioTrucksDetailL.setBorder(padding);
@@ -91,7 +103,8 @@ public class DetailsPanel extends JPanel {
         
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         
-        this.add(carDensityDetailP);
+        this.add(vehicleMinDensityP);
+        this.add(vehicleMaxDensityP);
         this.add(carAggressiveDetailP);
         this.add(ratioCarsDetailP);
         this.add(ratioTrucksDetailP);
@@ -103,8 +116,12 @@ public class DetailsPanel extends JPanel {
         time.setText(s);
     }
     
-    void setVehicleDensityText(String s) {
-        carDensityDetail.setText(s);
+    void setVehicleMinDensityText(String s) {
+        vehicleMinDensityDetail.setText(s);
+    }
+    
+    void setVehicleMaxDensityText(String s){
+        vehicleMaxDensityDetail.setText(s);
     }
     
     void setVehicleAggressionText(String s){

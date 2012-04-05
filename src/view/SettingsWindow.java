@@ -29,12 +29,14 @@ public class SettingsWindow extends JFrame {
     //TODO: the settings window closes even if an error occurs, fix this logic. 
     //TODO: there are todo's in the user interface class. do those too.
     private Container contentPane;
-    private JLabel densityLbl;
+    private JLabel minDensityLbl;
+    private JLabel maxDensityLbl;
     private JLabel aggressionLbl;
     private JLabel carRatioLbl;
     private JLabel truckRatioLbl;
     private JLabel junctionLbl;
-    private JTextField densityField;
+    private JTextField minDensityField;
+    private JTextField maxDensityField;
     private JTextField aggressionField;
     private JTextField carRatioField;
     private JTextField truckRatioField;
@@ -54,12 +56,14 @@ public class SettingsWindow extends JFrame {
 
     private void initComponents() {
         contentPane = this.getContentPane();
-        densityLbl = new JLabel("Density of cars (number of cars created per second)");
+        minDensityLbl = new JLabel("Minimum density of vehicles");
+        maxDensityLbl = new JLabel("Maximum density of vehicles");
         aggressionLbl = new JLabel("Aggression of drivers in simulation");
         carRatioLbl = new JLabel("Ratio of Cars");
         truckRatioLbl = new JLabel("Ratio of Trucks");
         junctionLbl = new JLabel("Junction to be simulated: ");
-        densityField = new JTextField(20);
+        minDensityField = new JTextField(20);
+        maxDensityField = new JTextField(20);
         aggressionField = new JTextField(20);
         carRatioField = new JTextField(20);
         truckRatioField = new JTextField(20);
@@ -68,7 +72,7 @@ public class SettingsWindow extends JFrame {
         defaultBtn = new JButton("Default Values");
         this.setResizable(false);
         contentPane.setLayout(new GridBagLayout());
-        fields = new JTextField[4];
+        fields = new JTextField[5];
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -87,25 +91,42 @@ public class SettingsWindow extends JFrame {
         cons.gridy = 0;
         cons.ipadx = 5;
         cons.ipady = 5;
-        contentPane.add(densityLbl, cons);
+        contentPane.add(minDensityLbl, cons);
 
         cons.gridy = 1;
+        contentPane.add(maxDensityLbl, cons);
+        
+        cons.gridy = 2;
         contentPane.add(aggressionLbl, cons);
 
-        cons.gridy = 2;
+        cons.gridy = 3;
         contentPane.add(carRatioLbl, cons);
 
+        cons.gridy = 4;
+        contentPane.add(truckRatioLbl, cons);
+        
+        cons.gridy = 5;
+        contentPane.add(junctionLbl, cons);
 
         cons.gridx = 1;
         cons.gridy = 0;
 
-        contentPane.add(densityField, cons);
-
+        contentPane.add(minDensityField, cons);
+        
         cons.gridy = 1;
-        contentPane.add(aggressionField, cons);
+        contentPane.add(maxDensityField, cons);
 
         cons.gridy = 2;
+        contentPane.add(aggressionField, cons);
+
+        cons.gridy = 3;
         contentPane.add(carRatioField, cons);
+        
+        cons.gridy = 4;
+        contentPane.add(truckRatioField, cons);
+        
+        cons.gridy = 5;
+        contentPane.add(junctions, cons);
 
         cons.gridx = 2;
         cons.gridy = 1;
@@ -114,31 +135,20 @@ public class SettingsWindow extends JFrame {
         cons.gridy = 2;
         contentPane.add(defaultBtn, cons);
 
-        cons.gridy = 3;
-        cons.gridx = 0;
-        contentPane.add(truckRatioLbl, cons);
+        minDensityField.setName(Simulation.MIN_DENSITY);
+        fields[0] = minDensityField;
 
-        cons.gridx = 1;
-        contentPane.add(truckRatioField, cons);
-
-        cons.gridy = 4;
-        cons.gridx = 0;
-        contentPane.add(junctionLbl, cons);
-
-        cons.gridx = 1;
-        contentPane.add(junctions, cons);
-
-        densityField.setName(Simulation.DENSITY);
-        fields[0] = densityField;
-
+        maxDensityField.setName(Simulation.MAX_DENSITY);
+        fields[1] = maxDensityField;
+        
         aggressionField.setName(Simulation.AGGRESSION);
-        fields[1] = aggressionField;
+        fields[2] = aggressionField;
 
         carRatioField.setName(Simulation.CAR_RATIO);
-        fields[2] = carRatioField;
+        fields[3] = carRatioField;
 
         truckRatioField.setName(Simulation.TRUCK_RATIO);
-        fields[3] = truckRatioField;
+        fields[4] = truckRatioField;
 
         this.pack();
 
@@ -160,7 +170,14 @@ public class SettingsWindow extends JFrame {
                                 return;
                             }
                             
-                            if(field.getName().equals(Simulation.DENSITY)){
+                            if(field.getName().equals(Simulation.MIN_DENSITY)){
+                                if(value > 100){
+                                    showErrMessage("You cannot have an density level greater than 100", "Error");
+                                    return;
+                                }
+                            }
+                            
+                            if(field.getName().equals(Simulation.MAX_DENSITY)){
                                 if(value > 100){
                                     showErrMessage("You cannot have an density level greater than 100", "Error");
                                     return;
@@ -197,7 +214,7 @@ public class SettingsWindow extends JFrame {
                     }
                 }
                 
-                if(((Integer)Simulation.getOption(Simulation.CAR_RATIO)) + ((Integer)Simulation.getOption(Simulation.TRUCK_RATIO)) > 10){
+                if(((int)Simulation.getOption(Simulation.CAR_RATIO)) + ((int)Simulation.getOption(Simulation.TRUCK_RATIO)) > 10){
                     showErrMessage("The ratio of cars : trucks must sum to 10.", "Error");
                     return;
                 }
@@ -209,6 +226,16 @@ public class SettingsWindow extends JFrame {
 
                 if (newValues < fields.length) {
                     showErrMessage("You need to enter values for all fields", "Error");
+                    return;
+                }
+                
+                if((int)Simulation.getOption(Simulation.MIN_DENSITY) > (int)Simulation.getOption(Simulation.MAX_DENSITY)){
+                    showErrMessage("Min > max is not allowed. Try again", "Error");
+                    return;
+                }
+                
+                if((int)Simulation.getOption(Simulation.MAX_DENSITY) < (int)Simulation.getOption(Simulation.MIN_DENSITY)){
+                    showErrMessage("Max < min is not allowed. Try again", "Error");
                     return;
                 }
                 
@@ -229,7 +256,8 @@ public class SettingsWindow extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                densityField.setText("10");
+                minDensityField.setText("10");
+                maxDensityField.setText("25");
                 aggressionField.setText("25");
                 carRatioField.setText("5");
                 truckRatioField.setText("5");

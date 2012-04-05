@@ -4,8 +4,6 @@
  */
 package model.junctions;
 
-import controller.Simulation;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 import model.*;
@@ -26,6 +24,7 @@ public class TwoLaneJunction extends Junction {
     private Lane rightLeftwardsLane;
     private Lane rightLeftwardsLane2;
     private int numberOfVehicles;
+    private Random rnd;
 
     public TwoLaneJunction() {
 
@@ -54,6 +53,7 @@ public class TwoLaneJunction extends Junction {
         registerLane(rightLeftwardsLane2);
 
         numberOfVehicles = 0; // we start with 0 vehicles in the junction.
+        rnd = new Random(System.nanoTime());
  /*
          * randomCars(bottomUpwardsLane); randomCars(bottomUpwardsLane2); randomCars(topDownwardsLane); randomCars(topDownwardsLane2); randomCars(leftRightwardsLane); randomCars(leftRightwardsLane2);
          * randomCars(rightLeftwardsLane); randomCars(rightLeftwardsLane2);
@@ -111,45 +111,9 @@ public class TwoLaneJunction extends Junction {
 
     }
 
-    
     @Override
-    public void distributeNewCars(int cars, int trucks) {
-        // TODO
-        int density = (int) Simulation.getOption(Simulation.DENSITY);
-
-        if (numberOfVehicles < density) {
-            int lowestRatio = (cars < trucks) ? cars : trucks;
-            if (density - numberOfVehicles == density) { // if num of vehicles is 0.
-                for (Lane l : getLanes()) {
-                    generateVehicle(l, lowestRatio);
-                }
-            } else if ((density - numberOfVehicles) > getLanes().size()) { // if difference between density and number of vehicles on road is greater than the number of lanes
-                for (int i = 0; i < getLanes().size(); i++) {
-                    Lane l = chooseEmptyLane();
-                    generateVehicle(l, lowestRatio);
-                }
-            } else { //else the difference between density value and number of vehicles on road is less than the number of lanes.
-                for (int i = 0; i < (density - numberOfVehicles); i++) { // 0 <= i <= (density - number of vehicles)
-                    Lane l = chooseEmptyLane();
-                    generateVehicle(l, lowestRatio);
-                }
-            }
-        }
-    }
-
-    private void generateVehicle(Lane l, int lowestRatio) {
-        double rnd = Math.random();
-        rnd = rnd * 10; //conversion to same scale as ratio of cars/trucks
-        if (rnd < lowestRatio) {
-            new Car(l, l.getFirstSegment(), CAR_COLOR);
-        } else {
-            new Truck(l, l.getFirstSegment(), TRUCK_COLOR);
-        }
-    }
-
-    @Override
-    protected Lane chooseEmptyLane() {
-
+    protected Lane chooseLane() {
+        ArrayList<Lane> potentialLanes = new ArrayList<>(getLanes().size());
         for (Lane l : getLanes()) {
 
             Segment firstSegment = l.getFirstSegment();

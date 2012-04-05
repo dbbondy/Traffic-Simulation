@@ -16,15 +16,17 @@ public final class State implements Serializable {
     
     private Integer timeStep;
     private String currentJunction;
-    private Integer density;
+    private Integer minDensity;
+    private Integer maxDensity;
     private Integer aggression;
     private Integer carRatio;
     private Integer truckRatio;
 
-    public State(int timeStep, String currentJunction, int density, int aggression, int carRatio, int truckRatio) {
+    public State(int timeStep, String currentJunction, int minDensity,int maxDensity, int aggression, int carRatio, int truckRatio) {
         this.timeStep = timeStep;
         this.currentJunction = currentJunction;
-        this.density = density;
+        this.minDensity = minDensity;
+        this.maxDensity = maxDensity;
         this.aggression = aggression;
         this.carRatio = carRatio;
         this.truckRatio = truckRatio;
@@ -42,8 +44,12 @@ public final class State implements Serializable {
         return currentJunction;
     }
 
-    public int getDensity() {
-        return density;
+    public int getMinDensity() {
+        return minDensity;
+    }
+    
+    public int getMaxDensity(){
+        return maxDensity;
     }
 
     public int getTimeStep() {

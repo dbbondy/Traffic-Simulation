@@ -40,7 +40,8 @@ public class UserInterface extends JFrame {
     public void updateGUI() {
 
         detailPanel.setTimeText(Simulation.getOption(Simulation.TIME_STEP).toString());
-        detailPanel.setVehicleDensityText(Simulation.getOption(Simulation.DENSITY).toString());
+        detailPanel.setVehicleMinDensityText(Simulation.getOption(Simulation.MIN_DENSITY).toString());
+        detailPanel.setVehicleMaxDensityText(Simulation.getOption(Simulation.MAX_DENSITY).toString());
         detailPanel.setRatioCarsText(Simulation.getOption(Simulation.CAR_RATIO).toString());
         detailPanel.setRatioTrucksText(Simulation.getOption(Simulation.TRUCK_RATIO).toString());
         detailPanel.setVehicleAggressionText(Simulation.getOption(Simulation.AGGRESSION).toString());
