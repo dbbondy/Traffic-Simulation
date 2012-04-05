@@ -436,38 +436,44 @@ public class SimulationPanel extends JPanel {
 
     @Override
     public synchronized void paintComponent(Graphics graphics1) {
-        super.paintComponent(graphics1);
-
-        // no need to paint if we can't see it
-        if (getWidth() == 0 || getHeight() == 0) {
-            return;
-        }
-
-        // create cache image if necessary
-        if (null == image
-                || image.getWidth() != getWidth()
-                || image.getHeight() != getHeight()) {
-            renderToImage();
-        }
         
-        System.out.println(getHeight());
-        System.out.println(getWidth());
+        // prevent AI while rendering
+        synchronized (Simulation.class) {
+            
+            super.paintComponent(graphics1);
 
-        Graphics2D graphics = (Graphics2D) graphics1;
+            // no need to paint if we can't see it
+            if (getWidth() == 0 || getHeight() == 0) {
+                return;
+            }
 
-        graphics.setRenderingHint(
-                RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
+            // create cache image if necessary
+            if (null == image
+                    || image.getWidth() != getWidth()
+                    || image.getHeight() != getHeight()) {
+                renderToImage();
+            }
+            
+            System.out.println(getHeight());
+            System.out.println(getWidth());
 
-        // redraw the junction from the image cache
-        graphics.drawImage(image, 0, 0, null);
-        drawVehicles(graphics);
+            Graphics2D graphics = (Graphics2D) graphics1;
 
-        if (Simulation.isPaused()) {
+            graphics.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
 
-            graphics.setColor(new Color(1 * 16 + 13, 4 * 16 + 0, 1 * 16 + 13)); // 1D401D
-            graphics.fillRect(this.getWidth() - 50, 20, 10, 40);
-            graphics.fillRect(this.getWidth() - 30, 20, 10, 40);
+            // redraw the junction from the image cache
+            graphics.drawImage(image, 0, 0, null);
+            drawVehicles(graphics);
+
+            if (Simulation.isPaused()) {
+
+                graphics.setColor(new Color(1 * 16 + 13, 4 * 16 + 0, 1 * 16 + 13)); // 1D401D
+                graphics.fillRect(this.getWidth() - 50, 20, 10, 40);
+                graphics.fillRect(this.getWidth() - 30, 20, 10, 40);
+            }
+            
         }
     }
 }
