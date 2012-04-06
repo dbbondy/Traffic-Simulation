@@ -51,6 +51,7 @@ public abstract class Vehicle {
 
     public void setVehicleInFront(Vehicle vehicleInFront) {
         this.vehicleInFront = vehicleInFront;
+        setVehicleBehind(this);
     }
  
     public int getWidth() {
