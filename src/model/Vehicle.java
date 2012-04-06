@@ -29,6 +29,8 @@ public abstract class Vehicle {
         vehicleBehind = behind;
         color = c;
     }
+    
+    public abstract void act();
 
     protected void setDimensions(int w, int l) {
         this.width = w;
@@ -63,8 +65,6 @@ public abstract class Vehicle {
         return this.color;
     }
     
-    public abstract void act();
-
     public int getSpeed(){
         return currentSpeed;
     }
@@ -81,5 +81,4 @@ public abstract class Vehicle {
         currentSpeed = newSpeed;
     }
      
-   
 }
