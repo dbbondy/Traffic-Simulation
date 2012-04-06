@@ -14,7 +14,7 @@ import java.awt.Color;
 public class GhostVehicle extends Vehicle {
     
     public GhostVehicle(Lane lane, Segment segment) {
-        super(lane, segment, Color.BLACK);
+        super(lane, segment, null, null, Color.BLACK);
         setDimensions(0, 0);                
     }
 

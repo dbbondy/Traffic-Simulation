@@ -123,12 +123,11 @@ public class TwoLaneJunction extends Junction {
             Segment firstSegment = l.getFirstSegment();
             Vehicle closestVehicleToStart = l.getVehicleAhead(firstSegment);
             Segment closestVehiclePosition = closestVehicleToStart.getHeadSegment();
-            int firstIndex = l.getLaneSegments().indexOf(l.getFirstSegment());
-            int closestVehicleIndex = l.getLaneSegments().indexOf(closestVehicleToStart);
+            int closestVehicleIndex = l.getLaneSegments().indexOf(closestVehiclePosition);
 
             if (closestVehiclePosition.equals(firstSegment)) { //if there is a vehicle in the first segment of this lane.
                 continue;
-            } else if (closestVehicleIndex - firstIndex > (closestVehicleToStart.getLength() + 5)) { //if there is no vehicle immediately in front, but is long enough to occupy some space of where the vehicle is to be positioned
+            } else if (closestVehicleIndex < (closestVehicleToStart.getLength() + 5)) { //if there is no vehicle immediately in front, but is long enough to occupy some space of where the vehicle is to be positioned
                 continue;
             } else {
                 potentialLanes.add(l);

@@ -21,18 +21,36 @@ public abstract class Vehicle {
     
     protected Lane currentLane;
     
+    public Vehicle(Lane lane, Segment segment, Vehicle inFront, Vehicle behind, Color c) {
+        currentLane = lane;
+        headSegment = segment;
+        lane.addVehicle(this);
+        vehicleInFront = inFront;
+        vehicleBehind = behind;
+        color = c;
+    }
+
     protected void setDimensions(int w, int l) {
         this.width = w;
         this.length = l;
     }
     
-    public Vehicle(Lane lane, Segment segment, Color c) {
-        currentLane = lane;
-        headSegment = segment;
-        lane.addVehicle(this);
-        color = c;
+    public Vehicle getVehicleBehind() {
+        return vehicleBehind;
     }
-    
+
+    public void setVehicleBehind(Vehicle vehicleBehind) {
+        this.vehicleBehind = vehicleBehind;
+    }
+
+    public Vehicle getVehicleInFront() {
+        return vehicleInFront;
+    }
+
+    public void setVehicleInFront(Vehicle vehicleInFront) {
+        this.vehicleInFront = vehicleInFront;
+    }
+ 
     public int getWidth() {
         return this.width;
     }
@@ -63,8 +81,5 @@ public abstract class Vehicle {
         currentSpeed = newSpeed;
     }
      
-   /*  public static Vehicle getVehicle(int carRatio, int truckRatio){
-        return new Car(); //just a placeholder right now until i figure out how to create based on ratio.
-    }
-     */
+   
 }
