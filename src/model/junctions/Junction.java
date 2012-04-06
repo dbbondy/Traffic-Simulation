@@ -30,13 +30,7 @@ public abstract class Junction {
         int variableDensity = random.nextInt((maxDensity - minDensity) + 1);
         int lowestRatio = (cars < trucks) ? cars : trucks;
 
-        //System.out.println(numberOfVehicles);
-
-
-
         while (numberOfVehicles < variableDensity) {
-
-
             Lane l = chooseLane();
             if (l != null) {
                 l = chooseLane();
@@ -44,34 +38,22 @@ public abstract class Junction {
                 System.out.println("numOfVehicles var: " + numberOfVehicles);
             }
 
-            /*
-             * if (numberOfVehicles == 14) { if (l != null) { for (Vehicle v : l.getVehicles()) { if (v.getVehicleBehind() == null) { int currentPos = l.getLaneSegments().indexOf(v.getHeadSegment());
-             * int carInFront = l.getLaneSegments().indexOf(v.getVehicleInFront().getHeadSegment()); System.out.println((carInFront - currentPos) >= (v.getLength() + 5)); } else if
-             * (v.getVehicleInFront() == null) { int currentPos = l.getLaneSegments().indexOf(v.getHeadSegment()); int carBehind = l.getLaneSegments().indexOf(v.getVehicleBehind().getHeadSegment());
-             * System.out.println((currentPos - carBehind) >= (v.getLength() + 5)); }
-             *
-             * }
-             * }
-             * }
-             */
-
             if (l == null) {
                 variableDensity--;
                 continue;
             } else {
-
                 generateVehicle(l, lowestRatio);
             }
         }
     }
 
     private void generateVehicle(Lane l, int lowestRatio) {
-        //double rnd = Math.random();
-        //rnd = rnd * 10; //conversion to same scale as ratio of cars/trucks
-        int rand = random.nextInt(11);
+        double rnd = Math.random();
+        rnd = rnd * 10; //conversion to same scale as ratio of cars/trucks
+
         if (!l.getVehicles().isEmpty()) {
             Vehicle v = l.getVehicleAhead(l.getFirstSegment());
-            if (rand <= lowestRatio) {
+            if (rnd <= lowestRatio) {
                 new Car(l, l.getFirstSegment(), v, null, CAR_COLOR);
                 numberOfVehicles++;
 
@@ -81,7 +63,7 @@ public abstract class Junction {
 
             }
         } else {
-            if (rand <= lowestRatio) {
+            if (rnd <= lowestRatio) {
                 new Car(l, l.getFirstSegment(), CAR_COLOR);
                 numberOfVehicles++;
             } else {
@@ -92,10 +74,8 @@ public abstract class Junction {
     }
 
     protected Lane chooseLane() {
-        ArrayList<Lane> potentialLanes = new ArrayList<>(getLanes().size());
-        int lanes = 0;
-        for (Lane l : getLanes()) {
-            //System.out.println("lane " + lanes++ + "has " + l.getVehicles().size() + "vehicles");
+        ArrayList<Lane> potentialLanes = new ArrayList<>(lanes.size());
+        for (Lane l : lanes) {
             if (l.getVehicles().isEmpty()) { //if lane is devoid of vehicles. it is obviously a potential lane.
                 potentialLanes.add(l);
                 continue;
@@ -132,7 +112,38 @@ public abstract class Junction {
         }
     }
 
-    public abstract void manageJunction();
+    public void updateDeletions() {
+        for (Lane l : lanes) {
+            ArrayList<Vehicle> vehArray = l.getVehicles();
+            synchronized (vehArray) {
+                for (Vehicle v : vehArray) {
+                    if (v.getHeadSegment().equals(l.getLastSegment())) {
+                        vehArray.remove(v);
+                        numberOfVehicles--;
+                        if (v instanceof Car) {
+                            SimulationStats.increment(Car.class);
+                        } else if (v instanceof Truck) {
+                            SimulationStats.increment(Truck.class);
+                        }
+
+
+                    }
+                }
+            }
+
+        }
+    }
+
+    public void manageJunction() {
+        for (Lane l : lanes) {
+            for (Vehicle v : l.getVehicles()) {
+                Segment head = v.getHeadSegment();
+                if (head.getNextSegment() != null) {
+                    v.setHeadSegment(head.getNextSegment());
+                }
+            }
+        }
+    }
 
     public ArrayList<Lane> getLanes() {
         return lanes;

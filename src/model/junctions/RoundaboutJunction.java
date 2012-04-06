@@ -26,22 +26,6 @@ public class RoundaboutJunction extends Junction{
         
     }
 
-    
-
-    @Override
-    public void manageJunction() {
-        for(Lane l : getLanes()){
-            for(Vehicle v : l.getVehicles()){
-                Segment head = v.getHeadSegment();
-                if (head.getNextSegment() != null) {
-                    v.setHeadSegment(head.getNextSegment());
-                } else {
-                    v.setHeadSegment(l.getFirstSegment());
-                }
-            }
-        }
-    }
-
     @Override
     public String toString(){
         return "Roundabout Junction";

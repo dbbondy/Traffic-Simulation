@@ -6,9 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-//TODO: create classes for each invidividual junction and just create instances of Lane necessary amounts of times
-//TODO: split "buildLaneSegments" into "buildStraightSection(x)"  and "buildLeftCurve()" and "buildRightCurve()"
-//TODO: continue to work on graphics
 /**
  *
  * @author Dan

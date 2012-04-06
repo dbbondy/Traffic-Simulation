@@ -12,16 +12,12 @@ import java.util.HashMap;
  */
 public class SimulationStats {
 
-    private static HashMap<Class, VehicleCounter> vehicleCounters;
-
-    public SimulationStats() {
-        vehicleCounters = new HashMap<Class, VehicleCounter>();
-    }
+    private static HashMap<Class, VehicleCounter> vehicleCounters = new HashMap<>();
 
     /**
      * resets the statistics of the simulation.
      */
-    public void reset(){
+    public static void reset(){
         for (Class vehType : vehicleCounters.keySet()) {
             VehicleCounter count = vehicleCounters.get(vehType);
             count.reset();
@@ -32,7 +28,7 @@ public class SimulationStats {
      * Increments the count of vehicles that have exited the junction area.
      * @param vehicle the vehicle type to increment
      */
-    public void increment(Class vehicle) {
+    public static void increment(Class vehicle) {
         VehicleCounter count = vehicleCounters.get(vehicle);
         if (count == null) {
             count = new VehicleCounter(vehicle.getName());
