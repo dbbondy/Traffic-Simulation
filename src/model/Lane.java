@@ -26,6 +26,10 @@ public class Lane{
         this.initialAngle = initialAngle;
     }
     
+    public void removeVehicles() {
+        vehicles.clear();
+    }
+    
     public ArrayList<Segment> getLaneSegments() {
         return this.laneSegments;
     }

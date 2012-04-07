@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import model.SimulationStats;
 import model.junctions.Junction;
 
 /**
@@ -45,6 +46,8 @@ public class UserInterface extends JFrame {
         detailPanel.setRatioCarsText(Simulation.getOption(Simulation.CAR_RATIO).toString());
         detailPanel.setRatioTrucksText(Simulation.getOption(Simulation.TRUCK_RATIO).toString());
         detailPanel.setVehicleAggressionText(Simulation.getOption(Simulation.AGGRESSION).toString());
+        detailPanel.setCarCountText(Integer.toString(SimulationStats.getCarCount()));
+        detailPanel.setTruckCountText(Integer.toString(SimulationStats.getTruckCount()));
         updateButtonState();
         simPanel.repaint();
     }

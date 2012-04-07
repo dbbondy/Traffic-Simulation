@@ -6,11 +6,11 @@ package view;
 
 import controller.Simulation;
 import java.awt.*;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.Border;
+import model.Car;
+import model.SimulationStats;
+import model.Truck;
 
 /**
  *
@@ -24,12 +24,14 @@ public class DetailsPanel extends JPanel {
     private JLabel ratioCarsDetail;
     private JLabel ratioTrucksDetail;
     private JLabel time;
+    private JLabel carsTr;
+    private JLabel trucksTr;
 
     public DetailsPanel() {
         super();
         initComponents();
         this.setBackground(new Color(250, 250, 250));
-        this.setMaximumSize(new Dimension(220, 120));
+        this.setMaximumSize(new Dimension(220, 180));
         this.setMinimumSize(new Dimension(220, 0));
         this.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
     }
@@ -85,6 +87,22 @@ public class DetailsPanel extends JPanel {
         timeP.add(timeL, BorderLayout.LINE_START);
         timeP.add(time, BorderLayout.LINE_END);
         
+        JLabel carsTrL = new JLabel("Cars Travelled");
+        carsTr = new JLabel(Integer.toString(SimulationStats.getCarCount()));
+        JPanel carsTrP = new JPanel();
+        carsTrP.setBackground(null);
+        carsTrP.setLayout(new BorderLayout());
+        carsTrP.add(carsTrL, BorderLayout.LINE_START);
+        carsTrP.add(carsTr, BorderLayout.LINE_END);
+        
+        JLabel trucksTrL = new JLabel("Trucks Travelled");
+        trucksTr = new JLabel(Integer.toString(SimulationStats.getTruckCount()));
+        JPanel trucksTrP = new JPanel();
+        trucksTrP.setBackground(null);
+        trucksTrP.setLayout(new BorderLayout());
+        trucksTrP.add(trucksTrL, BorderLayout.LINE_START);
+        trucksTrP.add(trucksTr, BorderLayout.LINE_END);
+        
         Border padding = BorderFactory.createEmptyBorder(0, 10, 0, 10);
         
         vehicleMinDensityDetail.setBorder(padding);
@@ -93,6 +111,10 @@ public class DetailsPanel extends JPanel {
         ratioCarsDetail.setBorder(padding);
         ratioTrucksDetail.setBorder(padding);
         time.setBorder(padding);
+        carsTr.setBorder(padding);
+        trucksTr.setBorder(padding);
+        
+        JSeparator seperator = new JSeparator(JSeparator.HORIZONTAL);
         
         vehicleMinDensityDetailL.setBorder(padding);
         vehicleMaxDensityDetailL.setBorder(padding);
@@ -100,6 +122,8 @@ public class DetailsPanel extends JPanel {
         ratioCarsDetailL.setBorder(padding);
         ratioTrucksDetailL.setBorder(padding);
         timeL.setBorder(padding);
+        carsTrL.setBorder(padding);
+        trucksTrL.setBorder(padding);
         
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         
@@ -109,6 +133,13 @@ public class DetailsPanel extends JPanel {
         this.add(ratioCarsDetailP);
         this.add(ratioTrucksDetailP);
         this.add(timeP);
+        this.add(Box.createVerticalStrut(6));
+        this.add(seperator);
+        this.add(Box.createVerticalStrut(6));
+        this.add(carsTrP);
+        this.add(trucksTrP);
+        
+        
         
     }
 
@@ -134,6 +165,14 @@ public class DetailsPanel extends JPanel {
     
     void setRatioTrucksText(String s){
         ratioTrucksDetail.setText(s);
+    }
+    
+    void setCarCountText(String s){
+        carsTr.setText(s);
+    }
+    
+    void setTruckCountText(String s){
+        trucksTr.setText(s);
     }
     
 }

@@ -3,10 +3,7 @@ package controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import model.Lane;
-import model.Segment;
-import model.State;
-import model.Vehicle;
+import model.*;
 import model.junctions.*;
 import view.SettingsWindow;
 import view.UserInterface;
@@ -135,7 +132,7 @@ public class Simulation {
             int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
             int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
             junc.distributeNewCars(carsRatio, trucksRatio); 
-            junc.manageJunction(); //goes through all lanes contained in the junction, and tells each car within each lane to "act" 
+            junc.manageJunction(); //goesthrough all lanes contained in the junction, and tells each car within each lane to "act" 
             junc.updateDeletions();
             //when cars go outof the end of the junction, they get "deleted" and statistics are incremented.   
             
@@ -176,6 +173,9 @@ public class Simulation {
         // cannot stop until the current step
         // and rendering is complete
         synchronized (ui) {
+            Junction jn = (Junction) getOption(JUNCTION_TYPE);
+            jn.removeVehicles();
+            SimulationStats.reset();
             setOption(TIME_STEP, 0); 
             started = false;
             paused = false;
@@ -216,7 +216,7 @@ public class Simulation {
                         simulateOneStep();
                         ui.updateGUI(); 
                     }
-                    Thread.sleep(30);
+                    Thread.sleep(10);
                 } catch (InterruptedException ie) {
                     ie.printStackTrace();
                 }

@@ -17,33 +17,39 @@ public abstract class Junction {
     protected int numberOfVehicles;
     protected Random random;
     private ArrayList<Lane> lanes = new ArrayList<>();
+    private int variableDensityCounter = 0;
+    private int variableDensity = 0;
 
     public Junction() {
-        random = new Random(42);
+        random = new Random(System.nanoTime());
         numberOfVehicles = 0;
+    }
+    
+    public void removeVehicles() {
+        numberOfVehicles = 0;
+        for (Lane lane : lanes) {
+            lane.removeVehicles();
+        }
     }
 
     public void distributeNewCars(int cars, int trucks) {
-        // TODO
-        int minDensity = (int) Simulation.getOption(Simulation.MIN_DENSITY);
-        int maxDensity = (int) Simulation.getOption(Simulation.MAX_DENSITY);
-        int variableDensity = random.nextInt((maxDensity - minDensity) + 1);
+        
+        if (variableDensityCounter++ % 200 == 0) {
+            // choose a new density every ~ 1 second otherwise it will tend
+            // towards the max density as a result of more this method
+            // being executed more often than a car is removed.
+            int minDensity = (int) Simulation.getOption(Simulation.MIN_DENSITY);
+            int maxDensity = (int) Simulation.getOption(Simulation.MAX_DENSITY);
+            variableDensity = random.nextInt((maxDensity - minDensity) + 1) + minDensity;
+        }
+        
         int lowestRatio = (cars < trucks) ? cars : trucks;
-
+        
         while (numberOfVehicles < variableDensity) {
-            Lane l = chooseLane();
-            if (l != null) {
-                l = chooseLane();
-                System.out.println(l.getVehicles().size());
-                System.out.println("numOfVehicles var: " + numberOfVehicles);
-            }
-
-            if (l == null) {
-                variableDensity--;
-                continue;
-            } else {
-                generateVehicle(l, lowestRatio);
-            }
+            System.out.println(numberOfVehicles);
+            Lane l = chooseLane();            
+            if (l == null) variableDensity--;
+            else generateVehicle(l, lowestRatio);
         }
     }
 
@@ -114,23 +120,18 @@ public abstract class Junction {
 
     public void updateDeletions() {
         for (Lane l : lanes) {
-            ArrayList<Vehicle> vehArray = l.getVehicles();
-            synchronized (vehArray) {
-                for (Vehicle v : vehArray) {
-                    if (v.getHeadSegment().equals(l.getLastSegment())) {
-                        vehArray.remove(v);
-                        numberOfVehicles--;
-                        if (v instanceof Car) {
-                            SimulationStats.increment(Car.class);
-                        } else if (v instanceof Truck) {
-                            SimulationStats.increment(Truck.class);
-                        }
-
-
+            Vehicle[] vehArray = l.getVehicles().toArray(new Vehicle[0]);
+            for (Vehicle v : vehArray) {
+                if (v.getHeadSegment().equals(l.getLastSegment())) {
+                    l.getVehicles().remove(v);
+                    numberOfVehicles--;
+                    if (v instanceof Car) {
+                        SimulationStats.incrementCars();
+                    } else if (v instanceof Truck) {
+                        SimulationStats.incrementTrucks();
                     }
                 }
             }
-
         }
     }
 
