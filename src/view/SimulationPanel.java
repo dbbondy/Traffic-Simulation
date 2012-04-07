@@ -151,72 +151,6 @@ public class SimulationPanel extends JPanel {
         return new double[]{centerX, centerY};
     }
 
-    public boolean serialiseJunction(String filePath) {
-
-        try {
-            //write out the image
-            File outputFile = new File(filePath);
-            ImageIO.write(image, "png", outputFile);
-
-            //write out the corresponding state object
-            State currentSystemState = new State((int) Simulation.getOption(Simulation.TIME_STEP),
-                    Simulation.getOption(Simulation.JUNCTION_TYPE).toString(),
-                    (int) Simulation.getOption(Simulation.MIN_DENSITY),
-                    (int) Simulation.getOption(Simulation.MAX_DENSITY),
-                    (int) Simulation.getOption(Simulation.AGGRESSION),
-                    (int) Simulation.getOption(Simulation.CAR_RATIO),
-                    (int) Simulation.getOption(Simulation.TRUCK_RATIO));
-            File outputFilePath = outputFile.getParentFile();
-
-            FileOutputStream fos = new FileOutputStream(outputFilePath.getAbsolutePath() + File.separator + "current_simulation_state.st");
-            ObjectOutputStream out = new ObjectOutputStream(fos);
-            out.writeObject(currentSystemState);
-            out.close();
-            return true; //image and system state wrote successfully, so return true
-        } catch (IOException e) {
-            return false; //something went wrong. return false
-        }
-    }
-
-    public boolean deserialiseJunction(String filePath) {
-        File f = new File(filePath);
-        File dir;
-        if (!f.isDirectory()) { //if the path is not already a directory, get the current directory the filepath is contained within.
-            File fileDir = f.getParentFile();
-            dir = new File(fileDir.getAbsolutePath()); //parent directory path of the selected file
-        } else {
-            dir = new File(f.getAbsolutePath());
-        }
-
-        FilenameFilter filter = new FilenameFilter() {
-
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".st");
-            }
-        };
-        String[] children = dir.list(filter);
-        State incomingState;
-        try {
-            FileInputStream fis = new FileInputStream(dir.getAbsolutePath() + File.separator + children[0]);
-            ObjectInputStream in = new ObjectInputStream(fis);
-            incomingState = (State) in.readObject();
-            in.close();
-            if (!(incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString()))) { //if incoming state junction differs from our current junction
-                Simulation.setSimulationState(incomingState);
-                Simulation.reset();
-            } else if (incomingState.getJunction().toString().equals(Simulation.getOption(Simulation.JUNCTION_TYPE).toString())) { // if junction from incoming state and current are the same. just set values and resume processing.
-                Simulation.setSimulationState(incomingState);
-            }
-
-            image = ImageIO.read(new File(filePath));
-            this.repaint();
-            return true;
-        } catch (IOException | ClassNotFoundException ioe) {
-            return false;
-        }
-    }
-
     private void renderToImage() {
 
         // clear from post render
@@ -377,6 +311,8 @@ public class SimulationPanel extends JPanel {
                 }
 
             }
+            
+            last.setNextSegment(null);
         }
         
         graphics.setColor(new Color(80, 80, 80));
@@ -431,11 +367,7 @@ public class SimulationPanel extends JPanel {
         currentJunction = null;
         image = null;
     }
-
-    public synchronized void updatePanel(Junction j) {
-        currentJunction = j;
-    }
-
+    
     @Override
     public synchronized void paintComponent(Graphics graphics1) {
         

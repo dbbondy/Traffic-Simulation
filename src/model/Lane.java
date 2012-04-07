@@ -10,14 +10,14 @@ import java.util.Comparator;
  *
  * @author Dan
  */
-public class Lane{
+public class Lane {
 
     private int xCoord;
     private int yCoord;
     private ArrayList<Segment> laneSegments;
     private int initialAngle;
     private ArrayList<Vehicle> vehicles;
-
+    
     public Lane(int xCoord, int yCoord, int initialAngle) {
         laneSegments = new ArrayList<>(32);
         vehicles = new ArrayList<>(32);
@@ -62,13 +62,13 @@ public class Lane{
         return vehicles;
     }
 
-    public void add(Segment[] segment) {
+    public void add(Segment[] segments) {
         if (!laneSegments.isEmpty()) {
             Segment endSegment = laneSegments.get(laneSegments.size() - 1);
-            laneSegments.addAll(Arrays.asList(segment));
-            endSegment.setNextSegment(segment[0]);
+            laneSegments.addAll(Arrays.asList(segments));
+            endSegment.setNextSegment(segments[0]);
         }else{
-            laneSegments.addAll(Arrays.asList(segment));
+            laneSegments.addAll(Arrays.asList(segments));
         }
     }
 
@@ -142,16 +142,5 @@ public class Lane{
 
     public int getYStart() {
         return yCoord;
-    }
-
-    public void updateVehicles() { //will be more complex than this later on. just a placeholder body at the moment
-        for (Vehicle v : vehicles) {
-            Segment s = v.getHeadSegment();
-            Segment s1 = s.getNextSegment();
-            if (s1 == null) {
-                continue;
-            }
-            v.setHeadSegment(s1);
-        }
     }
 }

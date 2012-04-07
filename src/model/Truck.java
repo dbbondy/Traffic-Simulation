@@ -11,6 +11,8 @@ public class Truck extends Vehicle{
     private static final int WIDTH = 14;
     private static final int LENGTH = 30;
     
+    public Truck() {}
+    
     public Truck(Lane lane) {
         super(lane, lane.getFirstSegment(),null, null, Color.RED);
         setDimensions(WIDTH, LENGTH);
@@ -38,7 +40,7 @@ public class Truck extends Vehicle{
 
     @Override
     public void act() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        advanceVehicle(currentSpeed);
     }
     
 }

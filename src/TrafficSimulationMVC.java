@@ -1,5 +1,8 @@
 
 import controller.Simulation;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import javax.swing.UIManager;
 
 /**
@@ -9,16 +12,10 @@ import javax.swing.UIManager;
 public class TrafficSimulationMVC {
  
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         
-        try
-        {
-            // set the system look and feel and then ask for update
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        
+        // set the system look and feel and then ask for update
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());        
         Simulation.init();
         
     }

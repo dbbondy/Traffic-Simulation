@@ -15,8 +15,8 @@ public class Segment{
     private int angle;
     public static final int WIDTH = 22;
     public static final int LENGTH = 1;
-    private Segment next;
-    private Segment previous;
+    private Segment next = null;
+    private Segment previous = null;
     private Map<Segment, ConnectionType> connectedSegments;
     private Lane lane;
     private static int segmentCounter = 0;
@@ -33,6 +33,10 @@ public class Segment{
         this.lane = lane;
         this.id = segmentCounter++;
         connectedSegments = new HashMap<>();
+    }
+    
+    public Lane getLane() {
+        return this.lane;
     }
     
     public int id() {
@@ -76,12 +80,12 @@ public class Segment{
     }
     
     public void setNextSegment(Segment segment){
-        segment.previous = this;
+        if (segment != null) segment.previous = this;
         next = segment;        
     }
     
     public void setPreviousSegment(Segment segment){
-        segment.next = this;
+        if (segment != null) segment.next = this;
         previous = segment;        
     }
     

@@ -16,6 +16,8 @@ public class Car extends Vehicle {
     private static final int WIDTH = 12;
     private static final int LENGTH = 20;
     
+    public Car() {}
+    
     public Car(Lane lane) {
         super(lane, lane.getFirstSegment(),null, null, Color.RED);
         setDimensions(WIDTH, LENGTH);
@@ -40,12 +42,10 @@ public class Car extends Vehicle {
         super(lane, seg, inFront, behind, c);
         setDimensions(WIDTH, LENGTH);
     }
-    
-    
-
+     
     @Override
     public void act() {
-       
+       advanceVehicle(currentSpeed);
     }
     
 }

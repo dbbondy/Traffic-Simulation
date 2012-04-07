@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Color;
+import java.util.Random;
 
 /**
  *
@@ -13,13 +14,17 @@ public abstract class Vehicle {
     
     protected Color color;
     
-    protected int currentSpeed;
+    protected int currentSpeed = 100;
     protected Segment headSegment;
         
     protected Vehicle vehicleInFront;
     protected Vehicle vehicleBehind;
     
     protected Lane currentLane;
+    
+    private int nextSegmentPercent = 0;
+    
+    public Vehicle() {}
     
     public Vehicle(Lane lane, Segment segment, Vehicle inFront, Vehicle behind, Color c) {
         currentLane = lane;
@@ -28,11 +33,14 @@ public abstract class Vehicle {
         vehicleInFront = inFront;
         vehicleBehind = behind;
         color = c;
+        
+        // TODO: remove this later
+        currentSpeed = new Random(System.nanoTime()).nextInt(100) + 50;
     }
     
     public abstract void act();
 
-    protected void setDimensions(int w, int l) {
+    public void setDimensions(int w, int l) {
         this.width = w;
         this.length = l;
     }
@@ -53,7 +61,18 @@ public abstract class Vehicle {
         this.vehicleInFront = vehicleInFront;
         setVehicleBehind(this);
     }
- 
+    
+    public void advanceVehicle(int value) {
+        int newValue = value + nextSegmentPercent;
+        nextSegmentPercent = newValue % 100;
+        int advanceSegments = newValue / 100;
+        for (int i = 0; i < advanceSegments; i++) {
+            Segment next = headSegment.getNextSegment();
+            if (next == null) return;
+            headSegment = next;
+        }
+    }
+    
     public int getWidth() {
         return this.width;
     }
@@ -78,8 +97,12 @@ public abstract class Vehicle {
         this.headSegment = headSegment;
     }
     
-    public void updateSpeed(int newSpeed){
+    public void setSpeed(int newSpeed){
         currentSpeed = newSpeed;
+    }
+    
+    public void setColor(Color color) {
+        this.color = color;
     }
      
 }

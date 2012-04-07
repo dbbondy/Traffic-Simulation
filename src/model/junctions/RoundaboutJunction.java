@@ -15,6 +15,8 @@ import model.*;
  */
 public class RoundaboutJunction extends Junction{
     
+    public static final String name = "Roundabout Junction";
+    
     private Lane testLane;
     
     public RoundaboutJunction(){
@@ -28,6 +30,6 @@ public class RoundaboutJunction extends Junction{
 
     @Override
     public String toString(){
-        return "Roundabout Junction";
+        return name;
     }
 }

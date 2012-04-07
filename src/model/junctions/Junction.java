@@ -3,7 +3,9 @@ package model.junctions;
 import controller.Simulation;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 import model.*;
 
 /**
@@ -11,6 +13,8 @@ import model.*;
  * @author Dan
  */
 public abstract class Junction {
+    
+    private static HashMap<String, Class> namedJunctionClasses = new HashMap<String, Class>();
 
     protected static final Color CAR_COLOR = new Color(0, 102, 153);
     protected static final Color TRUCK_COLOR = new Color(153, 0, 0);
@@ -25,16 +29,44 @@ public abstract class Junction {
         numberOfVehicles = 0;
     }
     
+    public static void registerJunctionType(Class cls) {
+        try { namedJunctionClasses.put((String) cls.getDeclaredField("name").get(cls), cls); }
+        catch (Exception e) { e.printStackTrace(); }
+    }
+    
+    public static Class getJunctionTypeByName(String name) {
+        return namedJunctionClasses.get(name);
+    }
+    
+    public static Set<String> getJunctionNames() {
+        return namedJunctionClasses.keySet();
+    }
+    
     public void removeVehicles() {
         numberOfVehicles = 0;
         for (Lane lane : lanes) {
             lane.removeVehicles();
         }
     }
+    
+    public ArrayList<Vehicle> getVehicles() {
+        ArrayList<Vehicle> allVehicles = new ArrayList<Vehicle>();
+        for (Lane lane : lanes) allVehicles.addAll(lane.getVehicles());
+        return allVehicles;
+    }
+    
+    // TODO: fix permissions so that
+    // only the StateLoader can call this
+    // or rework the code to fix the issue
+    public void updateNumberOfVehicles() {
+        numberOfVehicles = getVehicles().size();
+    }
 
     public void distributeNewCars(int cars, int trucks) {
         
-        if (variableDensityCounter++ % 200 == 0) {
+        if (random.nextInt(5) == 0) return;
+        
+        if (variableDensityCounter % 200 == 0) {
             // choose a new density every ~ 1 second otherwise it will tend
             // towards the max density as a result of more this method
             // being executed more often than a car is removed.
@@ -43,72 +75,40 @@ public abstract class Junction {
             variableDensity = random.nextInt((maxDensity - minDensity) + 1) + minDensity;
         }
         
-        int lowestRatio = (cars < trucks) ? cars : trucks;
+        int localVariableDensity = variableDensity;
         
-        while (numberOfVehicles < variableDensity) {
-            System.out.println(numberOfVehicles);
+        if (numberOfVehicles < localVariableDensity) {
             Lane l = chooseLane();            
-            if (l == null) variableDensity--;
-            else generateVehicle(l, lowestRatio);
+            if (l != null) generateVehicle(l, cars, trucks);
         }
     }
 
-    private void generateVehicle(Lane l, int lowestRatio) {
-        double rnd = Math.random();
-        rnd = rnd * 10; //conversion to same scale as ratio of cars/trucks
-
-        if (!l.getVehicles().isEmpty()) {
-            Vehicle v = l.getVehicleAhead(l.getFirstSegment());
-            if (rnd <= lowestRatio) {
-                new Car(l, l.getFirstSegment(), v, null, CAR_COLOR);
-                numberOfVehicles++;
-
-            } else {
-                new Truck(l, l.getFirstSegment(), v, null, TRUCK_COLOR);
-                numberOfVehicles++;
-
-            }
+    private void generateVehicle(Lane l, int carRatio, int truckRatio) {        
+        int totalRatio = carRatio + truckRatio;
+        int randRatio = random.nextInt(totalRatio);        
+        Vehicle v = l.getVehicleAhead(l.getFirstSegment());        
+        if (randRatio < carRatio) {
+            new Car(l, l.getFirstSegment(), v, null, CAR_COLOR);
+            numberOfVehicles++;
         } else {
-            if (rnd <= lowestRatio) {
-                new Car(l, l.getFirstSegment(), CAR_COLOR);
-                numberOfVehicles++;
-            } else {
-                new Truck(l, l.getFirstSegment(), TRUCK_COLOR);
-                numberOfVehicles++;
-            }
+            new Truck(l, l.getFirstSegment(), v, null, TRUCK_COLOR);
+            numberOfVehicles++;
         }
     }
 
     protected Lane chooseLane() {
         ArrayList<Lane> potentialLanes = new ArrayList<>(lanes.size());
-        for (Lane l : lanes) {
-            if (l.getVehicles().isEmpty()) { //if lane is devoid of vehicles. it is obviously a potential lane.
+        for (Lane l : lanes) {            
+            if (l.getVehicles().isEmpty()) { 
                 potentialLanes.add(l);
                 continue;
-            }
+            }            
+            Vehicle firstVehicle = l.getVehicles().get(0);
+            Segment vehicleSegment = firstVehicle.getHeadSegment();
             Segment firstSegment = l.getFirstSegment();
-            Vehicle closestVehicleToStart = l.getVehicleAhead(firstSegment);
-            Vehicle atStart = l.getVehicleBehind(firstSegment);
-            Segment closestVehiclePosition;
-            int closestVehicleIndex;
-            if (atStart == null) {
-                atStart = closestVehicleToStart;
-                closestVehiclePosition = atStart.getHeadSegment();
-                closestVehicleIndex = l.getLaneSegments().indexOf(closestVehiclePosition);
-            } else {
-                closestVehiclePosition = atStart.getHeadSegment();
-                closestVehicleIndex = l.getLaneSegments().indexOf(closestVehiclePosition);
-            }
-
-
-
-            if (closestVehiclePosition.equals(firstSegment)) { //if there is a vehicle in the first segment of this lane.
-                continue;
-            } else if ((closestVehicleIndex) < (closestVehicleToStart.getLength() + 10)) { //if there is no vehicle immediately in front, but is long enough to occupy some space of where the vehicle is to be positioned
-                continue;
-            } else {
+            if (firstSegment.id() < vehicleSegment.id() - firstVehicle.getLength() - 5) {
                 potentialLanes.add(l);
-            }
+            }            
         }
 
         if (potentialLanes.isEmpty()) {
@@ -136,14 +136,7 @@ public abstract class Junction {
     }
 
     public void manageJunction() {
-        for (Lane l : lanes) {
-            for (Vehicle v : l.getVehicles()) {
-                Segment head = v.getHeadSegment();
-                if (head.getNextSegment() != null) {
-                    v.setHeadSegment(head.getNextSegment());
-                }
-            }
-        }
+        for (Vehicle v : this.getVehicles()) v.act();
     }
 
     public ArrayList<Lane> getLanes() {

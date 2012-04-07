@@ -5,6 +5,8 @@
 package view;
 
 import controller.Simulation;
+import controller.StateLoader;
+import controller.StateSaver;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,7 +56,6 @@ public class UserInterface extends JFrame {
 
     public void reloadGUI() {
         simPanel.clearCache();
-        simPanel.updatePanel((Junction) Simulation.getOption(Simulation.JUNCTION_TYPE));
     }
 
     private void updateButtonState() {
@@ -85,8 +86,8 @@ public class UserInterface extends JFrame {
         pauseSim = new JButton("Pause Simulation");
         pauseSim.setEnabled(false);
         changeSettings = new JButton("Change Settings");
-        saveJunc = new JButton("Save Junction");
-        loadJunc = new JButton("Load Junction");
+        saveJunc = new JButton("Save");
+        loadJunc = new JButton("Load");
 
         buttonPanel = new JPanel() {
             @Override
@@ -122,8 +123,8 @@ public class UserInterface extends JFrame {
         buttonPanel.add(startSim);
         buttonPanel.add(pauseSim);
         buttonPanel.add(changeSettings);
-        buttonPanel.add(saveJunc);
         buttonPanel.add(loadJunc);
+        buttonPanel.add(saveJunc);
         buttonPanel.setBackground(new Color(235, 235, 235));
 
         JPanel simulationContainer = new JPanel();
@@ -164,7 +165,6 @@ public class UserInterface extends JFrame {
                 } else { //else start
                     Simulation.start();
                     updateButtonState();
-                    Simulation.Simulate();
                 }
             }
         });
@@ -206,6 +206,7 @@ public class UserInterface extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (!Simulation.isPaused()) Simulation.pause();
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fileChooser.setAcceptAllFileFilterUsed(false);
@@ -214,12 +215,16 @@ public class UserInterface extends JFrame {
                 int returnOption = fileChooser.showSaveDialog(saveJunc);
                 if (returnOption == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    String filePath = selectedFile.getAbsolutePath();
-
-                    if (simPanel.serialiseJunction(filePath)) {
-                        displayNotification("Junction saved successfully!");
-                    } else {
-                        displayNotification("Junction not saved successfully!");
+                    // TODO: check whether to overwrite file or not
+                    // TODO: save .tss in a constant instant of literal
+                    if (!selectedFile.getName().endsWith(".tss")) {
+                        selectedFile = new File(selectedFile.getAbsolutePath().concat(".tss"));
+                    }
+                    try { 
+                        StateSaver.saveState(selectedFile);
+                    } catch (Exception ex) {
+                        displayNotification("Error: unable to save simulation.");
+                        ex.printStackTrace();
                     }
                 }
             }
@@ -229,6 +234,7 @@ public class UserInterface extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (!Simulation.isPaused()) Simulation.pause();
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fileChooser.setAcceptAllFileFilterUsed(false);
@@ -237,12 +243,13 @@ public class UserInterface extends JFrame {
                 int returnOption = fileChooser.showOpenDialog(loadJunc);
                 if (returnOption == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    String filePath = selectedFile.getAbsolutePath();
-                    if (simPanel.deserialiseJunction(filePath)) {
-                        displayNotification("Image loaded successfully!");
-                    } else {
-                        displayNotification("Image was not loaded correctly!");
-
+                    try { 
+                        StateLoader.loadState(selectedFile);
+                        reloadGUI();
+                        updateGUI();
+                    } catch (Exception ex) {
+                        displayNotification("Error: unable to load simulation.");
+                        ex.printStackTrace();
                     }
                 }
             }
@@ -267,43 +274,12 @@ class CustomFilter extends FileFilter {
 
     @Override
     public boolean accept(File f) {
-        if (f.isDirectory()) {
-            return true;
-        }
-        String fileExt = getExtension(f);
-        if (fileExt != null) {
-            switch (fileExt) {
-                case "jpeg":
-                    return true;
-                case "gif":
-                    return true;
-                case "png":
-                    return true;
-                case "jpg":
-                    return true;
-                case "st":
-                    return true;
-            }
-        }
-        return false;
+        return (f.getName().endsWith(".tss"));
     }
 
     @Override
     public String getDescription() {
-        return "Image and Simulation state types";
+        return "Traffic Simulation";
     }
-
-    /*
-     * Get the extension of a file.
-     */
-    public String getExtension(File f) {
-        String ext = null;
-        String s = f.getName();
-        int i = s.lastIndexOf('.');
-
-        if (i > 0 && i < s.length() - 1) {
-            ext = s.substring(i + 1).toLowerCase();
-        }
-        return ext;
-    }
+    
 }

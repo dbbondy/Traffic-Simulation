@@ -6,6 +6,10 @@ package view;
 
 import controller.Simulation;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 import model.Car;
@@ -23,10 +27,14 @@ public class DetailsPanel extends JPanel {
     private JLabel carAggressiveDetail;
     private JLabel ratioCarsDetail;
     private JLabel ratioTrucksDetail;
-    private JLabel time;
+    private JLabel timeDetail;
     private JLabel carsTr;
     private JLabel trucksTr;
+    
+    private JLabel editing;
 
+    // TODO: online change of options needs validation
+    
     public DetailsPanel() {
         super();
         initComponents();
@@ -40,22 +48,21 @@ public class DetailsPanel extends JPanel {
         
         JLabel vehicleMinDensityDetailL = new JLabel("Vehicle Minimum Density");
         vehicleMinDensityDetail = new JLabel(Simulation.getOption(Simulation.MIN_DENSITY).toString());
-        vehicleMaxDensityDetail = new JLabel(Simulation.getOption(Simulation.MAX_DENSITY).toString());
-        JPanel vehicleMinDensityP = new JPanel();
-        vehicleMinDensityP.setBackground(null);
-        vehicleMinDensityP.setLayout(new BorderLayout());
-        vehicleMinDensityP.add(vehicleMinDensityDetailL, BorderLayout.LINE_START);
-        vehicleMinDensityP.add(vehicleMinDensityDetail, BorderLayout.LINE_END);
+        JPanel vehicleMinDensityDetailP = new JPanel();
+        vehicleMinDensityDetailP.setBackground(null);
+        vehicleMinDensityDetailP.setLayout(new BorderLayout());
+        vehicleMinDensityDetailP.add(vehicleMinDensityDetailL, BorderLayout.LINE_START);
+        vehicleMinDensityDetailP.add(vehicleMinDensityDetail, BorderLayout.LINE_END);
         
         JLabel vehicleMaxDensityDetailL = new JLabel("Vehicle Maximum Density");
         vehicleMaxDensityDetail = new JLabel(Simulation.getOption(Simulation.MAX_DENSITY).toString());
-        JPanel vehicleMaxDensityP = new JPanel();
-        vehicleMaxDensityP.setBackground(null);
-        vehicleMaxDensityP.setLayout(new BorderLayout());
-        vehicleMaxDensityP.add(vehicleMaxDensityDetailL, BorderLayout.LINE_START);
-        vehicleMaxDensityP.add(vehicleMaxDensityDetail, BorderLayout.LINE_END);
+        JPanel vehicleMaxDensityDetailP = new JPanel();
+        vehicleMaxDensityDetailP.setBackground(null);
+        vehicleMaxDensityDetailP.setLayout(new BorderLayout());
+        vehicleMaxDensityDetailP.add(vehicleMaxDensityDetailL, BorderLayout.LINE_START);
+        vehicleMaxDensityDetailP.add(vehicleMaxDensityDetail, BorderLayout.LINE_END);
         
-        JLabel carAggressiveDetailL = new JLabel("Vehicle Aggression"); // + Simulation.getOption(Simulation.AGGRESSION));
+        JLabel carAggressiveDetailL = new JLabel("Vehicle Aggression"); 
         carAggressiveDetail = new JLabel(Simulation.getOption(Simulation.AGGRESSION).toString());
         JPanel carAggressiveDetailP = new JPanel();
         carAggressiveDetailP.setBackground(null);
@@ -79,13 +86,13 @@ public class DetailsPanel extends JPanel {
         ratioTrucksDetailP.add(ratioTrucksDetailL, BorderLayout.LINE_START);
         ratioTrucksDetailP.add(ratioTrucksDetail, BorderLayout.LINE_END);
         
-        JLabel timeL = new JLabel("Time Step");
-        time = new JLabel(Simulation.getOption(Simulation.TIME_STEP).toString());
-        JPanel timeP = new JPanel();
-        timeP.setBackground(null);
-        timeP.setLayout(new BorderLayout());
-        timeP.add(timeL, BorderLayout.LINE_START);
-        timeP.add(time, BorderLayout.LINE_END);
+        JLabel timeDetailL = new JLabel("Time Step");
+        timeDetail = new JLabel(Simulation.getOption(Simulation.TIME_STEP).toString());
+        JPanel timeDetailP = new JPanel();
+        timeDetailP.setBackground(null);
+        timeDetailP.setLayout(new BorderLayout());
+        timeDetailP.add(timeDetailL, BorderLayout.LINE_START);
+        timeDetailP.add(timeDetail, BorderLayout.LINE_END);
         
         JLabel carsTrL = new JLabel("Cars Travelled");
         carsTr = new JLabel(Integer.toString(SimulationStats.getCarCount()));
@@ -103,67 +110,166 @@ public class DetailsPanel extends JPanel {
         trucksTrP.add(trucksTrL, BorderLayout.LINE_START);
         trucksTrP.add(trucksTr, BorderLayout.LINE_END);
         
+        vehicleMinDensityDetail.setName(Simulation.MIN_DENSITY);
+        vehicleMaxDensityDetail.setName(Simulation.MAX_DENSITY);
+        carAggressiveDetail.setName(Simulation.AGGRESSION);
+        ratioCarsDetail.setName(Simulation.CAR_RATIO);
+        ratioTrucksDetail.setName(Simulation.TRUCK_RATIO);
+        timeDetail.setName(Simulation.TIME_STEP); 
+        
         Border padding = BorderFactory.createEmptyBorder(0, 10, 0, 10);
         
-        vehicleMinDensityDetail.setBorder(padding);
-        vehicleMaxDensityDetail.setBorder(padding);
-        carAggressiveDetail.setBorder(padding);
-        ratioCarsDetail.setBorder(padding);
-        ratioTrucksDetail.setBorder(padding);
-        time.setBorder(padding);
-        carsTr.setBorder(padding);
-        trucksTr.setBorder(padding);
+        vehicleMinDensityDetailP.setBorder(padding);
+        vehicleMaxDensityDetailP.setBorder(padding);
+        carAggressiveDetailP.setBorder(padding);
+        ratioCarsDetailP.setBorder(padding);
+        ratioTrucksDetailP.setBorder(padding);
+        timeDetailP.setBorder(padding);
+        carsTrP.setBorder(padding);
+        trucksTrP.setBorder(padding);
         
         JSeparator seperator = new JSeparator(JSeparator.HORIZONTAL);
         
-        vehicleMinDensityDetailL.setBorder(padding);
-        vehicleMaxDensityDetailL.setBorder(padding);
-        carAggressiveDetailL.setBorder(padding);
-        ratioCarsDetailL.setBorder(padding);
-        ratioTrucksDetailL.setBorder(padding);
-        timeL.setBorder(padding);
-        carsTrL.setBorder(padding);
-        trucksTrL.setBorder(padding);
-        
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         
-        this.add(vehicleMinDensityP);
-        this.add(vehicleMaxDensityP);
+        this.add(vehicleMinDensityDetailP);
+        this.add(vehicleMaxDensityDetailP);
         this.add(carAggressiveDetailP);
         this.add(ratioCarsDetailP);
         this.add(ratioTrucksDetailP);
-        this.add(timeP);
+        this.add(timeDetailP);
         this.add(Box.createVerticalStrut(6));
         this.add(seperator);
         this.add(Box.createVerticalStrut(6));
         this.add(carsTrP);
         this.add(trucksTrP);
         
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+        .addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                synchronized (Simulation.class) {
+                    if (e.getID() == KeyEvent.KEY_PRESSED && editing != null) {
+                        if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
+                            if (editing.getText().equals("      ")) editing.setText("");
+                            editing.setText(editing.getText() + e.getKeyChar());
+                            e.consume();
+                            return true;
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            finishEditing();
+                            e.consume();
+                            return true;
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                            if (!editing.getText().equals("      ")) {
+                                if (editing.getText().length() == 1) {
+                                    editing.setText("      ");
+                                    e.consume();
+                                    return true;
+                                } else {
+                                    editing.setText(editing.getText().substring(0, editing.getText().length()-2));
+                                    e.consume();
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
+        });
         
+        MouseListener ml = new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (!Simulation.isPaused()) Simulation.pause();
+                    finishEditing();
+                    editing = (JLabel) e.getSource();
+                    editing.setBackground(new Color(10*16+1, 14*16+6, 15*16+7)); // a1d6f7
+                    editing.setOpaque(true);
+                    editing.setText("      ");
+                }
+            }
+        };
         
+        vehicleMaxDensityDetail.addMouseListener(ml);
+        vehicleMinDensityDetail.addMouseListener(ml);
+        carAggressiveDetail.addMouseListener(ml);
+        ratioCarsDetail.addMouseListener(ml);
+        ratioTrucksDetail.addMouseListener(ml);        
+        
+    }
+    
+    void finishEditing() {
+        if (editing != null) {
+            JLabel edited = editing;
+            editing.setBackground(null);
+            editing.setOpaque(false);
+            editing = null;
+            if (edited.getText().equals("      ")) {
+                edited.setText(Integer.toString((Integer) Simulation.getOption(edited.getName())));
+            } else {
+                try {
+                    int value = Integer.parseInt(edited.getText());                    
+                    if (edited.getName().equals(Simulation.MAX_DENSITY)) {
+                        if (value > 100) {
+                            throw new RuntimeException(SettingsWindow.DENSITY_RANGE_ERROR);
+                        }
+                        if (value < (Integer) Simulation.getOption(Simulation.MIN_DENSITY)) {                            
+                            throw new RuntimeException(SettingsWindow.DENSITY_DIFFERENCE_ERROR);
+                        }
+                    }                    
+                    if (edited.getName().equals(Simulation.MIN_DENSITY)) {
+                        if (value > 100) {
+                            throw new RuntimeException(SettingsWindow.DENSITY_RANGE_ERROR);
+                        }
+                        if (value > (Integer) Simulation.getOption(Simulation.MAX_DENSITY)) {                            
+                            throw new RuntimeException(SettingsWindow.DENSITY_DIFFERENCE_ERROR);
+                        }
+                    }                    
+                    if (edited.getName().equals(Simulation.AGGRESSION)) {
+                        if (value > 100) {
+                            throw new RuntimeException(SettingsWindow.AGGRESSION_RANGE_ERROR);
+                        }
+                    }                    
+                    Simulation.setOption(edited.getName(), value);
+                } 
+                catch (RuntimeException e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    edited.setText(Integer.toString((Integer) Simulation.getOption(edited.getName())));
+                }
+            }
+        }
     }
 
     void setTimeText(String s){
-        time.setText(s);
+        finishEditing();
+        timeDetail.setText(s);
     }
     
     void setVehicleMinDensityText(String s) {
+        finishEditing();
         vehicleMinDensityDetail.setText(s);
     }
     
     void setVehicleMaxDensityText(String s){
+        finishEditing();
         vehicleMaxDensityDetail.setText(s);
     }
     
     void setVehicleAggressionText(String s){
+        finishEditing();
         carAggressiveDetail.setText(s);
     }
     
     void setRatioCarsText(String s){
+        finishEditing();
         ratioCarsDetail.setText(s);
     }
     
     void setRatioTrucksText(String s){
+        finishEditing();
         ratioTrucksDetail.setText(s);
     }
     
@@ -174,5 +280,4 @@ public class DetailsPanel extends JPanel {
     void setTruckCountText(String s){
         trucksTr.setText(s);
     }
-    
 }

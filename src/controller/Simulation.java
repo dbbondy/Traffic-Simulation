@@ -1,6 +1,8 @@
 package controller;
 
-import java.util.ArrayList;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 import model.*;
@@ -17,10 +19,10 @@ public class Simulation {
     public static final String MIN_DENSITY = "min-density";
     public static final String MAX_DENSITY = "max-density";
     public static final String AGGRESSION = "aggression";
-    public static final String CAR_RATIO = "car ratio";
-    public static final String TRUCK_RATIO = "truck ratio";
-    public static final String JUNCTION_TYPE = "junction type";
-    public static final String TIME_STEP = "time step";
+    public static final String CAR_RATIO = "car-ratio";
+    public static final String TRUCK_RATIO = "truck-ratio";
+    public static final String JUNCTION_TYPE = "junction-type";
+    public static final String TIME_STEP = "time-step";
     private static boolean paused;
     private static boolean started;
     private static SettingsWindow settingsWindow;
@@ -28,7 +30,12 @@ public class Simulation {
     private static Map<String, Object> settings;
     private static SimulationThread simulationThread;
 
-    public static void init() {
+    public static void init() {        
+        Junction.registerJunctionType(FlyoverJunction.class);
+        Junction.registerJunctionType(PlainJunction.class);
+        Junction.registerJunctionType(RoundaboutJunction.class);
+        Junction.registerJunctionType(TrafficLightJunction.class);
+        Junction.registerJunctionType(TwoLaneJunction.class);
         settings = new HashMap<>();
         settings.put(MIN_DENSITY, 0);
         settings.put(MAX_DENSITY, 0);
@@ -40,10 +47,10 @@ public class Simulation {
         paused = false;
         started = false;
         simulationThread = new SimulationThread();
-        settingsWindow = new SettingsWindow();
+        settingsWindow = new SettingsWindow();        
     }
 
-    //how to create a proper MVC compliant instantiation
+    // how to create a proper MVC compliant instantiation
     /*
      * simulation creates instance of settings window, and waits until processing on that window is complete simulation creates instance of main user interface window
      */
@@ -56,53 +63,16 @@ public class Simulation {
     }
 
     public static void pause() {
-        paused = !paused;
-        if (ui != null) {
-            ui.updateGUI();
+        if (isStarted()) {
+            paused = !paused;
+            if (ui != null) {
+                ui.updateGUI();
+            }
         }
-    }
-    
-    public static void setSimulationState(State state){
-        Simulation.setOption(MIN_DENSITY, state.getMinDensity());
-        Simulation.setOption(MAX_DENSITY, state.getMaxDensity());
-        Simulation.setOption(AGGRESSION, state.getAggression());
-        Simulation.setOption(CAR_RATIO, state.getCarRatio());
-        Simulation.setOption(TRUCK_RATIO, state.getTruckRatio());
-        Simulation.setOption(TIME_STEP, state.getTimeStep());
-        
-        switch(state.getJunction()){
-            case "Two-Lane Junction":
-                Simulation.setOption(JUNCTION_TYPE, new TwoLaneJunction());
-                break;
-            case "Flyover Junction":
-                Simulation.setOption(JUNCTION_TYPE, new FlyoverJunction());
-                break;
-            case "Plain Junction":
-                Simulation.setOption(JUNCTION_TYPE, new PlainJunction());
-                break;
-            case "Traffic Light Junction":
-                Simulation.setOption(JUNCTION_TYPE, new TrafficLightJunction());
-                break;
-            case "Roundabout Junction":
-                Simulation.setOption(JUNCTION_TYPE, new RoundaboutJunction());
-                break;
-        }
-        ui.updateGUI();
     }
 
     public static synchronized boolean isPaused() {
         return paused;
-    }
-
-    public static void Simulate() {
-        if (simulationThread != null) {
-            // tells the thread to terminate
-            simulationThread.terminate();
-        }
-        // creates a new thread
-        simulationThread = new SimulationThread();
-        simulationThread.start();
-        //SimulationStats.publishStats();
     }
 
     public static void settingsChanged() {
@@ -110,11 +80,7 @@ public class Simulation {
             ui = new UserInterface();
             return;
         }
-        if(settingsWindow.isJuncDifferent()){
-            reset();
-            ui.reloadGUI();
-            ui.updateGUI();
-        }
+        reset();
         ui.reloadGUI();
         ui.updateGUI();
         if(paused == true){
@@ -127,45 +93,42 @@ public class Simulation {
         // prevent rendering while AI processes
         synchronized (Simulation.class) {
             
-            //core simulation step progress.
+            // core simulation step progress.
             Junction junc = (Junction)getOption(Simulation.JUNCTION_TYPE); 
             int carsRatio = (Integer)getOption(Simulation.CAR_RATIO); 
             int trucksRatio = (Integer)getOption(Simulation.TRUCK_RATIO);
             junc.distributeNewCars(carsRatio, trucksRatio); 
-            junc.manageJunction(); //goesthrough all lanes contained in the junction, and tells each car within each lane to "act" 
+            junc.manageJunction(); // goes through all lanes contained in the junction, and tells each car within each lane to "act" 
             junc.updateDeletions();
-            //when cars go outof the end of the junction, they get "deleted" and statistics are incremented.   
+            // when cars go outof the end of the junction, they get "deleted" and statistics are incremented.   
             
-        }
-         
+            setOption(TIME_STEP, ((int) getOption(TIME_STEP) + 1));
+            
+        }      
         
-        
-        /*// test code
-        Junction currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
-        ArrayList<Lane> lanes = currentJunction.getLanes();
-        for(Lane l : lanes){
-            for(Vehicle v : l.getVehicles()){
-                Segment head = v.getHeadSegment();
-                if (head.getNextSegment() != null) {
-                    v.setHeadSegment(head.getNextSegment());
-                } else {
-                    v.setHeadSegment(l.getFirstSegment());
-                }
-            }
-        }
-        */
-        int currentStep = (Integer) getOption(TIME_STEP);
-        currentStep++;
-        setOption(TIME_STEP, currentStep);
-
     }
 
     public static void start() {
-        started = (!started);
+        
+        started = true;
+        
+        if (simulationThread != null) {
+            // tells the thread to terminate
+            simulationThread.terminate();
+        }
+        
+        // creates a new thread
+        simulationThread = new SimulationThread();
+        simulationThread.start();
+        
     }
 
     public static synchronized boolean isStarted() {
         return started;
+    }
+    
+    public static void stop() {
+        reset();
     }
     
     public static void reset(){
@@ -179,8 +142,8 @@ public class Simulation {
             setOption(TIME_STEP, 0); 
             started = false;
             paused = false;
-            ui.updateGUI();
             ui.reloadGUI();
+            ui.updateGUI();            
         }
         
     }
@@ -199,15 +162,6 @@ public class Simulation {
         @Override
         public void run() {
             while (isStarted() && !terminate) {
-                synchronized (this) {
-                    while (isPaused()) {
-                        try {
-                            this.wait();
-                        } catch (InterruptedException ie) {
-                            ie.printStackTrace();
-                        }
-                    }
-                }
                 try {
                     // synchronize on ui so that
                     // we can prevent reset() etc 
@@ -219,6 +173,15 @@ public class Simulation {
                     Thread.sleep(10);
                 } catch (InterruptedException ie) {
                     ie.printStackTrace();
+                }
+                synchronized (this) {
+                    while (isPaused()) {
+                        try {
+                            this.wait();
+                        } catch (InterruptedException ie) {
+                            ie.printStackTrace();
+                        }
+                    }
                 }
             }
         }

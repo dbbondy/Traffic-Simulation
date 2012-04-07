@@ -12,6 +12,8 @@ import model.Lane;
  */
 public class PlainJunction extends Junction{
 
+    public static final String name = "Plain Junction";
+    
     @Override
     public void distributeNewCars(int cars, int trucks) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -24,6 +26,6 @@ public class PlainJunction extends Junction{
 
     @Override
     public String toString(){
-        return "Plain Junction";
+        return name;
     }
 }

@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import model.junctions.Junction;
+import model.junctions.TwoLaneJunction;
 
 
 
@@ -25,6 +26,15 @@ import model.junctions.Junction;
  * @author Dan
  */
 public class SettingsWindow extends JFrame {
+    
+    public static final String DENSITY_RANGE_ERROR 
+         = "You cannot have a density level greater than 100";
+    
+    public static final String AGGRESSION_RANGE_ERROR
+         = "You cannot have an aggression level greater than 100";
+    
+    public static final String DENSITY_DIFFERENCE_ERROR
+         = "Maximum density must be greater than or equal to minimum density. ";
 
     //TODO: the settings window closes even if an error occurs, fix this logic. 
     //TODO: there are todo's in the user interface class. do those too.
@@ -46,10 +56,16 @@ public class SettingsWindow extends JFrame {
     private JTextField[] fields;
     private JComboBox<String> junctions;
 
+    // TODO: default values automatically on first start
+    // and then the current values thereafter!!!!
+    
+    // TODO: fix tab index
+    
     public SettingsWindow() {
         initComponents();
         addComponents();
         addListeners();  
+        setDefaultValues();
         this.setTitle("Settings");
         this.setVisible(true); 
     }
@@ -76,12 +92,10 @@ public class SettingsWindow extends JFrame {
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        String[] junctionOptions = {"<<please enter a choice>>", "Two-Lane Junction", "Roundabout Junction", "Traffic light Junction", "Flyover Junction", "Plain Junction"};
+        String[] junctionOptions = Junction.getJunctionNames().toArray(new String[0]);
         junctions = new JComboBox<String>(junctionOptions);
 
         this.setLocationRelativeTo(null); //centers the frame in the screen
-        
-        
 
     }
 
@@ -172,35 +186,21 @@ public class SettingsWindow extends JFrame {
                             
                             if(field.getName().equals(Simulation.MIN_DENSITY)){
                                 if(value > 100){
-                                    showErrMessage("You cannot have an density level greater than 100", "Error");
+                                    showErrMessage(DENSITY_RANGE_ERROR, "Error");
                                     return;
                                 }
                             }
                             
                             if(field.getName().equals(Simulation.MAX_DENSITY)){
                                 if(value > 100){
-                                    showErrMessage("You cannot have an density level greater than 100", "Error");
+                                    showErrMessage(DENSITY_RANGE_ERROR, "Error");
                                     return;
                                 }
                             }
                             
                             if (field.getName().equals(Simulation.AGGRESSION)) {
                                 if (value > 100) {
-                                    showErrMessage("You cannot have an aggression level greater than 100", "Error");
-                                    return;
-                                }
-                            }
-                            
-                            if (field.getName().equals(Simulation.CAR_RATIO)) {
-                                if(value > 10){
-                                    showErrMessage("You cannot have a car ratio level greater than 10", "Error");
-                                    return;
-                                }
-                            }
-                            
-                            if (field.getName().equals(Simulation.TRUCK_RATIO)) {
-                                if(value > 10){
-                                    showErrMessage("You cannot have a truck ratio level greater than 10", "Error");
+                                    showErrMessage(AGGRESSION_RANGE_ERROR, "Error");
                                     return;
                                 }
                             }
@@ -214,28 +214,18 @@ public class SettingsWindow extends JFrame {
                     }
                 }
                 
-                if(((int)Simulation.getOption(Simulation.CAR_RATIO)) + ((int)Simulation.getOption(Simulation.TRUCK_RATIO)) > 10){
-                    showErrMessage("The ratio of cars : trucks must sum to 10.", "Error");
-                    return;
-                }
-                
-                if (junctions.getSelectedIndex() == 0) {
-                    showErrMessage("You haven't selected a junction. Please select a junction", "Error");
-                    return;
-                }
-
                 if (newValues < fields.length) {
                     showErrMessage("You need to enter values for all fields", "Error");
                     return;
                 }
                 
                 if((int)Simulation.getOption(Simulation.MIN_DENSITY) > (int)Simulation.getOption(Simulation.MAX_DENSITY)){
-                    showErrMessage("Min > max is not allowed. Try again", "Error");
+                    showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
                     return;
                 }
                 
                 if((int)Simulation.getOption(Simulation.MAX_DENSITY) < (int)Simulation.getOption(Simulation.MIN_DENSITY)){
-                    showErrMessage("Max < min is not allowed. Try again", "Error");
+                    showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
                     return;
                 }
                 
@@ -256,45 +246,28 @@ public class SettingsWindow extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                minDensityField.setText("10");
-                maxDensityField.setText("25");
-                aggressionField.setText("25");
-                carRatioField.setText("5");
-                truckRatioField.setText("5");
-                junctions.setSelectedIndex(1);
+                setDefaultValues();
             }
         });
+        
     }
     
-    public boolean isJuncDifferent(){
-         String junction = (String)junctions.getSelectedItem();
-         Junction currentJunction = (Junction)Simulation.getOption(Simulation.JUNCTION_TYPE);
-         
-         if(currentJunction.toString().equals(junction)){
-             return false;
-         }
-         return true;
+    private void setDefaultValues() {
+        minDensityField.setText("10");
+        maxDensityField.setText("25");
+        aggressionField.setText("25");
+        carRatioField.setText("5");
+        truckRatioField.setText("5");
+        junctions.setSelectedIndex(2);
     }
     
     private void determineJuncInit(){
-        String junction = (String)junctions.getSelectedItem();
-                switch (junction) {
-                    case "Two-Lane Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TwoLaneJunction());
-                        break;
-                    case "Roundabout Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.RoundaboutJunction());
-                        break;
-                    case "Plain Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.PlainJunction());
-                        break;
-                    case "Traffic light Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.TrafficLightJunction());
-                        break;
-                    case "Flyover Junction":
-                        Simulation.setOption(Simulation.JUNCTION_TYPE, new model.junctions.FlyoverJunction());
-                        break;
-                }
+        try {
+            String junction = (String) junctions.getSelectedItem();
+            Simulation.setOption(Simulation.JUNCTION_TYPE, Junction.getJunctionTypeByName(junction).newInstance());
+        } catch (Exception e) {
+            e.printStackTrace();;
+        }        
     }
 
     private void showErrMessage(String message, String title) {

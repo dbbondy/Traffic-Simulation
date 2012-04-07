@@ -30,4 +30,12 @@ public class SimulationStats {
     public static int getTruckCount() { 
         return truckCount;
     }
+    
+    public static void setCarCount(int value) {
+        carCount = value;
+    }
+    
+    public static void setTruckCount(int value) { 
+        truckCount = value;
+    }
 }

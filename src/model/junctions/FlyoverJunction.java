@@ -8,7 +8,9 @@ package model.junctions;
  *
  * @author Dan
  */
-public class FlyoverJunction extends Junction{
+public class FlyoverJunction extends Junction {
+    
+    public static final String name = "Flyover Junction";
 
     @Override
     public void distributeNewCars(int cars, int trucks) {
@@ -22,7 +24,7 @@ public class FlyoverJunction extends Junction{
     
     @Override
     public String toString(){
-        return "Flyover Junction";
+        return name;
     }
     
 }
