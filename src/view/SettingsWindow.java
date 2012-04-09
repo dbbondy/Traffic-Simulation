@@ -5,11 +5,10 @@
 package view;
 
 import controller.Simulation;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -17,9 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import model.junctions.Junction;
-import model.junctions.TwoLaneJunction;
-
-
 
 /**
  *
@@ -27,17 +23,14 @@ import model.junctions.TwoLaneJunction;
  */
 public class SettingsWindow extends JFrame {
     
-    public static final String DENSITY_RANGE_ERROR 
-         = "You cannot have a density level greater than 100";
-    
-    public static final String AGGRESSION_RANGE_ERROR
-         = "You cannot have an aggression level greater than 100";
-    
-    public static final String DENSITY_DIFFERENCE_ERROR
-         = "Maximum density must be greater than or equal to minimum density. ";
-
-    //TODO: the settings window closes even if an error occurs, fix this logic. 
-    //TODO: there are todo's in the user interface class. do those too.
+    public static final String DENSITY_RANGE_ERROR = "You cannot have a density level greater than 100";
+    public static final String AGGRESSION_RANGE_ERROR = "You cannot have an aggression level greater than 100";
+    public static final String DENSITY_DIFFERENCE_ERROR = "Maximum density must be greater than or equal to minimum density. ";
+    public static final String MIN_DENSITY_DEFAULT = "10";
+    public static final String MAX_DENSITY_DEFAULT = "25";
+    public static final String AGGRESSION_DEFAULT = "25";
+    public static final String CAR_RATIO_DEFAULT = "5";
+    public static final String TRUCK_RATIO_DEFAULT = "5";
     private Container contentPane;
     private JLabel minDensityLbl;
     private JLabel maxDensityLbl;
@@ -58,18 +51,20 @@ public class SettingsWindow extends JFrame {
 
     // TODO: default values automatically on first start
     // and then the current values thereafter!!!!
-    
     // TODO: fix tab index
-    
     public SettingsWindow() {
         initComponents();
         addComponents();
-        addListeners();  
-        setDefaultValues();
+        addListeners();
+        if (((Integer) Simulation.getOption(Simulation.TIME_STEP)) > 0) {
+            setCurrentValues();
+        } else {
+            setDefaultValues();
+        }
         this.setTitle("Settings");
-        this.setVisible(true); 
+        this.setVisible(true);
     }
-
+    
     private void initComponents() {
         contentPane = this.getContentPane();
         minDensityLbl = new JLabel("Minimum density of vehicles");
@@ -89,16 +84,32 @@ public class SettingsWindow extends JFrame {
         this.setResizable(false);
         contentPane.setLayout(new GridBagLayout());
         fields = new JTextField[5];
-
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         String[] junctionOptions = Junction.getJunctionNames().toArray(new String[0]);
         junctions = new JComboBox<String>(junctionOptions);
-
+        
+        //customises tab usage so that tabs can be used to modify values
+        TabFocusTraversal tft = new TabFocusTraversal();
+        tft.addIndexedComponent(minDensityField);
+        tft.addIndexedComponent(maxDensityField);
+        tft.addIndexedComponent(aggressionField);
+        tft.addIndexedComponent(carRatioField);
+        tft.addIndexedComponent(truckRatioField);
+        tft.addIndexedComponent(junctions);
+        tft.addIndexedComponent(submitBtn);
+        tft.addIndexedComponent(defaultBtn);
+        setFocusTraversalPolicy(tft);
+        
+        
+        
+        
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(null); //centers the frame in the screen
+        
+        
+        
 
     }
-
+    
     private void addComponents() {
         cons.fill = GridBagConstraints.HORIZONTAL;
         cons.gridx = 0;
@@ -106,33 +117,33 @@ public class SettingsWindow extends JFrame {
         cons.ipadx = 5;
         cons.ipady = 5;
         contentPane.add(minDensityLbl, cons);
-
+        
         cons.gridy = 1;
         contentPane.add(maxDensityLbl, cons);
         
         cons.gridy = 2;
         contentPane.add(aggressionLbl, cons);
-
+        
         cons.gridy = 3;
         contentPane.add(carRatioLbl, cons);
-
+        
         cons.gridy = 4;
         contentPane.add(truckRatioLbl, cons);
         
         cons.gridy = 5;
         contentPane.add(junctionLbl, cons);
-
+        
         cons.gridx = 1;
         cons.gridy = 0;
-
+        
         contentPane.add(minDensityField, cons);
         
         cons.gridy = 1;
         contentPane.add(maxDensityField, cons);
-
+        
         cons.gridy = 2;
         contentPane.add(aggressionField, cons);
-
+        
         cons.gridy = 3;
         contentPane.add(carRatioField, cons);
         
@@ -141,36 +152,36 @@ public class SettingsWindow extends JFrame {
         
         cons.gridy = 5;
         contentPane.add(junctions, cons);
-
+        
         cons.gridx = 2;
         cons.gridy = 1;
         contentPane.add(submitBtn, cons);
-
+        
         cons.gridy = 2;
         contentPane.add(defaultBtn, cons);
-
+        
         minDensityField.setName(Simulation.MIN_DENSITY);
         fields[0] = minDensityField;
-
+        
         maxDensityField.setName(Simulation.MAX_DENSITY);
         fields[1] = maxDensityField;
         
         aggressionField.setName(Simulation.AGGRESSION);
         fields[2] = aggressionField;
-
+        
         carRatioField.setName(Simulation.CAR_RATIO);
         fields[3] = carRatioField;
-
+        
         truckRatioField.setName(Simulation.TRUCK_RATIO);
         fields[4] = truckRatioField;
-
+        
         this.pack();
-
+        
     }
-
+    
     private void addListeners() {
         submitBtn.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 int newValues = 0;
@@ -178,21 +189,21 @@ public class SettingsWindow extends JFrame {
                     if (!field.getText().isEmpty()) {
                         try {
                             int value = Integer.parseInt(field.getText());
-
+                            
                             if (value < 0) {
                                 showErrMessage("You have inputted negative values for 1 or more fields. Please enter sensible, positive values", "Error");
                                 return;
                             }
                             
-                            if(field.getName().equals(Simulation.MIN_DENSITY)){
-                                if(value > 100){
+                            if (field.getName().equals(Simulation.MIN_DENSITY)) {
+                                if (value > 100) {
                                     showErrMessage(DENSITY_RANGE_ERROR, "Error");
                                     return;
                                 }
                             }
                             
-                            if(field.getName().equals(Simulation.MAX_DENSITY)){
-                                if(value > 100){
+                            if (field.getName().equals(Simulation.MAX_DENSITY)) {
+                                if (value > 100) {
                                     showErrMessage(DENSITY_RANGE_ERROR, "Error");
                                     return;
                                 }
@@ -204,7 +215,7 @@ public class SettingsWindow extends JFrame {
                                     return;
                                 }
                             }
-
+                            
                             Simulation.setOption(field.getName(), value);
                             newValues++;
                         } catch (NumberFormatException nfe) {
@@ -219,12 +230,12 @@ public class SettingsWindow extends JFrame {
                     return;
                 }
                 
-                if((int)Simulation.getOption(Simulation.MIN_DENSITY) > (int)Simulation.getOption(Simulation.MAX_DENSITY)){
+                if ((int) Simulation.getOption(Simulation.MIN_DENSITY) > (int) Simulation.getOption(Simulation.MAX_DENSITY)) {
                     showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
                     return;
                 }
                 
-                if((int)Simulation.getOption(Simulation.MAX_DENSITY) < (int)Simulation.getOption(Simulation.MIN_DENSITY)){
+                if ((int) Simulation.getOption(Simulation.MAX_DENSITY) < (int) Simulation.getOption(Simulation.MIN_DENSITY)) {
                     showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
                     return;
                 }
@@ -232,20 +243,21 @@ public class SettingsWindow extends JFrame {
                 determineJuncInit();
                 Simulation.settingsChanged();
                 
-               
                 
-                synchronized(Simulation.getSimulationThread()){ //notifying simulation thread that we are done with waiting.
+                
+                synchronized (Simulation.getSimulationThread()) { //notifying simulation thread that we are done with waiting.
                     Simulation.getSimulationThread().notify();
                 }
                 
                 SettingsWindow.this.dispose();
             }
         });
-
+        
         defaultBtn.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
+                
                 setDefaultValues();
             }
         });
@@ -253,23 +265,36 @@ public class SettingsWindow extends JFrame {
     }
     
     private void setDefaultValues() {
-        minDensityField.setText("10");
-        maxDensityField.setText("25");
-        aggressionField.setText("25");
-        carRatioField.setText("5");
-        truckRatioField.setText("5");
+        
+        minDensityField.setText(MIN_DENSITY_DEFAULT);
+        maxDensityField.setText(MAX_DENSITY_DEFAULT);
+        aggressionField.setText(AGGRESSION_DEFAULT);
+        carRatioField.setText(CAR_RATIO_DEFAULT);
+        truckRatioField.setText(TRUCK_RATIO_DEFAULT);
         junctions.setSelectedIndex(2);
     }
     
-    private void determineJuncInit(){
+    private void setCurrentValues() {
+        minDensityField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.MIN_DENSITY)));
+        maxDensityField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.MAX_DENSITY)));
+        aggressionField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.AGGRESSION)));
+        carRatioField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.CAR_RATIO)));
+        truckRatioField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.TRUCK_RATIO)));
+        Junction j = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
+        String name = j.toString();
+        
+        junctions.setSelectedItem(name);
+    }
+    
+    private void determineJuncInit() {
         try {
             String junction = (String) junctions.getSelectedItem();
             Simulation.setOption(Simulation.JUNCTION_TYPE, Junction.getJunctionTypeByName(junction).newInstance());
         } catch (Exception e) {
-            e.printStackTrace();;
-        }        
+            e.printStackTrace();
+        }
     }
-
+    
     private void showErrMessage(String message, String title) {
         JOptionPane.showMessageDialog(this,
                 message,
@@ -277,5 +302,42 @@ public class SettingsWindow extends JFrame {
                 JOptionPane.ERROR_MESSAGE);
     }
     
-    
+    private class TabFocusTraversal extends FocusTraversalPolicy {
+        
+        private ArrayList<Component> components = new ArrayList<>();
+        
+        public void addIndexedComponent(Component component) {
+            components.add(component);
+        }
+        
+        @Override
+        public Component getComponentAfter(Container aContainer, Component aComponent) {
+            int atIndex = components.indexOf(aComponent);
+            int nextIndex = (atIndex + 1) % components.size();
+            return components.get(nextIndex);
+        }
+        
+        @Override
+        public Component getComponentBefore(Container aContainer, Component aComponent) {
+            int atIndex = components.indexOf(aComponent);
+            int nextIndex = (atIndex + components.size() - 1)
+                    % components.size();
+            return components.get(nextIndex);
+        }
+        
+        @Override
+        public Component getFirstComponent(Container aContainer) {
+            return components.get(0);
+        }
+
+        @Override
+        public Component getLastComponent(Container aContainer) {
+            return components.get(components.size());
+        }
+
+        @Override
+        public Component getDefaultComponent(Container aContainer) {
+            return components.get(0);
+        }
+    }
 }

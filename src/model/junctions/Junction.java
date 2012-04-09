@@ -14,7 +14,7 @@ import model.*;
  */
 public abstract class Junction {
     
-    private static HashMap<String, Class> namedJunctionClasses = new HashMap<String, Class>();
+    private static HashMap<String, Class> namedJunctionClasses = new HashMap<>();
 
     protected static final Color CAR_COLOR = new Color(0, 102, 153);
     protected static final Color TRUCK_COLOR = new Color(153, 0, 0);
@@ -30,8 +30,11 @@ public abstract class Junction {
     }
     
     public static void registerJunctionType(Class cls) {
-        try { namedJunctionClasses.put((String) cls.getDeclaredField("name").get(cls), cls); }
-        catch (Exception e) { e.printStackTrace(); }
+        try { 
+            namedJunctionClasses.put((String) cls.getDeclaredField("name").get(cls), cls);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public static Class getJunctionTypeByName(String name) {
@@ -55,9 +58,7 @@ public abstract class Junction {
         return allVehicles;
     }
     
-    // TODO: fix permissions so that
-    // only the StateLoader can call this
-    // or rework the code to fix the issue
+    
     public void updateNumberOfVehicles() {
         numberOfVehicles = getVehicles().size();
     }

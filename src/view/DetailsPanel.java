@@ -12,9 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.border.Border;
-import model.Car;
 import model.SimulationStats;
-import model.Truck;
 
 /**
  *
@@ -33,7 +31,7 @@ public class DetailsPanel extends JPanel {
     
     private JLabel editing;
 
-    // TODO: online change of options needs validation
+    
     
     public DetailsPanel() {
         super();
