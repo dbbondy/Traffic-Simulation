@@ -53,7 +53,7 @@ public abstract class Junction {
     }
     
     public ArrayList<Vehicle> getVehicles() {
-        ArrayList<Vehicle> allVehicles = new ArrayList<Vehicle>();
+        ArrayList<Vehicle> allVehicles = new ArrayList<>();
         for (Lane lane : lanes) allVehicles.addAll(lane.getVehicles());
         return allVehicles;
     }
@@ -137,7 +137,8 @@ public abstract class Junction {
     }
 
     public void manageJunction() {
-        for (Vehicle v : this.getVehicles()) v.act();
+        for (Vehicle v : this.getVehicles())
+            v.act();
     }
 
     public ArrayList<Lane> getLanes() {

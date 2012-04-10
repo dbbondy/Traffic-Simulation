@@ -25,6 +25,7 @@ public class DetailsPanel extends JPanel {
     private JLabel carAggressiveDetail;
     private JLabel ratioCarsDetail;
     private JLabel ratioTrucksDetail;
+    private JLabel maximumSpeedDetail;
     private JLabel timeDetail;
     private JLabel carsTr;
     private JLabel trucksTr;
@@ -37,7 +38,7 @@ public class DetailsPanel extends JPanel {
         super();
         initComponents();
         this.setBackground(new Color(250, 250, 250));
-        this.setMaximumSize(new Dimension(220, 180));
+        this.setMaximumSize(new Dimension(220, 200));
         this.setMinimumSize(new Dimension(220, 0));
         this.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
     }
@@ -84,6 +85,14 @@ public class DetailsPanel extends JPanel {
         ratioTrucksDetailP.add(ratioTrucksDetailL, BorderLayout.LINE_START);
         ratioTrucksDetailP.add(ratioTrucksDetail, BorderLayout.LINE_END);
         
+        JLabel maximumSpeedDetailL = new JLabel("Maximum Speed");
+        maximumSpeedDetail = new JLabel(Simulation.getOption(Simulation.MAXIMUM_SPEED).toString());
+        JPanel maximumSpeedDetailP = new JPanel();
+        maximumSpeedDetailP.setBackground(null);
+        maximumSpeedDetailP.setLayout(new BorderLayout());
+        maximumSpeedDetailP.add(maximumSpeedDetailL, BorderLayout.LINE_START);
+        maximumSpeedDetailP.add(maximumSpeedDetail, BorderLayout.LINE_END);
+        
         JLabel timeDetailL = new JLabel("Time Step");
         timeDetail = new JLabel(Simulation.getOption(Simulation.TIME_STEP).toString());
         JPanel timeDetailP = new JPanel();
@@ -113,6 +122,7 @@ public class DetailsPanel extends JPanel {
         carAggressiveDetail.setName(Simulation.AGGRESSION);
         ratioCarsDetail.setName(Simulation.CAR_RATIO);
         ratioTrucksDetail.setName(Simulation.TRUCK_RATIO);
+        maximumSpeedDetail.setName(Simulation.MAXIMUM_SPEED);
         timeDetail.setName(Simulation.TIME_STEP); 
         
         Border padding = BorderFactory.createEmptyBorder(0, 10, 0, 10);
@@ -122,6 +132,7 @@ public class DetailsPanel extends JPanel {
         carAggressiveDetailP.setBorder(padding);
         ratioCarsDetailP.setBorder(padding);
         ratioTrucksDetailP.setBorder(padding);
+        maximumSpeedDetailP.setBorder(padding);
         timeDetailP.setBorder(padding);
         carsTrP.setBorder(padding);
         trucksTrP.setBorder(padding);
@@ -135,6 +146,7 @@ public class DetailsPanel extends JPanel {
         this.add(carAggressiveDetailP);
         this.add(ratioCarsDetailP);
         this.add(ratioTrucksDetailP);
+        this.add(maximumSpeedDetailP);
         this.add(timeDetailP);
         this.add(Box.createVerticalStrut(6));
         this.add(seperator);
@@ -195,11 +207,12 @@ public class DetailsPanel extends JPanel {
         vehicleMinDensityDetail.addMouseListener(ml);
         carAggressiveDetail.addMouseListener(ml);
         ratioCarsDetail.addMouseListener(ml);
-        ratioTrucksDetail.addMouseListener(ml);        
+        ratioTrucksDetail.addMouseListener(ml);
+        maximumSpeedDetail.addMouseListener(ml);
         
     }
     
-    void finishEditing() {
+    void finishEditing(){
         if (editing != null) {
             JLabel edited = editing;
             editing.setBackground(null);
@@ -230,7 +243,12 @@ public class DetailsPanel extends JPanel {
                         if (value > 100) {
                             throw new RuntimeException(SettingsWindow.AGGRESSION_RANGE_ERROR);
                         }
-                    }                    
+                    }
+                    if(edited.getName().equals(Simulation.MAXIMUM_SPEED)){
+                        if(value > 100){
+                            throw new RuntimeException(SettingsWindow.MAXIMUM_SPEED_ERROR);
+                        }
+                    }
                     Simulation.setOption(edited.getName(), value);
                 } 
                 catch (RuntimeException e) {
@@ -269,6 +287,11 @@ public class DetailsPanel extends JPanel {
     void setRatioTrucksText(String s){
         finishEditing();
         ratioTrucksDetail.setText(s);
+    }
+    
+    void setMaximumSpeedText(String s){
+        finishEditing();
+        maximumSpeedDetail.setText(s);
     }
     
     void setCarCountText(String s){

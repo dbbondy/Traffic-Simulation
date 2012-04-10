@@ -29,7 +29,7 @@ public class StateLoader {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(file);
 
-            ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
+            ArrayList<Vehicle> vehicles = new ArrayList<>();
             Junction junc = null;
 
             NodeList detailsNodeList = doc.getElementsByTagName("details").item(0).getChildNodes();

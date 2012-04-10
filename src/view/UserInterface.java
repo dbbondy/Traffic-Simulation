@@ -48,6 +48,7 @@ public class UserInterface extends JFrame {
         detailPanel.setRatioCarsText(Simulation.getOption(Simulation.CAR_RATIO).toString());
         detailPanel.setRatioTrucksText(Simulation.getOption(Simulation.TRUCK_RATIO).toString());
         detailPanel.setVehicleAggressionText(Simulation.getOption(Simulation.AGGRESSION).toString());
+        detailPanel.setMaximumSpeedText(Simulation.getOption(Simulation.MAXIMUM_SPEED).toString());
         detailPanel.setCarCountText(Integer.toString(SimulationStats.getCarCount()));
         detailPanel.setTruckCountText(Integer.toString(SimulationStats.getTruckCount()));
         updateButtonState();
@@ -217,8 +218,8 @@ public class UserInterface extends JFrame {
                     File selectedFile = fileChooser.getSelectedFile();
                     // TODO: check whether to overwrite file or not
                     // TODO: save .tss in a constant instant of literal
-                    if (!selectedFile.getName().endsWith(".tss")) {
-                        selectedFile = new File(selectedFile.getAbsolutePath().concat(".tss"));
+                    if (!selectedFile.getName().endsWith(Simulation.FILE_EXT)) {
+                        selectedFile = new File(selectedFile.getAbsolutePath().concat(Simulation.FILE_EXT));
                     }
                     try { 
                         StateSaver.saveState(selectedFile);
@@ -274,7 +275,7 @@ class CustomFilter extends FileFilter {
 
     @Override
     public boolean accept(File f) {
-        return (f.getName().endsWith(".tss"));
+        return (f.getName().endsWith(Simulation.FILE_EXT));
     }
 
     @Override

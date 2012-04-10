@@ -23,35 +23,46 @@ import model.junctions.Junction;
  */
 public class SettingsWindow extends JFrame {
     
-    public static final String DENSITY_RANGE_ERROR = "You cannot have a density level greater than 100";
-    public static final String AGGRESSION_RANGE_ERROR = "You cannot have an aggression level greater than 100";
-    public static final String DENSITY_DIFFERENCE_ERROR = "Maximum density must be greater than or equal to minimum density. ";
+    public static final String DENSITY_RANGE_ERROR 
+            = "You cannot have a density level greater than 100";
+    
+    public static final String AGGRESSION_RANGE_ERROR 
+            = "You cannot have an aggression level greater than 100";
+    
+    public static final String DENSITY_DIFFERENCE_ERROR 
+            = "Maximum density must be greater than or equal to minimum density. ";
+    
+    public static final String MAXIMUM_SPEED_ERROR
+            = "You cannot have a maximum speed of greater than 100.";
+    
     public static final String MIN_DENSITY_DEFAULT = "10";
     public static final String MAX_DENSITY_DEFAULT = "25";
     public static final String AGGRESSION_DEFAULT = "25";
     public static final String CAR_RATIO_DEFAULT = "5";
     public static final String TRUCK_RATIO_DEFAULT = "5";
+    public static final String MAXIMUM_SPEED_DEFAULT = "50";
+    
     private Container contentPane;
     private JLabel minDensityLbl;
     private JLabel maxDensityLbl;
     private JLabel aggressionLbl;
     private JLabel carRatioLbl;
     private JLabel truckRatioLbl;
+    private JLabel maximumSpeedLbl;
     private JLabel junctionLbl;
     private JTextField minDensityField;
     private JTextField maxDensityField;
     private JTextField aggressionField;
     private JTextField carRatioField;
     private JTextField truckRatioField;
+    private JTextField maximumSpeedField;
     private JButton submitBtn;
     private JButton defaultBtn;
     private GridBagConstraints cons;
     private JTextField[] fields;
     private JComboBox<String> junctions;
 
-    // TODO: default values automatically on first start
-    // and then the current values thereafter!!!!
-    // TODO: fix tab index
+    
     public SettingsWindow() {
         initComponents();
         addComponents();
@@ -72,20 +83,22 @@ public class SettingsWindow extends JFrame {
         aggressionLbl = new JLabel("Aggression of drivers in simulation");
         carRatioLbl = new JLabel("Ratio of Cars");
         truckRatioLbl = new JLabel("Ratio of Trucks");
-        junctionLbl = new JLabel("Junction to be simulated: ");
+        maximumSpeedLbl = new JLabel("Maximum Speed of Vehicles");
+        junctionLbl = new JLabel("Junction to be simulated");
         minDensityField = new JTextField(20);
         maxDensityField = new JTextField(20);
         aggressionField = new JTextField(20);
         carRatioField = new JTextField(20);
         truckRatioField = new JTextField(20);
+        maximumSpeedField = new JTextField(20);
         cons = new GridBagConstraints();
         submitBtn = new JButton("Submit");
         defaultBtn = new JButton("Default Values");
         this.setResizable(false);
         contentPane.setLayout(new GridBagLayout());
-        fields = new JTextField[5];
+        fields = new JTextField[6];
         String[] junctionOptions = Junction.getJunctionNames().toArray(new String[0]);
-        junctions = new JComboBox<String>(junctionOptions);
+        junctions = new JComboBox<>(junctionOptions);
         
         //customises tab usage so that tabs can be used to modify values
         TabFocusTraversal tft = new TabFocusTraversal();
@@ -94,13 +107,11 @@ public class SettingsWindow extends JFrame {
         tft.addIndexedComponent(aggressionField);
         tft.addIndexedComponent(carRatioField);
         tft.addIndexedComponent(truckRatioField);
+        tft.addIndexedComponent(maximumSpeedField);
         tft.addIndexedComponent(junctions);
         tft.addIndexedComponent(submitBtn);
         tft.addIndexedComponent(defaultBtn);
         setFocusTraversalPolicy(tft);
-        
-        
-        
         
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(null); //centers the frame in the screen
@@ -131,6 +142,9 @@ public class SettingsWindow extends JFrame {
         contentPane.add(truckRatioLbl, cons);
         
         cons.gridy = 5;
+       contentPane.add(maximumSpeedLbl, cons);
+        
+        cons.gridy = 6;
         contentPane.add(junctionLbl, cons);
         
         cons.gridx = 1;
@@ -151,6 +165,9 @@ public class SettingsWindow extends JFrame {
         contentPane.add(truckRatioField, cons);
         
         cons.gridy = 5;
+        contentPane.add(maximumSpeedField, cons);
+        
+        cons.gridy = 6;
         contentPane.add(junctions, cons);
         
         cons.gridx = 2;
@@ -174,6 +191,9 @@ public class SettingsWindow extends JFrame {
         
         truckRatioField.setName(Simulation.TRUCK_RATIO);
         fields[4] = truckRatioField;
+        
+        maximumSpeedField.setName(Simulation.MAXIMUM_SPEED);
+        fields[5] = maximumSpeedField;
         
         this.pack();
         
@@ -212,6 +232,13 @@ public class SettingsWindow extends JFrame {
                             if (field.getName().equals(Simulation.AGGRESSION)) {
                                 if (value > 100) {
                                     showErrMessage(AGGRESSION_RANGE_ERROR, "Error");
+                                    return;
+                                }
+                            }
+                            
+                            if(field.getName().equals(Simulation.MAXIMUM_SPEED)){
+                                if(value > 100){
+                                    showErrMessage(MAXIMUM_SPEED_ERROR, "Error");
                                     return;
                                 }
                             }
@@ -257,7 +284,6 @@ public class SettingsWindow extends JFrame {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                
                 setDefaultValues();
             }
         });
@@ -271,6 +297,7 @@ public class SettingsWindow extends JFrame {
         aggressionField.setText(AGGRESSION_DEFAULT);
         carRatioField.setText(CAR_RATIO_DEFAULT);
         truckRatioField.setText(TRUCK_RATIO_DEFAULT);
+        maximumSpeedField.setText(MAXIMUM_SPEED_DEFAULT);
         junctions.setSelectedIndex(2);
     }
     
@@ -280,9 +307,10 @@ public class SettingsWindow extends JFrame {
         aggressionField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.AGGRESSION)));
         carRatioField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.CAR_RATIO)));
         truckRatioField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.TRUCK_RATIO)));
+        maximumSpeedField.setText(Integer.toString((Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED)));
+        
         Junction j = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
         String name = j.toString();
-        
         junctions.setSelectedItem(name);
     }
     
@@ -290,7 +318,7 @@ public class SettingsWindow extends JFrame {
         try {
             String junction = (String) junctions.getSelectedItem();
             Simulation.setOption(Simulation.JUNCTION_TYPE, Junction.getJunctionTypeByName(junction).newInstance());
-        } catch (Exception e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

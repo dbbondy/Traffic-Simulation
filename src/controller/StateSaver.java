@@ -99,6 +99,7 @@ public class StateSaver {
             String aggression = ((Integer) Simulation.getOption(Simulation.AGGRESSION)).toString();
             String carRatio = ((Integer) Simulation.getOption(Simulation.CAR_RATIO)).toString();
             String truckRatio = ((Integer) Simulation.getOption(Simulation.TRUCK_RATIO)).toString();
+            String maxSpeed = ((Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED)).toString();
             String carCount = Integer.toString(SimulationStats.getCarCount());
             String truckCount = Integer.toString(SimulationStats.getTruckCount());
 
@@ -109,6 +110,7 @@ public class StateSaver {
             Element aggressionElm = doc.createElement(Simulation.AGGRESSION);
             Element carRatioElm = doc.createElement(Simulation.CAR_RATIO);
             Element truckRatioElm = doc.createElement(Simulation.TRUCK_RATIO);
+            Element maxSpeedElm = doc.createElement(Simulation.MAXIMUM_SPEED);
             Element carCountElm = doc.createElement("carCount");
             Element truckCountElm = doc.createElement("truckCount");
 
@@ -119,6 +121,7 @@ public class StateSaver {
             aggressionElm.setTextContent(aggression);
             carRatioElm.setTextContent(carRatio);
             truckRatioElm.setTextContent(truckRatio);
+            maxSpeedElm.setTextContent(maxSpeed);
             carCountElm.setTextContent(carCount);
             truckCountElm.setTextContent(truckCount);
 
@@ -129,6 +132,7 @@ public class StateSaver {
             detailsElm.appendChild(aggressionElm);
             detailsElm.appendChild(carRatioElm);
             detailsElm.appendChild(truckRatioElm);
+            detailsElm.appendChild(maxSpeedElm);
             detailsElm.appendChild(carCountElm);
             detailsElm.appendChild(truckCountElm);
 

@@ -21,8 +21,10 @@ public class Simulation {
     public static final String AGGRESSION = "aggression";
     public static final String CAR_RATIO = "car-ratio";
     public static final String TRUCK_RATIO = "truck-ratio";
+    public static final String MAXIMUM_SPEED = "maximum-speed";
     public static final String JUNCTION_TYPE = "junction-type";
     public static final String TIME_STEP = "time-step";
+    public static final String FILE_EXT = ".tss";
     private static boolean paused;
     private static boolean started;
     private static SettingsWindow settingsWindow;
@@ -42,6 +44,7 @@ public class Simulation {
         settings.put(AGGRESSION, 0);
         settings.put(CAR_RATIO, 0);
         settings.put(TRUCK_RATIO, 0);
+        settings.put(MAXIMUM_SPEED, 0);
         settings.put(JUNCTION_TYPE, null);
         settings.put(TIME_STEP, 0);
         paused = false;
@@ -102,7 +105,7 @@ public class Simulation {
             junc.updateDeletions();
             // when cars go outof the end of the junction, they get "deleted" and statistics are incremented.   
             
-            setOption(TIME_STEP, ((int) getOption(TIME_STEP) + 1));
+            setOption(TIME_STEP, ((int) getOption(TIME_STEP) + 1)); 
             
         }      
         
