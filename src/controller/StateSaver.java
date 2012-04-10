@@ -59,7 +59,6 @@ public class StateSaver {
                 Element segmentElm = doc.createElement("segment");
                 Element laneElm = doc.createElement("lane");
 
-                System.out.println(segment.id());
 
                 String width = Integer.toString(vehicle.getWidth());
                 String length = Integer.toString(vehicle.getLength());

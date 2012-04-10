@@ -57,7 +57,7 @@ public class StateLoader {
                             Simulation.setOption(detailNode.getNodeName(), value);
                         }
                 }
-
+                System.out.println("");
             }
 
             NodeList vehiclesNodeList = doc.getElementsByTagName("vehicles").item(0).getChildNodes();

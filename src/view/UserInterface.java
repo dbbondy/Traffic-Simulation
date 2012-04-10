@@ -91,12 +91,13 @@ public class UserInterface extends JFrame {
         loadJunc = new JButton("Load");
 
         buttonPanel = new JPanel() {
+
             @Override
             public Dimension getPreferredSize() {
                 return new Dimension(0, 33);
             }
         };
-        
+
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         detailPanel = new DetailsPanel();
@@ -203,25 +204,46 @@ public class UserInterface extends JFrame {
             }
         });
 
-       saveJunc.addActionListener(new ActionListener() {
+        saveJunc.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!Simulation.isPaused()) Simulation.pause();
-                final JFileChooser fileChooser = new JFileChooser();
+                if (!Simulation.isPaused()) {
+                    Simulation.pause();
+                }
+
+                final JFileChooser fileChooser = new JFileChooser() {
+
+                    @Override
+                    public void approveSelection() {
+                        File f = getSelectedFile();
+                        if (f.exists() && getDialogType() == SAVE_DIALOG) {
+                            int result = JOptionPane.showConfirmDialog(this, "This file already exists, overwrite?", "Existing file", JOptionPane.YES_NO_CANCEL_OPTION);
+                            switch (result) {
+                                case JOptionPane.YES_OPTION:
+                                    super.approveSelection();
+                                    return;
+                                case JOptionPane.NO_OPTION:
+                                    return;
+                                case JOptionPane.CANCEL_OPTION:
+                                    super.cancelSelection();
+                                    return;
+                            }
+                        }
+                        super.approveSelection();
+                    }
+                };
+                
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fileChooser.setAcceptAllFileFilterUsed(false);
                 fileChooser.addChoosableFileFilter(new CustomFilter());
-
                 int returnOption = fileChooser.showSaveDialog(saveJunc);
                 if (returnOption == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    // TODO: check whether to overwrite file or not
-                    // TODO: save .tss in a constant instant of literal
                     if (!selectedFile.getName().endsWith(Simulation.FILE_EXT)) {
                         selectedFile = new File(selectedFile.getAbsolutePath().concat(Simulation.FILE_EXT));
                     }
-                    try { 
+                    try {
                         StateSaver.saveState(selectedFile);
                     } catch (Exception ex) {
                         displayNotification("Error: unable to save simulation.");
@@ -229,32 +251,35 @@ public class UserInterface extends JFrame {
                     }
                 }
             }
-       });
-
-        loadJunc.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!Simulation.isPaused()) Simulation.pause();
-                final JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                fileChooser.setAcceptAllFileFilterUsed(false);
-                fileChooser.addChoosableFileFilter(new CustomFilter());
-
-                int returnOption = fileChooser.showOpenDialog(loadJunc);
-                if (returnOption == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
-                    try { 
-                        StateLoader.loadState(selectedFile);
-                        reloadGUI();
-                        updateGUI();
-                    } catch (Exception ex) {
-                        displayNotification("Error: unable to load simulation.");
-                        ex.printStackTrace();
-                    }
-                }
-            }
         });
+
+        loadJunc.addActionListener(
+                new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (!Simulation.isPaused()) {
+                            Simulation.pause();
+                        }
+                        final JFileChooser fileChooser = new JFileChooser();
+                        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                        fileChooser.setAcceptAllFileFilterUsed(false);
+                        fileChooser.addChoosableFileFilter(new CustomFilter());
+
+                        int returnOption = fileChooser.showOpenDialog(loadJunc);
+                        if (returnOption == JFileChooser.APPROVE_OPTION) {
+                            File selectedFile = fileChooser.getSelectedFile();
+                            try {
+                                StateLoader.loadState(selectedFile);
+                                reloadGUI();
+                                updateGUI();
+                            } catch (Exception ex) {
+                                displayNotification("Error: unable to load simulation.");
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });
     }
 
     private void onUnPauseButtonPress() {
@@ -282,5 +307,4 @@ class CustomFilter extends FileFilter {
     public String getDescription() {
         return "Traffic Simulation";
     }
-    
 }
