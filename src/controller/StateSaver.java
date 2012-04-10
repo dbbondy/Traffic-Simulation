@@ -46,8 +46,10 @@ public class StateSaver {
 
                 String type = "vehicle";
 
-                if (vehicle instanceof Car) type = "car";
-                if (vehicle instanceof Truck) type = "truck";
+                if (vehicle instanceof Car)
+                    type = "car";
+                if (vehicle instanceof Truck)
+                    type = "truck";
 
                 Element vehicleElm = doc.createElement(type);
                 Element widthElm = doc.createElement("width");

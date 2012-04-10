@@ -11,17 +11,12 @@ public abstract class Vehicle {
 
     protected int width = 14;
     protected int length = 22;
-    
     protected Color color;
-    
-    protected int currentSpeed = 100;
+    protected int currentSpeed;
     protected Segment headSegment;
-        
     protected Vehicle vehicleInFront;
     protected Vehicle vehicleBehind;
-    
     protected Lane currentLane;
-    
     private int nextSegmentPercent = 0;
     
     public Vehicle() {}
@@ -68,7 +63,8 @@ public abstract class Vehicle {
         int advanceSegments = newValue / 100;
         for (int i = 0; i < advanceSegments; i++) {
             Segment next = headSegment.getNextSegment();
-            if (next == null) return;
+            if (next == null) 
+                return;
             headSegment = next;
         }
     }
