@@ -47,71 +47,33 @@ public class Car extends Vehicle {
 
     @Override
     public void act() {
+       
         advanceVehicle(currentSpeed);
 
         Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
+        Vehicle behind = currentLane.getVehicleBehind(this.getHeadSegment());
+        //if there is only ourselves in the lane, then we can just blindly accelerate up until the maximum speed
+        if (currentLane.getVehicles().size() == 1 && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
+            accelerate();
+            return;
+        }
 
-        int aheadIndex = currentLane.getLaneSegments().indexOf(ahead);
-        int currentIndex = currentLane.getLaneSegments().indexOf(this);
-        
-        if(currentLane.getVehicles().size() == 1){
+        if ((findVehDistanceAhead(ahead) == -1 || findVehDistanceAhead(ahead) > 5)
+                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
             accelerate();
             return;
         }
         
-        
-        
-
-    }
-
-    public void accelerate() {
-        this.currentSpeed++;
-    }
-
-    public void decelerate() {
-        this.currentSpeed--;
-    }
-
-    public boolean adjacentLaneAvailability() {
-        Segment s = this.getHeadSegment();
-        Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
-        Set<Entry<Segment, ConnectionType>> allEntries = connectedSegments.entrySet();
-        Segment adjacentSeg = null;
-        for (Entry e : allEntries) {
-            if (e.getValue() == ConnectionType.NEXT_TO) {
-                adjacentSeg = (Segment) e.getKey();
-            }
+        if(findVehDistanceAhead(ahead) != -1 && findVehDistanceAhead(ahead) <= 5  
+                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))){
+            decelerate();
+            return;
         }
-        
-        if (adjacentSeg == null) { // there are no "adjacent" segments so we cannot change lanes adjacent
-            return false;
+
+        if (adjacentLaneAvailability()) {
+            adjacentLaneAvailability();
+            changeLaneAdjacent();
+            return;
         }
-        
-        Lane adjacentLane = adjacentSeg.getLane();
-        
-        if(adjacentLane.getVehicles().isEmpty()){ // if there are no vehicles in the adjacent lane we can change lanes.
-            return true;
-        }
-        
-        Vehicle vAhead = adjacentLane.getVehicleAhead(adjacentSeg);
-        Vehicle vBehind = adjacentLane.getVehicleBehind(adjacentSeg);
-        int aheadIndex = adjacentLane.getLaneSegments().indexOf(vAhead.getHeadSegment());
-        int behindIndex = adjacentLane.getLaneSegments().indexOf(vBehind.getHeadSegment());
-        int currentIndex = adjacentLane.getLaneSegments().indexOf(adjacentSeg);
-
-        if (aheadIndex != -1 && (aheadIndex - currentIndex) > Lane.SAFE_VEHICLE_DISTANCE) { //if vehicle ahead exists and the distance is greater than the safe distance (10 segments)
-
-            if ((this.getSpeed() - vAhead.getSpeed()) > Lane.SAFE_SPEED_DIFFERENTIAL) { //if this vehicle is going faster than 5 speed more than the vehicle ahead in the adjacent lane
-                return false;
-            }
-
-        } else if (behindIndex != -1 && (currentIndex - behindIndex) > Lane.SAFE_VEHICLE_DISTANCE) { //if vehicle behind exists and the distance is greater than the safe distance (10 segments)
-
-            if ((vBehind.getSpeed() - this.getSpeed()) > Lane.SAFE_SPEED_DIFFERENTIAL) { //if this vehicle is going slower than 5 speed more than the vehicle behind in the adjacent lane
-                return false;
-            }
-        }
-        //if no errors were found in the transition between lanes, it is safe to state we can change lanes.
-        return true;
     }
 }

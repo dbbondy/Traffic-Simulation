@@ -1,5 +1,6 @@
 package model;
 
+import controller.Simulation;
 import java.awt.Color;
 
 /**
@@ -40,7 +41,34 @@ public class Truck extends Vehicle{
 
     @Override
     public void act() {
+        System.out.println("this " + this.getHeadSegment());
+        System.out.println("last " + currentLane.getLastSegment());
         advanceVehicle(currentSpeed);
+
+        Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
+        Vehicle behind = currentLane.getVehicleBehind(this.getHeadSegment());
+        //if there is only ourselves in the lane, then we can just blindly accelerate up until the maximum speed
+        if (currentLane.getVehicles().size() == 1 && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
+            accelerate();
+            return;
+        }
+
+        if ((findVehDistanceAhead(ahead) == -1 || findVehDistanceAhead(ahead) > 5)
+                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
+            accelerate();
+            return;
+        }
+        
+        if(findVehDistanceAhead(ahead) != -1 && findVehDistanceAhead(ahead) <= 5  
+                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))){
+            decelerate();
+            return;
+        }
+
+        if (adjacentLaneAvailability()) {
+            changeLaneAdjacent();
+            return;
+        }
     }
     
 }

@@ -16,7 +16,7 @@ public class Lane {
     private ArrayList<Segment> laneSegments;
     private int initialAngle;
     private ArrayList<Vehicle> vehicles;
-    public static final int SAFE_VEHICLE_DISTANCE = 10;
+    public static final int SAFE_VEHICLE_DISTANCE = 25;
     public static final int SAFE_SPEED_DIFFERENTIAL = 5;
     
     public Lane(int xCoord, int yCoord, int initialAngle) {

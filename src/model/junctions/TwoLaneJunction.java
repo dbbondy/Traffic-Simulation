@@ -60,6 +60,9 @@ public class TwoLaneJunction extends Junction {
         RoadDesigner.buildParallelLanes(SimulationPanel.HEIGHT, topDownwardsLane, topDownwardsLane2);
         RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, leftRightwardsLane, leftRightwardsLane2);
         RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, rightLeftwardsLane, rightLeftwardsLane2);
+        System.out.println("height: " + SimulationPanel.HEIGHT);
+        System.out.println("lane: " + bottomUpwardsLane.getLaneSegments().size());
+        
     }
 
     private void setUpIntersectionConnections() {

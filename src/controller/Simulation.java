@@ -25,6 +25,7 @@ public class Simulation {
     public static final String JUNCTION_TYPE = "junction-type";
     public static final String TIME_STEP = "time-step";
     public static final String FILE_EXT = ".tss";
+    
     private static boolean paused;
     private static boolean started;
     private static SettingsWindow settingsWindow;
