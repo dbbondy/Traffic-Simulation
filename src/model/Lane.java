@@ -19,6 +19,7 @@ public class Lane {
     private TurnDirection direction;
     public static final int SAFE_VEHICLE_DISTANCE = 25;
     public static final int SAFE_SPEED_DIFFERENTIAL = 5;
+    private int newSegmentID = 0;
     
     public Lane(int xCoord, int yCoord, int initialAngle, TurnDirection direction) {
         laneSegments = new ArrayList<>(32);
@@ -26,6 +27,11 @@ public class Lane {
         this.xCoord = xCoord;
         this.yCoord = yCoord;
         this.initialAngle = initialAngle;
+        this.newSegmentID = 0;
+    }
+    
+    public int getNewSegmentID() {
+        return this.newSegmentID++;
     }
     
     public TurnDirection getTurnDirection(){

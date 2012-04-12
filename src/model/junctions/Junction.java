@@ -107,6 +107,7 @@ public abstract class Junction {
             Vehicle firstVehicle = l.getVehicles().get(0);
             Segment vehicleSegment = firstVehicle.getHeadSegment();
             Segment firstSegment = l.getFirstSegment();
+            // TODO: -5 is a constant. make it depend on the initial speed of the car!!!!
             if (firstSegment.id() < vehicleSegment.id() - firstVehicle.getLength() - 5) {
                 potentialLanes.add(l);
             }            

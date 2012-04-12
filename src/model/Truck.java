@@ -41,6 +41,8 @@ public class Truck extends Vehicle{
 
     @Override
     public void act() {
+        
+        /*
         System.out.println("this " + this.getHeadSegment());
         System.out.println("last " + currentLane.getLastSegment());
         advanceVehicle(currentSpeed);
@@ -69,6 +71,7 @@ public class Truck extends Vehicle{
             changeLaneAdjacent();
             return;
         }
+        */
     }
     
 }

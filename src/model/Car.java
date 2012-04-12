@@ -49,7 +49,7 @@ public class Car extends Vehicle {
     public void act() {
        
         advanceVehicle(currentSpeed);
-
+/*
         Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
         Vehicle behind = currentLane.getVehicleBehind(this.getHeadSegment());
         //if there is only ourselves in the lane, then we can just blindly accelerate up until the maximum speed
@@ -75,5 +75,7 @@ public class Car extends Vehicle {
             changeLaneAdjacent();
             return;
         }
+        * */
+        
     }
 }

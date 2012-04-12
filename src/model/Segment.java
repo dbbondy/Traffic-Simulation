@@ -19,7 +19,6 @@ public class Segment{
     private Segment previous = null;
     private Map<Segment, ConnectionType> connectedSegments;
     private Lane lane;
-    private static int segmentCounter = 0;
     private int id;
     private int renderAngle;
     private double renderX;
@@ -31,7 +30,7 @@ public class Segment{
         this.length = length;
         this.angle = angle;
         this.lane = lane;
-        this.id = segmentCounter++;
+        this.id = lane.getNewSegmentID();
         connectedSegments = new HashMap<>();
     }
     

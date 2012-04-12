@@ -19,7 +19,7 @@ public abstract class Vehicle {
     protected Vehicle vehicleInFront;
     protected Vehicle vehicleBehind;
     protected Lane currentLane;
-    protected Desire desire;
+    protected Desire desire; // TODO: auto routing based on desired destination!
     protected Random rnd;
     private int nextSegmentPercent = 0;
 
@@ -81,10 +81,7 @@ public abstract class Vehicle {
         int advanceSegments = newValue / 100;
         for (int i = 0; i < advanceSegments; i++) {
             Segment next = headSegment.getNextSegment();
-            if (next == null) {
-                return;
-            }
-            
+            if (next == null) return;
             headSegment = next;
         }
     }
@@ -95,46 +92,19 @@ public abstract class Vehicle {
      * @return the distance between vehicles
      */
     public int findVehDistanceAhead(Vehicle v) {
-        if (v == null) {
-            return -1;
-        }
-
+        if (v == null) return -1;
         Vehicle vAhead = v.getVehicleInFront();
-        if (vAhead == null) {
-            return -1;
-        }
-
-        int currentPos = currentLane.getLaneSegments().indexOf(this);
-        int aheadPos = currentLane.getLaneSegments().indexOf(v);
-        if (aheadPos == -1) {
-            return -1;
-        }
-        currentPos -= getLength();
-        aheadPos -= getLength();
-
-        return aheadPos - currentPos;
+        if (vAhead == null) return -1;
+        // TODO: have an id specific to the lane
+        return vAhead.getHeadSegment().id() - vAhead.getLength() - v.getHeadSegment().id();
     }
 
     public int findVehDistanceBehind(Vehicle v) {
-        if (v == null) {
-            return -1;
-        }
-
+        if (v == null) return -1;
         Vehicle vBehind = v.getVehicleBehind();
-        if (vBehind == null) {
-            return -1;
-        }
-
-        int currentPos = currentLane.getLaneSegments().indexOf(this);
-        int behindPos = currentLane.getLaneSegments().indexOf(v);
-        if (behindPos == -1) {
-            return -1;
-        }
-        
-        currentPos -= getLength();
-        behindPos -= getLength();
-
-        return currentPos - behindPos;
+        if (vBehind == null) return -1;
+        // TODO: have an id specific to the lane
+        return v.getHeadSegment().id() - v.getLength() - vBehind.getHeadSegment().id();
     }
 
     public void changeLaneAdjacent() {
@@ -169,58 +139,6 @@ public abstract class Vehicle {
         
     }
 
-    public boolean adjacentLaneAvailability() {
-        Segment s = this.getHeadSegment();
-        Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
-        Set<Map.Entry<Segment, ConnectionType>> allEntries = connectedSegments.entrySet();
-        Segment adjacentSeg = null;
-        for (Map.Entry e : allEntries) {
-            if (e.getValue() == ConnectionType.NEXT_TO) {
-                adjacentSeg = (Segment) e.getKey();
-            }
-        }
-
-        if (adjacentSeg == null) { // there are no "adjacent" segments so we cannot change lanes adjacent
-            return false;
-        }
-
-        Lane adjacentLane = adjacentSeg.getLane();
-        Vehicle vAhead = adjacentLane.getVehicleAhead(adjacentSeg);
-        Vehicle vBehind = adjacentLane.getVehicleBehind(adjacentSeg);
-
-        if (adjacentLane.getVehicles().isEmpty()) { // if there are no vehicles in the adjacent lane we can change lanes.
-            return true;
-        }
-
-        if ((adjacentLane.getVehicles().size() == 1 && findVehDistanceAhead(vAhead) > Lane.SAFE_VEHICLE_DISTANCE) 
-                ||(adjacentLane.getVehicles().size() == 1 && findVehDistanceBehind(vBehind) > Lane.SAFE_VEHICLE_DISTANCE)) {
-            return true;
-        }
-
-        
-        if (vAhead == null) {
-            return true;
-        }
-        
-        if (vBehind == null && (findVehDistanceAhead(vAhead) > Lane.SAFE_VEHICLE_DISTANCE)) {
-            return true;
-        }else if(vBehind == null || (findVehDistanceAhead(vBehind) < Lane.SAFE_VEHICLE_DISTANCE)){
-            return false;
-        }
-         
-        if (findVehDistanceAhead(vAhead) != -1  && findVehDistanceAhead(vAhead) > Lane.SAFE_VEHICLE_DISTANCE) { //if vehicle ahead exists and the distance is greater than the safe distance (10 segments)
-            if ((this.getSpeed() - vAhead.getSpeed()) > Lane.SAFE_SPEED_DIFFERENTIAL) { //if this vehicle is going faster than 5 speed more than the vehicle ahead in the adjacent lane
-                return false;
-            }
-
-        } else if (findVehDistanceBehind(vBehind) != -1 && findVehDistanceBehind(vBehind) > Lane.SAFE_VEHICLE_DISTANCE) { //if vehicle behind exists and the distance is greater than the safe distance (10 segments)
-            if ((vBehind.getSpeed() - this.getSpeed()) > Lane.SAFE_SPEED_DIFFERENTIAL) { //if this vehicle is going slower than 5 speed more than the vehicle behind in the adjacent lane
-                return false;
-            }
-        }
-        //if no errors were found in the transition between lanes, it is safe to state we can change lanes.
-        return true;
-    }
 
     public int getWidth() {
         return this.width;
