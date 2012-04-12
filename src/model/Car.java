@@ -4,6 +4,8 @@ package model;
 import controller.Simulation;
 import java.awt.Color;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 // this is another change
 /**
@@ -47,54 +49,69 @@ public class Car extends Vehicle {
     public void act() {
         advanceVehicle(currentSpeed);
 
-        /*Vehicle ahead = currentLane.getVehicleAhead(getHeadSegment());
-        
+        Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
+
         int aheadIndex = currentLane.getLaneSegments().indexOf(ahead);
         int currentIndex = currentLane.getLaneSegments().indexOf(this);
-        int distance = aheadIndex - currentIndex;
-        if(distance < 0){ // there is no vehicle ahead of us, so we can safely accelerate
+        
+        if(currentLane.getVehicles().size() == 1){
             accelerate();
             return;
-        }else if (distance < 10){ //if vehicle ahead is close enough, we need to evaluate our own speed.
-            int aheadSpeed = ahead.getSpeed();
-            int speedDifferential = aheadSpeed - currentSpeed;
-            if(speedDifferential < 0){ // if we are going faster than the vehicle ahead, we need to at least match the speed of that vehicle. 
-                for(int i = 0; i < Math.abs(speedDifferential); i++){
-                    decelerate();
-                }
-                if(checkLaneAvailability()){
-                    
-                }
-            }else if(speedDifferential <= 5 && (Integer)Simulation.getOption(Simulation.AGGRESSION) > 50){
-                accelerate();
-            }else { //else the speed differential is significantly large whereby a change of lanes serves no purpose
-                accelerate();
-                return;
-            }
         }
+        
         
         
 
-        if (currentSpeed < ((Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
-            accelerate();
-            
-        }else{
-            decelerate();
-        }
-        */
     }
 
     public void accelerate() {
         this.currentSpeed++;
     }
-    
-    public void decelerate(){
+
+    public void decelerate() {
         this.currentSpeed--;
     }
-    
-    public void checkLaneAvailability(){
+
+    public boolean adjacentLaneAvailability() {
         Segment s = this.getHeadSegment();
         Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
-       // connectedSegments.
+        Set<Entry<Segment, ConnectionType>> allEntries = connectedSegments.entrySet();
+        Segment adjacentSeg = null;
+        for (Entry e : allEntries) {
+            if (e.getValue() == ConnectionType.NEXT_TO) {
+                adjacentSeg = (Segment) e.getKey();
+            }
+        }
+        
+        if (adjacentSeg == null) { // there are no "adjacent" segments so we cannot change lanes adjacent
+            return false;
+        }
+        
+        Lane adjacentLane = adjacentSeg.getLane();
+        
+        if(adjacentLane.getVehicles().isEmpty()){ // if there are no vehicles in the adjacent lane we can change lanes.
+            return true;
+        }
+        
+        Vehicle vAhead = adjacentLane.getVehicleAhead(adjacentSeg);
+        Vehicle vBehind = adjacentLane.getVehicleBehind(adjacentSeg);
+        int aheadIndex = adjacentLane.getLaneSegments().indexOf(vAhead.getHeadSegment());
+        int behindIndex = adjacentLane.getLaneSegments().indexOf(vBehind.getHeadSegment());
+        int currentIndex = adjacentLane.getLaneSegments().indexOf(adjacentSeg);
+
+        if (aheadIndex != -1 && (aheadIndex - currentIndex) > Lane.SAFE_VEHICLE_DISTANCE) { //if vehicle ahead exists and the distance is greater than the safe distance (10 segments)
+
+            if ((this.getSpeed() - vAhead.getSpeed()) > Lane.SAFE_SPEED_DIFFERENTIAL) { //if this vehicle is going faster than 5 speed more than the vehicle ahead in the adjacent lane
+                return false;
+            }
+
+        } else if (behindIndex != -1 && (currentIndex - behindIndex) > Lane.SAFE_VEHICLE_DISTANCE) { //if vehicle behind exists and the distance is greater than the safe distance (10 segments)
+
+            if ((vBehind.getSpeed() - this.getSpeed()) > Lane.SAFE_SPEED_DIFFERENTIAL) { //if this vehicle is going slower than 5 speed more than the vehicle behind in the adjacent lane
+                return false;
+            }
+        }
+        //if no errors were found in the transition between lanes, it is safe to state we can change lanes.
+        return true;
     }
 }

@@ -30,7 +30,7 @@ public abstract class Vehicle {
         color = c;
         
         // TODO: remove this later
-        currentSpeed = new Random(System.nanoTime()).nextInt(100) + 50;
+        //currentSpeed = new Random(System.nanoTime()).nextInt(100) + 50;
     }
     
     public abstract void act();
