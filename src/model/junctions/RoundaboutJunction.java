@@ -4,9 +4,6 @@
  */
 package model.junctions;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Random;
 import model.*;
 
 /**
@@ -20,7 +17,7 @@ public class RoundaboutJunction extends Junction{
     private Lane testLane;
     
     public RoundaboutJunction(){
-        testLane = new Lane(400, 0, 0);
+        testLane = new Lane(400, 0, 0, TurnDirection.RIGHT_AND_STRAIGHT);
         testLane.add(RoadDesigner.buildStraight(300, testLane));
         testLane.add(RoadDesigner.buildLargeTurn(-90, testLane, 4));
         testLane.add(RoadDesigner.buildStraight(300, testLane));

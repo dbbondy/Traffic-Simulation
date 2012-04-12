@@ -25,7 +25,7 @@ public abstract class Junction {
     private int variableDensity = 0;
 
     public Junction() {
-        random = new Random(System.nanoTime());
+        random = Randomizer.getInstance();
         numberOfVehicles = 0;
     }
     

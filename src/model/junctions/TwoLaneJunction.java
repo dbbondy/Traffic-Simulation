@@ -29,17 +29,17 @@ public class TwoLaneJunction extends Junction {
 
     public TwoLaneJunction() {
 
-        bottomUpwardsLane = new Lane(400, SimulationPanel.HEIGHT, 180);
-        bottomUpwardsLane2 = new Lane(400 - Segment.WIDTH, SimulationPanel.HEIGHT, 180);
+        bottomUpwardsLane = new Lane(400, SimulationPanel.HEIGHT, 180, TurnDirection.RIGHT_AND_STRAIGHT);
+        bottomUpwardsLane2 = new Lane(400 - Segment.WIDTH, SimulationPanel.HEIGHT, 180, TurnDirection.LEFT);
 
-        topDownwardsLane = new Lane((400 - (Segment.WIDTH * 2)), 0, 0);
-        topDownwardsLane2 = new Lane((400 - Segment.WIDTH * 3), 0, 0);
+        topDownwardsLane = new Lane((400 - (Segment.WIDTH * 2)), 0, 0, TurnDirection.LEFT);
+        topDownwardsLane2 = new Lane((400 - Segment.WIDTH * 3), 0, 0, TurnDirection.RIGHT_AND_STRAIGHT);
 
-        leftRightwardsLane = new Lane(0, 350, 270);
-        leftRightwardsLane2 = new Lane(0, 350 - Segment.WIDTH, 270);
+        leftRightwardsLane = new Lane(0, 350, 270, TurnDirection.LEFT);
+        leftRightwardsLane2 = new Lane(0, 350 - Segment.WIDTH, 270, TurnDirection.RIGHT_AND_STRAIGHT);
 
-        rightLeftwardsLane = new Lane(800, (350 - (Segment.WIDTH * 2)), 90);
-        rightLeftwardsLane2 = new Lane(800, (350 - (Segment.WIDTH * 3)), 90);
+        rightLeftwardsLane = new Lane(800, (350 - (Segment.WIDTH * 2)), 90, TurnDirection.RIGHT_AND_STRAIGHT);
+        rightLeftwardsLane2 = new Lane(800, (350 - (Segment.WIDTH * 3)), 90, TurnDirection.LEFT);
 
         buildRoads();
         setUpIntersectionConnections();
@@ -60,9 +60,6 @@ public class TwoLaneJunction extends Junction {
         RoadDesigner.buildParallelLanes(SimulationPanel.HEIGHT, topDownwardsLane, topDownwardsLane2);
         RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, leftRightwardsLane, leftRightwardsLane2);
         RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, rightLeftwardsLane, rightLeftwardsLane2);
-        System.out.println("height: " + SimulationPanel.HEIGHT);
-        System.out.println("lane: " + bottomUpwardsLane.getLaneSegments().size());
-        
     }
 
     private void setUpIntersectionConnections() {

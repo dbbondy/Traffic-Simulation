@@ -1,6 +1,5 @@
 package model;
 
-import controller.Simulation;
 import java.awt.Color;
 import java.util.Map;
 import java.util.Random;
@@ -20,6 +19,8 @@ public abstract class Vehicle {
     protected Vehicle vehicleInFront;
     protected Vehicle vehicleBehind;
     protected Lane currentLane;
+    protected Desire desire;
+    protected Random rnd;
     private int nextSegmentPercent = 0;
 
     public Vehicle() {
@@ -32,8 +33,9 @@ public abstract class Vehicle {
         vehicleInFront = inFront;
         vehicleBehind = behind;
         color = c;
-
-        // TODO: remove this later
+        rnd = Randomizer.getInstance();
+        Desire[] allDesires = Desire.values();
+        desire = allDesires[rnd.nextInt(allDesires.length)];
         currentSpeed = 0;
     }
 
@@ -50,6 +52,10 @@ public abstract class Vehicle {
 
     protected void decelerate() {
         this.currentSpeed--;
+    }
+    
+    protected Desire getDesire(){
+        return desire;
     }
 
     public Vehicle getVehicleBehind() {
@@ -143,6 +149,24 @@ public abstract class Vehicle {
         }
         this.setHeadSegment(adjacentSeg);
 
+    }
+    
+    public void changeLaneOverlap(){
+        Segment s = this.getHeadSegment();
+        Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
+        Set<Map.Entry<Segment, ConnectionType>> allEntries = connectedSegments.entrySet();
+        Segment overlapSeg = null;
+        for(Map.Entry e : allEntries){
+            if(e.getValue() == ConnectionType.OVERLAP){
+                overlapSeg = (Segment) e.getKey();
+            }
+        }
+        this.setHeadSegment(overlapSeg);
+    }
+    
+    public void lookAhead(Vehicle v){
+        Desire d = v.getDesire();
+        
     }
 
     public boolean adjacentLaneAvailability() {

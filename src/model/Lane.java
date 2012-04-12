@@ -16,15 +16,20 @@ public class Lane {
     private ArrayList<Segment> laneSegments;
     private int initialAngle;
     private ArrayList<Vehicle> vehicles;
+    private TurnDirection direction;
     public static final int SAFE_VEHICLE_DISTANCE = 25;
     public static final int SAFE_SPEED_DIFFERENTIAL = 5;
     
-    public Lane(int xCoord, int yCoord, int initialAngle) {
+    public Lane(int xCoord, int yCoord, int initialAngle, TurnDirection direction) {
         laneSegments = new ArrayList<>(32);
         vehicles = new ArrayList<>(32);
         this.xCoord = xCoord;
         this.yCoord = yCoord;
         this.initialAngle = initialAngle;
+    }
+    
+    public TurnDirection getTurnDirection(){
+        return direction;
     }
     
     public void removeVehicles() {
