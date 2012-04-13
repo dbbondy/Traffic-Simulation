@@ -12,6 +12,8 @@ public class Truck extends Vehicle{
     private static final int WIDTH = 14;
     private static final int LENGTH = 30;
     
+    // TODO: add max accel etc here
+    
     public Truck() {}
     
     public Truck(Lane lane) {
@@ -42,10 +44,12 @@ public class Truck extends Vehicle{
     @Override
     public void act() {
         
+        advanceVehicle(currentSpeed);
+        
         /*
         System.out.println("this " + this.getHeadSegment());
         System.out.println("last " + currentLane.getLastSegment());
-        advanceVehicle(currentSpeed);
+        
 
         Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
         Vehicle behind = currentLane.getVehicleBehind(this.getHeadSegment());

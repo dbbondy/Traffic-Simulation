@@ -33,14 +33,14 @@ public class SettingsWindow extends JFrame {
             = "Maximum density must be greater than or equal to minimum density. ";
     
     public static final String MAXIMUM_SPEED_ERROR
-            = "You cannot have a maximum speed of greater than 100.";
+            = "You cannot have a maximum speed of greater than 800.";
     
     public static final String MIN_DENSITY_DEFAULT = "10";
     public static final String MAX_DENSITY_DEFAULT = "25";
     public static final String AGGRESSION_DEFAULT = "25";
     public static final String CAR_RATIO_DEFAULT = "5";
     public static final String TRUCK_RATIO_DEFAULT = "5";
-    public static final String MAXIMUM_SPEED_DEFAULT = "50";
+    public static final String MAXIMUM_SPEED_DEFAULT = "250";
     
     private Container contentPane;
     private JLabel minDensityLbl;
@@ -237,7 +237,7 @@ public class SettingsWindow extends JFrame {
                             }
                             
                             if(field.getName().equals(Simulation.MAXIMUM_SPEED)){
-                                if(value > 100){
+                                if(value > 800){
                                     showErrMessage(MAXIMUM_SPEED_ERROR, "Error");
                                     return;
                                 }

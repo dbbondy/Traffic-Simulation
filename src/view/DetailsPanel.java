@@ -245,7 +245,7 @@ public class DetailsPanel extends JPanel {
                         }
                     }
                     if(edited.getName().equals(Simulation.MAXIMUM_SPEED)){
-                        if(value > 100){
+                        if(value > 800){
                             throw new RuntimeException(SettingsWindow.MAXIMUM_SPEED_ERROR);
                         }
                     }

@@ -26,6 +26,9 @@ public class TwoLaneJunction extends Junction {
     private Lane rightLeftwardsLane;
     private Lane rightLeftwardsLane2;
     
+    
+    
+    
 
     public TwoLaneJunction() {
 
@@ -75,31 +78,31 @@ public class TwoLaneJunction extends Junction {
 
         s1 = rightLeftwardsLane2.getLaneSegments().get(SimulationPanel.WIDTH - (bottomUpwardsLane.getXStart() + width50));
         s2 = bottomUpwardsLane.getLaneSegments().get(SimulationPanel.HEIGHT - (rightLeftwardsLane2.getYStart() - width50));
-        s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+        s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_RIGHT);
 
         s1 = leftRightwardsLane.getLaneSegments().get(topDownwardsLane2.getXStart() - width50);
         s2 = topDownwardsLane2.getLaneSegments().get(leftRightwardsLane.getYStart() + width50);
-        s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+        s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_RIGHT);
 
         s1 = bottomUpwardsLane.getLaneSegments().get(SimulationPanel.HEIGHT - (leftRightwardsLane.getYStart() + width50));
         s2 = leftRightwardsLane.getLaneSegments().get(bottomUpwardsLane.getXStart() + width50);
-        s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+        s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_LEFT);
 
         s1 = rightLeftwardsLane.getLaneSegments().get(SimulationPanel.WIDTH - (topDownwardsLane.getXStart() + width50));
         s2 = topDownwardsLane.getLaneSegments().get(rightLeftwardsLane.getYStart() + width50);
-        s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+        s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_LEFT);
 
         s1 = bottomUpwardsLane2.getLaneSegments().get(SimulationPanel.HEIGHT - (rightLeftwardsLane.getYStart() + width50));
         s2 = rightLeftwardsLane.getLaneSegments().get(SimulationPanel.WIDTH - (bottomUpwardsLane2.getXStart() - width50));
-        s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+        s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_LEFT);
 
         s1 = leftRightwardsLane2.getLaneSegments().get(bottomUpwardsLane2.getXStart() - width50);
         s2 = bottomUpwardsLane2.getLaneSegments().get(SimulationPanel.HEIGHT - (leftRightwardsLane2.getYStart() - width50));
-        s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+        s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_LEFT);
 
         s1 = topDownwardsLane.getLaneSegments().get(leftRightwardsLane2.getYStart() - width50);
         s2 = leftRightwardsLane2.getLaneSegments().get(topDownwardsLane.getXStart() + width50);
-        s1.addConnectedSegment(s2, ConnectionType.OVERLAP);
+        s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_LEFT);
 
 
     }

@@ -1,5 +1,6 @@
 package model;
 
+import controller.Simulation;
 import java.awt.Color;
 import java.util.Map;
 import java.util.Random;
@@ -19,9 +20,13 @@ public abstract class Vehicle {
     protected Vehicle vehicleInFront;
     protected Vehicle vehicleBehind;
     protected Lane currentLane;
-    protected Desire desire; // TODO: auto routing based on desired destination!
-    protected Random rnd;
-    private int nextSegmentPercent = 0;
+    
+    
+    private int nextSegmentPercent;
+    protected int maxAccelerationRate;
+    protected int maxDecelerationRate;
+    public static final int REACTION_TIME = 5; // 5 steps
+    protected DriverAI ai;
 
     public Vehicle() {
     }
@@ -29,14 +34,15 @@ public abstract class Vehicle {
     public Vehicle(Lane lane, Segment segment, Vehicle inFront, Vehicle behind, Color c) {
         currentLane = lane;
         headSegment = segment;
-        lane.addVehicle(this);
         vehicleInFront = inFront;
         vehicleBehind = behind;
         color = c;
-        rnd = Randomizer.getInstance();
-        Desire[] allDesires = Desire.values();
-        desire = allDesires[rnd.nextInt(allDesires.length)];
-        currentSpeed = 0;
+        currentSpeed = 50;
+        lane.addVehicle(this);
+        nextSegmentPercent = 0;
+        maxAccelerationRate = 0;
+        maxDecelerationRate = 0;
+        ai = new DriverAI(this);
     }
 
     public abstract void act();
@@ -46,17 +52,27 @@ public abstract class Vehicle {
         this.length = l;
     }
     
-    protected void accelerate() {
-        this.currentSpeed++;
+    protected void accelerate(int acceleration) {
+       int maxSpeed = (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED);
+        if(acceleration > maxAccelerationRate) 
+            acceleration = maxAccelerationRate;
+        currentSpeed += acceleration;
+        if (currentSpeed > maxSpeed) 
+            currentSpeed = maxSpeed;
     }
 
-    protected void decelerate() {
-        this.currentSpeed--;
+    protected void decelerate(int deceleration) {
+        if(deceleration > maxDecelerationRate){
+            deceleration = maxDecelerationRate;
+        }
+        currentSpeed -= deceleration;
+        if(currentSpeed < 0){
+            currentSpeed = 0;
+        }
+        
     }
     
-    protected Desire getDesire(){
-        return desire;
-    }
+    
 
     public Vehicle getVehicleBehind() {
         return vehicleBehind;
@@ -108,6 +124,7 @@ public abstract class Vehicle {
     }
 
     public void changeLaneAdjacent() {
+        /*
         Segment s = this.getHeadSegment();
         Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
         Set<Map.Entry<Segment, ConnectionType>> allEntries = connectedSegments.entrySet();
@@ -118,7 +135,7 @@ public abstract class Vehicle {
             }
         }
         this.setHeadSegment(adjacentSeg);
-
+        */
     }
     
     public void changeLaneOverlap(){
@@ -127,18 +144,16 @@ public abstract class Vehicle {
         Set<Map.Entry<Segment, ConnectionType>> allEntries = connectedSegments.entrySet();
         Segment overlapSeg = null;
         for(Map.Entry e : allEntries){
-            if(e.getValue() == ConnectionType.OVERLAP){
+            if(e.getValue() == ConnectionType.NEXT_TO_LEFT || e.getValue() == ConnectionType.NEXT_TO_RIGHT){
                 overlapSeg = (Segment) e.getKey();
             }
         }
         this.setHeadSegment(overlapSeg);
     }
     
-    public void lookAhead(Vehicle v){
-        Desire d = v.getDesire();
-        
+    public Lane getLane(){
+        return currentLane;
     }
-
 
     public int getWidth() {
         return this.width;

@@ -69,11 +69,20 @@ public class RoadDesigner {
         lane.add(s);
     }
     
+    /**
+     * 
+     * @param length the length
+     * @param lane1 the left lane of two
+     * @param lane2 the right lane of two
+     */
     public static void buildParallelLanes(int length, Lane lane1, Lane lane2){
         Segment[] s1 = RoadDesigner.buildStraight(length, lane1);
         Segment[] s2 = RoadDesigner.buildStraight(length, lane2);
         for (int i = 0; i < s1.length; i++) {
-            s1[i].addConnectedSegment(s2[i], ConnectionType.NEXT_TO);
+            s1[i].addConnectedSegment(s2[i], ConnectionType.NEXT_TO_RIGHT); 
+        }
+        for(int i = 0; i < s2.length; i++){
+            s2[i].addConnectedSegment(s1[i], ConnectionType.NEXT_TO_LEFT);
         }
         lane1.add(s1);
         lane2.add(s2);
