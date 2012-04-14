@@ -87,16 +87,12 @@ public class StateLoader {
                 String lengthStr = vehicleElm.getElementsByTagName("length").item(0).getTextContent().trim();
                 String colorStr = vehicleElm.getElementsByTagName("color").item(0).getTextContent().trim();
                 String speedStr = vehicleElm.getElementsByTagName("speed").item(0).getTextContent().trim();
-                String aheadStr = vehicleElm.getElementsByTagName("ahead").item(0).getTextContent().trim();
-                String behindStr = vehicleElm.getElementsByTagName("behind").item(0).getTextContent().trim();
                 String segmentStr = vehicleElm.getElementsByTagName("segment").item(0).getTextContent().trim();
                 String laneStr = vehicleElm.getElementsByTagName("lane").item(0).getTextContent().trim();
 
                 int width = Integer.parseInt(widthStr);
                 int length = Integer.parseInt(lengthStr);
                 int speed = Integer.parseInt(speedStr);
-                int ahead = Integer.parseInt(aheadStr);
-                int behind = Integer.parseInt(behindStr);
                 int segmentIndex = Integer.parseInt(segmentStr);
                 int laneIndex = Integer.parseInt(laneStr);
 
@@ -109,9 +105,6 @@ public class StateLoader {
                 Lane lane = junc.getLanes().get(laneIndex);
                 Segment segment = lane.getLaneSegments().get(segmentIndex);
                 vehicle.setHeadSegment(segment);
-
-                if (ahead >= 0) vehicle.setVehicleInFront(vehicles.get(ahead));
-                if (behind >= 0) vehicle.setVehicleBehind(vehicles.get(behind));
 
                 lane.addVehicle(vehicle);
 

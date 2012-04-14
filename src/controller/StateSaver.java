@@ -55,9 +55,7 @@ public class StateSaver {
                 Element widthElm = doc.createElement("width");
                 Element lengthElm = doc.createElement("length");
                 Element colorElm = doc.createElement("color");
-                Element speedElm = doc.createElement("speed");
-                Element aheadElm = doc.createElement("ahead");
-                Element behindElm = doc.createElement("behind");            
+                Element speedElm = doc.createElement("speed");        
                 Element segmentElm = doc.createElement("segment");
                 Element laneElm = doc.createElement("lane");
 
@@ -66,8 +64,6 @@ public class StateSaver {
                 String length = Integer.toString(vehicle.getLength());
                 String color = Integer.toString(vehicle.getColor().getRGB());
                 String speed = Integer.toString(vehicle.getSpeed());
-                String ahead = Integer.toString(vehicles.indexOf(vehicle.getVehicleInFront()));
-                String behind = Integer.toString(vehicles.indexOf(vehicle.getVehicleBehind()));
                 String segmentIndex = Integer.toString(lane.getLaneSegments().indexOf(segment));
                 String laneIndex = Integer.toString(junc.getLanes().indexOf(lane));
 
@@ -75,8 +71,6 @@ public class StateSaver {
                 vehicleElm.appendChild(lengthElm);
                 vehicleElm.appendChild(colorElm);
                 vehicleElm.appendChild(speedElm);
-                vehicleElm.appendChild(aheadElm);
-                vehicleElm.appendChild(behindElm);
                 vehicleElm.appendChild(segmentElm);
                 vehicleElm.appendChild(laneElm);
 
@@ -84,8 +78,6 @@ public class StateSaver {
                 lengthElm.setTextContent(length);
                 colorElm.setTextContent(color);
                 speedElm.setTextContent(speed);
-                aheadElm.setTextContent(ahead);
-                behindElm.setTextContent(behind);
                 segmentElm.setTextContent(segmentIndex);
                 laneElm.setTextContent(laneIndex);
 

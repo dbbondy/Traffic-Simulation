@@ -147,6 +147,15 @@ public class Lane {
         }
         return headSegmentFront;
     }
+    
+    public boolean isVehicleAtSegment(Segment s){
+        for(Vehicle v : vehicles){
+            if(v.getHeadSegment().equals(s)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public int getXStart() {
         return xCoord;
