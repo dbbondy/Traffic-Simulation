@@ -10,6 +10,6 @@ package model;
  */
 public enum ConnectionType {
     
-    // TODO: deal with next to
+    
     OVERLAP, NEXT_TO_LEFT, NEXT_TO_RIGHT;
 }

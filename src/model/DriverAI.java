@@ -43,10 +43,10 @@ public class DriverAI {
     public void act() {
         int stoppingTimeDistance = ((vehicle.getSpeed()) / (vehicle.getMaxDecelerationRate())); // number of time steps it will take to stop
         int crashTimeDistance = Integer.MIN_VALUE;
-        if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null) { 
+        if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null) {
             int distance = vehicle.findVehDistanceAhead();
             crashTimeDistance = (distance * 100) / vehicle.getSpeed();
-        }else if(vehicleLane.getVehicleBehind(vehicle.getHeadSegment()) != null){
+        } else if (vehicleLane.getVehicleBehind(vehicle.getHeadSegment()) != null) {
             Vehicle behind = vehicleLane.getVehicleBehind(vehicle.getHeadSegment());
             int distance = vehicle.findVehDistanceBehind();
             crashTimeDistance = (distance * 100) / behind.getSpeed();
@@ -54,44 +54,71 @@ public class DriverAI {
 
         if (desire.toString().equals("TURN_LEFT") && vehicleLane.getTurnDirection().toString().equals("RIGHT")) {
             decideLaneChangeAI(stoppingTimeDistance, crashTimeDistance);
-            return;
         } else if (desire.toString().equals("TURN_RIGHT") && vehicleLane.getTurnDirection().toString().equals("LEFT")) {
             decideLaneChangeAI(stoppingTimeDistance, crashTimeDistance);
-            return;
-        }else{
+        } else {
             performStraightLaneAI(stoppingTimeDistance, crashTimeDistance);
         }
-        
+
         //if we are in correct lane then do AI based in that.
-        
+
 
     }
-    
-    private boolean safeLaneChangeProximity(){
-        if(safeLaneChangeID - vehicle.getHeadSegment().id() < 100){
+
+    private boolean safeLaneChangeProximity() {
+        if (safeLaneChangeID - vehicle.getHeadSegment().id() < 100) {
             return true;
         }
         return false;
     }
-    
-    protected void performStraightLaneAI(int stoppingTimeDistance, int crashTimeDistance){
-        if(crashTimeDistance == Integer.MIN_VALUE){ //if there is no car in our lane
+
+    protected void performStraightLaneAI(int stoppingTimeDistance, int crashTimeDistance) {
+        if (crashTimeDistance == Integer.MIN_VALUE) { //if there is no car in our lane
             vehicle.accelerate(vehicle.getMaxAccelerationRate());
         }
-        if(vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) == null){ //if no vehicle ahead, accelerate freely
+        if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) == null) { //if no vehicle ahead, accelerate freely
             vehicle.accelerate(vehicle.getMaxAccelerationRate());
-        }else if(vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null){
+        } else if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null) {
             int distance = vehicle.findVehDistanceAhead();
             crashTimeDistance = (distance * 100) / vehicle.getSpeed();
-            if(crashTimeDistance > stoppingTimeDistance){
+            if (crashTimeDistance > stoppingTimeDistance) {
                 vehicle.accelerate(5);
-            }else if(crashTimeDistance == stoppingTimeDistance){
+            } else if (crashTimeDistance == stoppingTimeDistance) {
                 vehicle.decelerate(2);
-            }else{
+            } else {
                 vehicle.decelerate(vehicle.getMaxDecelerationRate());
             }
         }
     }
+    
+    private boolean approachingTurn(Segment s){
+        Segment overlappingSegment = findOverlappingSegment(s);
+        if(overlappingSegment != null){
+            int 
+        }
+        
+        
+    }
+    
+    private Segment findOverlappingSegment(Segment s){
+        Segment overlappingSegment = null;
+        Lane segmentLane = s.getLane();
+        ArrayList<Segment> allSegments = segmentLane.getLaneSegments();
+        for(int i = s.id(); i < allSegments.size(); i++){
+            Segment seg = allSegments.get(i);
+            Map<Segment, ConnectionType> connectedSegments = seg.getConnectedSegments();
+            if(connectedSegments.containsValue(ConnectionType.OVERLAP)){
+                for (Entry<Segment, ConnectionType> entry : connectedSegments.entrySet()) {
+                    if(entry.getValue() == ConnectionType.OVERLAP){
+                        overlappingSegment = allSegments.get(i);
+                    }
+                }
+            }
+        }
+        return overlappingSegment;
+    }
+    
+    
 
     private void decideLaneChangeAI(int stoppingTimeDistance, int crashTimeDistance) {
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
@@ -107,24 +134,23 @@ public class DriverAI {
             } else if (adjacentLane.isVehicleAtSegment(adjacentSeg)) { //if there is a vehicle in the immediately adjacent segment to us
                 vehicle.decelerate(5); //TODO: maybe think about constants for the deceleration and accel rate
                 return;
-            } else { 
+            } else {
                 Vehicle behind = adjacentLane.getVehicleBehind(adjacentSeg);
                 int distance = behind.findVehDistanceBehind();
                 crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             }
         }
-        if(safeLaneChangeProximity()){
+        if (safeLaneChangeProximity()) {
             vehicle.decelerate(5);
         }
-        
-        if(stoppingTimeDistance < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE){
+
+        if (stoppingTimeDistance < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) {
             vehicle.decelerate(vehicle.getMaxDecelerationRate());
             return;
         }
 
         if (crashTimeDistance > stoppingTimeDistance) { // if we can stop should the vehicle in front be at speed 0
             changeLane();
-
         } else {
             vehicle.decelerate(vehicle.getMaxDecelerationRate());
         }
@@ -155,8 +181,33 @@ public class DriverAI {
         return adjacentSeg;
     }
 
+    private Segment getOverlapSegment(Segment s) {
+        Segment overlapSeg = null;
+        Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
+        if (connectedSegments.containsValue(ConnectionType.OVERLAP)) {
+            for (Entry<Segment, ConnectionType> entry : connectedSegments.entrySet()) {
+                if (entry.getValue() == ConnectionType.OVERLAP) {
+                    overlapSeg = entry.getKey();
+                }
+            }
+        }
+        return overlapSeg;
+    }
+
     protected Desire getDesire() {
         return desire;
+    }
+
+    protected Lane getOverlapLane(Segment s) {
+        Segment overlapSeg = getOverlapSegment(s);
+        return overlapSeg.getLane();
+    }
+
+    protected void turnCorner() {
+        Segment overlapSeg = getOverlapSegment(vehicle.getHeadSegment());
+        Lane overlapLane = getOverlapLane(vehicle.getHeadSegment());
+        vehicle.setHeadSegment(overlapSeg);
+        overlapLane.addVehicle(vehicle);
     }
 
     protected void changeLane() {
