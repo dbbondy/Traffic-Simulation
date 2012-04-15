@@ -29,7 +29,6 @@ public class DriverAI {
         desire = allDesires[rnd.nextInt(allDesires.length)];
         vehicleLane = vehicle.getLane();
     }
-    
 
     protected void getSafeLaneChangeIndex() {
         ArrayList<Segment> laneSegments = vehicleLane.getLaneSegments();
@@ -44,47 +43,64 @@ public class DriverAI {
     public void act() {
         int stoppingTimeDistance = Integer.MAX_VALUE;
         int crashTimeDistance = Integer.MAX_VALUE;
-        if(vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null){
+        if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null) {
             stoppingTimeDistance = ((vehicle.getSpeed()) / (vehicle.getMaxDecelerationRate())); // number of time steps it will take to stop
             int distance = vehicle.findVehDistanceAhead();
             crashTimeDistance = (distance * 100) / vehicle.getSpeed();
+        }else if(vehicleLane.getVehicleBehind(vehicle.getHeadSegment()) != null){
+            Vehicle behind = vehicleLane.getVehicleBehind(vehicle.getHeadSegment());
+            stoppingTimeDistance = ((vehicle.getSpeed()) / (vehicle.getMaxDecelerationRate()));
+            int distance = vehicle.findVehDistanceBehind();
+            crashTimeDistance = (distance * 100) / behind.getSpeed();
         }
-        
+
         if (desire.toString().equals("TURN_LEFT") && vehicleLane.getTurnDirection().toString().equals("RIGHT")) {
-            
-            Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
-            Lane adjacentLane = getAdjacentLane(vehicle.getHeadSegment());
-            if(adjacentLane.getVehicles().isEmpty()){
-                changeLane();
+            decideLaneChangeAI(stoppingTimeDistance, crashTimeDistance);
+            return;
+        } else if (desire.toString().equals("TURN_RIGHT") && vehicleLane.getTurnDirection().toString().equals("LEFT")) {
+            decideLaneChangeAI(stoppingTimeDistance, crashTimeDistance);
+            return;
+        }
+
+
+    }
+
+    private void decideLaneChangeAI(int stoppingTimeDistance, int crashTimeDistance) {
+        Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
+        Lane adjacentLane = getAdjacentLane(vehicle.getHeadSegment());
+        if (adjacentLane.getVehicles().isEmpty()) {
+            changeLane();
+            return;
+        } else {
+            if (adjacentLane.getVehicleAhead(adjacentSeg) != null) {
+                Vehicle ahead = adjacentLane.getVehicleAhead(adjacentSeg);
+                int distance = ahead.findVehDistanceAhead();
+                crashTimeDistance = (distance * 100) / vehicle.getSpeed();
+            } else if (adjacentLane.isVehicleAtSegment(adjacentSeg)) { //if there is a vehicle in the immediately adjacent segment to us
+                vehicle.decelerate(10); //TODO: maybe think about constants for the deceleration and accel rate
                 return;
-            }else{
-                if(adjacentLane.getVehicleAhead(adjacentSeg) != null){
-                    Vehicle ahead = adjacentLane.getVehicleAhead(adjacentSeg);
-                    int distance = ahead.findVehDistanceAhead();
-                    crashTimeDistance = (distance * 100) / vehicle.getSpeed();
-                }else if(adjacentLane.isVehicleAtSegment(adjacentSeg)){ //if there is a vehicle in the immediately adjacent segment to us
-                    vehicle.decelerate(10); //TODO: maybe think about constants for the deceleration and accel rate
-                    return;
-                }else{
-                    Vehicle behind = adjacentLane.getVehicleBehind(adjacentSeg);
-                    int distance = behind.findVehDistanceBehind();
-                    crashTimeDistance = (distance * 100) / vehicle.getSpeed();
-                }
-            }
-            
-            if(crashTimeDistance > stoppingTimeDistance){ // if we can stop should the vehicle in front be at speed 0
-                changeLane();
+            } else {
+                Vehicle behind = adjacentLane.getVehicleBehind(adjacentSeg);
+                int distance = behind.findVehDistanceBehind();
+                crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             }
         }
-        
+
+        if (crashTimeDistance > stoppingTimeDistance) { // if we can stop should the vehicle in front be at speed 0
+            changeLane();
+            return;
+        } else {
+            vehicle.decelerate(10);
+        }
+
     }
-    
-    private Lane getAdjacentLane(Segment s){
+
+    private Lane getAdjacentLane(Segment s) {
         Segment adjacentSeg = getAdjacentSegment(s);
         return adjacentSeg.getLane();
     }
-    
-    private Segment getAdjacentSegment(Segment s){
+
+    private Segment getAdjacentSegment(Segment s) {
         Segment adjacentSeg = null;
         Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
         if (connectedSegments.containsValue(ConnectionType.NEXT_TO_LEFT)) {
@@ -102,16 +118,13 @@ public class DriverAI {
         }
         return adjacentSeg;
     }
-    
 
     protected Desire getDesire() {
         return desire;
     }
-    
-  
 
     protected void changeLane() {
-        
+
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
         Lane adjacentLane = getAdjacentLane(vehicle.getHeadSegment());
         vehicle.setHeadSegment(adjacentSeg);
