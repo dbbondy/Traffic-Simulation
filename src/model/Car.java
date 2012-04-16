@@ -10,7 +10,7 @@ import java.awt.Color;
  */
 public class Car extends Vehicle {
 
-    private static final int MAX_ACCELERATION_RATE = 5;
+    private static final int MAX_ACCELERATION_RATE = 10;
     private static final int MAX_DECELERATION_RATE = 20;
     
     private static final int WIDTH = 12;
@@ -58,6 +58,7 @@ public class Car extends Vehicle {
     public void act() {
        
         advanceVehicle(currentSpeed);
+        ai.act();
 /*
         Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
         Vehicle behind = currentLane.getVehicleBehind(this.getHeadSegment());

@@ -11,7 +11,8 @@ public class Truck extends Vehicle{
     
     private static final int WIDTH = 14;
     private static final int LENGTH = 30;
-    
+    private static final int MAX_ACCELERATION_RATE = 5;
+    private static final int MAX_DECELERATION_RATE = 15;
     // TODO: add max accel etc here
     
     public Truck() {}
@@ -19,33 +20,43 @@ public class Truck extends Vehicle{
     public Truck(Lane lane) {
         super(lane, lane.getFirstSegment(),null, null, Color.RED);
         setDimensions(WIDTH, LENGTH);
+        maxAccelerationRate = MAX_ACCELERATION_RATE;
+        maxDecelerationRate = MAX_DECELERATION_RATE;
     }
     
     public Truck(Lane lane, Color c) {
         super(lane, lane.getFirstSegment(),null, null, c);
         setDimensions(WIDTH, LENGTH);
+        maxAccelerationRate = MAX_ACCELERATION_RATE;
+        maxDecelerationRate = MAX_DECELERATION_RATE;
     }
     
     public Truck(Lane lane, Segment seg, Color c) {
         super(lane, seg,null, null, c);
         setDimensions(WIDTH, LENGTH);
+        maxAccelerationRate = MAX_ACCELERATION_RATE;
+        maxDecelerationRate = MAX_DECELERATION_RATE;
     }
     
     public Truck(Lane lane, Segment seg) {
         super(lane, seg,null, null, Color.RED);
         setDimensions(WIDTH, LENGTH);
+        maxAccelerationRate = MAX_ACCELERATION_RATE;
+        maxDecelerationRate = MAX_DECELERATION_RATE;
     }
     
     public Truck(Lane lane, Segment seg, Vehicle inFront, Vehicle behind, Color c){
         super(lane, seg, inFront, behind, c);
         setDimensions(WIDTH, LENGTH);
+        maxAccelerationRate = MAX_ACCELERATION_RATE;
+        maxDecelerationRate = MAX_DECELERATION_RATE;
     }
 
     @Override
     public void act() {
         
         advanceVehicle(currentSpeed);
-        
+        ai.act();
         /*
         System.out.println("this " + this.getHeadSegment());
         System.out.println("last " + currentLane.getLastSegment());

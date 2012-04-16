@@ -90,14 +90,14 @@ public abstract class Vehicle {
     public int findVehDistanceAhead() {
         Vehicle vAhead = currentLane.getVehicleAhead(headSegment);
         if (vAhead == null) throw new RuntimeException("no vehicle ahead");
-        return vAhead.getHeadSegment().id() - vAhead.getLength() - headSegment.id();
+        return ((vAhead.getHeadSegment().id() - vAhead.getLength()) - headSegment.id());
     }
 
     public int findVehDistanceBehind() {
         Vehicle vBehind = currentLane.getVehicleBehind(headSegment);
         if (vBehind == null) throw new RuntimeException("no vehicle behind");
         // TODO: have an id specific to the lane
-        return headSegment.id() - length - vBehind.getHeadSegment().id();
+        return ((headSegment.id() - length) - vBehind.getHeadSegment().id());
     }
 
     public Lane getLane(){

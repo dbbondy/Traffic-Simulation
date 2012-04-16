@@ -28,6 +28,7 @@ public class Lane {
         this.yCoord = yCoord;
         this.initialAngle = initialAngle;
         this.newSegmentID = 0;
+        this.direction = direction;
     }
     
     public int getNewSegmentID() {
@@ -70,7 +71,6 @@ public class Lane {
     }
 
     public ArrayList<Vehicle> getVehicles() {
-
         return vehicles;
     }
 
