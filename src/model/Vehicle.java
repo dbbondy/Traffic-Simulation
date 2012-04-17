@@ -25,7 +25,7 @@ public abstract class Vehicle {
     protected int maxDecelerationRate;
 
     
-    public static final int REACTION_TIME = 5; // 5 steps
+    
     protected DriverAI ai;
 
     public Vehicle() {
@@ -87,16 +87,15 @@ public abstract class Vehicle {
      * @return the distance between vehicles
      * assumption: vehicle ahead exists
      */
-    public int findVehDistanceAhead() {
+    public int findVehDistanceAhead() throws RuntimeException{
         Vehicle vAhead = currentLane.getVehicleAhead(headSegment);
         if (vAhead == null) throw new RuntimeException("no vehicle ahead");
         return ((vAhead.getHeadSegment().id() - vAhead.getLength()) - headSegment.id());
     }
 
-    public int findVehDistanceBehind() {
+    public int findVehDistanceBehind() throws RuntimeException{
         Vehicle vBehind = currentLane.getVehicleBehind(headSegment);
         if (vBehind == null) throw new RuntimeException("no vehicle behind");
-        // TODO: have an id specific to the lane
         return ((headSegment.id() - length) - vBehind.getHeadSegment().id());
     }
 

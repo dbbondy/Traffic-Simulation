@@ -100,6 +100,7 @@ public class Lane {
             return null;
         }
         Vehicle ahead = vehicles.get(index);
+        if(ahead.getHeadSegment().equals(segment))return null;
         return ahead;
     }
 
@@ -119,6 +120,7 @@ public class Lane {
             return null;
         }
         Vehicle behind = vehicles.get(index - 1);
+        if(behind.getHeadSegment().equals(segment)) return null;
         return behind;
     }
 

@@ -49,14 +49,17 @@ public class DriverAI {
         } else if (vehicleLane.getVehicleBehind(vehicle.getHeadSegment()) != null) {
             Vehicle behind = vehicleLane.getVehicleBehind(vehicle.getHeadSegment());
             int distance = vehicle.findVehDistanceBehind();
-            crashTimeDistance = (distance * 100) / behind.getSpeed();
+            if(behind.getSpeed() != 0)crashTimeDistance = (distance * 100) / behind.getSpeed();
         }
 
-        if (desire.toString().equals("TURN_LEFT") && vehicleLane.getTurnDirection().toString().equals("RIGHT_AND_STRAIGHT")) {
+        if ((desire.toString().equals("TURN_LEFT")) && (vehicleLane.getTurnDirection().toString().equals("RIGHT_AND_STRAIGHT"))) {
+            System.out.println("statement 1");
             decideLaneChangeDecision(stoppingTimeDistance, crashTimeDistance);
-        } else if (desire.toString().equals("TURN_RIGHT") && vehicleLane.getTurnDirection().toString().equals("LEFT")) {
+        } else if ((desire.toString().equals("TURN_RIGHT")) && (vehicleLane.getTurnDirection().toString().equals("LEFT"))) {
+            System.out.println("statement 2");
             decideLaneChangeDecision(stoppingTimeDistance, crashTimeDistance);
         } else { //if we are in correct lane then do AI based in that.
+            System.out.println("statement 3");
             performStraightLaneAI(stoppingTimeDistance, crashTimeDistance);
         }
 
@@ -70,25 +73,31 @@ public class DriverAI {
     }
 
     protected void performStraightLaneAI(int stoppingTimeDistance, int crashTimeDistance) {
+        
         if (crashTimeDistance == Integer.MIN_VALUE) { //if there is no car in our lane
             vehicle.accelerate(vehicle.getMaxAccelerationRate());
-            System.out.println(vehicle.getSpeed());
+            System.out.println("if statement 1");
             return;
         }
         if (vehicleLane.getVehicles().size() == 1) { //if 1 vehicle in the lane, then accelerate freely
+            System.out.println("if statement 2");
             vehicle.accelerate(vehicle.getMaxAccelerationRate());
         }else if(approachingTurn(vehicle.getHeadSegment(), stoppingTimeDistance)){ // if we are approaching a turn
             vehicle.decelerate(vehicle.getMaxDecelerationRate());
+            System.out.println("if statement 3");
         }else if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null) {
+            System.out.println("if statement 4");
             int distance = vehicle.findVehDistanceAhead();
-            if(distance == 0 - vehicle.getLength())
-            crashTimeDistance = (distance * 100) / vehicle.getSpeed();
+            if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             if (crashTimeDistance > stoppingTimeDistance) {
                 vehicle.accelerate(5);
+                System.out.println("if statement 5");
             } else if (crashTimeDistance == stoppingTimeDistance) {
                 vehicle.decelerate(2);
+                System.out.println("if statement 6");
             } else {
                 vehicle.decelerate(vehicle.getMaxDecelerationRate());
+                System.out.println("if statement 7");
             }
         }
         
@@ -133,20 +142,21 @@ public class DriverAI {
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
         Lane adjacentLane = getAdjacentLane(vehicle.getHeadSegment());
         if (adjacentLane.getVehicles().isEmpty()) {
+            System.out.println("we are changing lanes!");
             changeLane();
             return;
         } else {
             if (adjacentLane.getVehicleAhead(adjacentSeg) != null) {
                 Vehicle ahead = adjacentLane.getVehicleAhead(adjacentSeg);
-                int distance = ahead.findVehDistanceAhead();
+                int distance =  ((ahead.getHeadSegment().id() - ahead.getLength()) - vehicle.getHeadSegment().id());
                 if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             } else if (adjacentLane.isVehicleAtSegment(adjacentSeg)) { //if there is a vehicle in the immediately adjacent segment to us
                 vehicle.decelerate(5); //TODO: maybe think about constants for the deceleration and accel rate
                 return;
             } else {
                 Vehicle behind = adjacentLane.getVehicleBehind(adjacentSeg);
-                int distance = behind.findVehDistanceBehind();
-                crashTimeDistance = (distance * 100) / vehicle.getSpeed();
+                int distance = ((vehicle.getHeadSegment().id() - vehicle.getLength()) - behind.getHeadSegment().id());
+                if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             }
         }
         if (safeLaneChangeProximity()) {
