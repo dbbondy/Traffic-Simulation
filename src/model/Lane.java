@@ -35,8 +35,25 @@ public class Lane {
         return this.newSegmentID++;
     }
     
-    public TurnDirection getTurnDirection(){
-        return direction;
+    public boolean canGoStraight() {
+        if (direction == TurnDirection.RIGHT_AND_STRAIGHT) return true;
+        if (direction == TurnDirection.LEFT_AND_STRAIGHT) return true;
+        if (direction == TurnDirection.STRAIGHT) return true;
+        return false;
+    }
+    
+    public boolean canTurnLeft() {
+        if (direction == TurnDirection.LEFT) return true;
+        if (direction == TurnDirection.LEFT_AND_STRAIGHT) return true;
+        if (direction == TurnDirection.ALL) return true;
+        return false;
+    }
+        
+    public boolean canTurnRight() {
+        if (direction == TurnDirection.RIGHT) return true;
+        if (direction == TurnDirection.RIGHT_AND_STRAIGHT) return true;
+        if (direction == TurnDirection.ALL) return true;
+        return false;
     }
     
     public void removeVehicles() {
@@ -49,6 +66,12 @@ public class Lane {
 
     public int getInitialAngle() {
         return this.initialAngle;
+    }
+    
+    public void removeVehicle(Vehicle v){
+        if(!vehicles.remove(v)){
+            throw new RuntimeException("You cannot remove a vehicle that does not exist!");
+        }
     }
 
     public Segment getFirstSegment() {

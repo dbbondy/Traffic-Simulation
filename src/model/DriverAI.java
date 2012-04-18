@@ -16,22 +16,25 @@ import java.util.Random;
 public class DriverAI {
 
     public static final int DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE = 100;
+    // extra distance to allow us to slow down gradually before a corner
+    public static final int CORNER_STOP_TIME_DISTANCE = 10;
+    
     protected Vehicle vehicle;
     protected Desire desire; // TODO: auto routing based on desired destination!
     protected Random rnd;
     protected int safeLaneChangeID; // the ID of the segment that is the last safe point of changing lanes for turning
-    protected Lane vehicleLane;
+
 
     public DriverAI(Vehicle vehicle) {
         this.vehicle = vehicle;
         rnd = Randomizer.getInstance();
         Desire[] allDesires = Desire.values();
         desire = allDesires[rnd.nextInt(allDesires.length)];
-        vehicleLane = vehicle.getLane();
+        getSafeLaneChangeIndex();
     }
 
     protected void getSafeLaneChangeIndex() {
-        ArrayList<Segment> laneSegments = vehicleLane.getLaneSegments();
+        ArrayList<Segment> laneSegments = vehicle.getLane().getLaneSegments();
         for (int i = 0; i < laneSegments.size(); i++) {
             Map<Segment, ConnectionType> connectedSegments = laneSegments.get(i).getConnectedSegments();
             if (connectedSegments.containsValue(ConnectionType.OVERLAP)) {
@@ -43,30 +46,33 @@ public class DriverAI {
     public void act() {
         int stoppingTimeDistance = ((vehicle.getSpeed()) / (vehicle.getMaxDecelerationRate())); // number of time steps it will take to stop
         int crashTimeDistance = Integer.MIN_VALUE;
-        if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null) {
+        
+        if (vehicle.getLane().getVehicleAhead(vehicle.getHeadSegment()) != null) {
             int distance = vehicle.findVehDistanceAhead();
             if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
-        } else if (vehicleLane.getVehicleBehind(vehicle.getHeadSegment()) != null) {
-            Vehicle behind = vehicleLane.getVehicleBehind(vehicle.getHeadSegment());
-            int distance = vehicle.findVehDistanceBehind();
-            if(behind.getSpeed() != 0)crashTimeDistance = (distance * 100) / behind.getSpeed();
         }
 
-        if ((desire.toString().equals("TURN_LEFT")) && (vehicleLane.getTurnDirection().toString().equals("RIGHT_AND_STRAIGHT"))) {
-            System.out.println("statement 1");
+        // TODO: other types of turn direction combinations
+        if ((desire == Desire.TURN_LEFT) && (!vehicle.getLane().canTurnLeft())) {
             decideLaneChangeDecision(stoppingTimeDistance, crashTimeDistance);
-        } else if ((desire.toString().equals("TURN_RIGHT")) && (vehicleLane.getTurnDirection().toString().equals("LEFT"))) {
-            System.out.println("statement 2");
+        } else if ((desire == Desire.TURN_RIGHT) && (!vehicle.getLane().canTurnRight())) {
             decideLaneChangeDecision(stoppingTimeDistance, crashTimeDistance);
-        } else { //if we are in correct lane then do AI based in that.
-            System.out.println("statement 3");
+        } else { // if we are in correct lane then do AI based in that.
             performStraightLaneAI(stoppingTimeDistance, crashTimeDistance);
         }
+        
 
     }
 
     private boolean safeLaneChangeProximity() {
-        if (safeLaneChangeID - vehicle.getHeadSegment().id() < 100) {
+        // TODO: PROBABLY SHOULD DO: this only works if we expect to change lane for 1 reason
+        // what if we have 2 reasons to change lane
+        // 1. turn left in a short while
+        // 2. turn left in a long while 
+        // this SHOULD allow for this
+        // safeLaneChangeID is relevant to a specific corner
+        // in another lane and NOT the entire lane
+        if (safeLaneChangeID - vehicle.getHeadSegment().id() < 100) { // TODO: 100 should be a constant
             return true;
         }
         return false;
@@ -75,29 +81,31 @@ public class DriverAI {
     protected void performStraightLaneAI(int stoppingTimeDistance, int crashTimeDistance) {
         
         if (crashTimeDistance == Integer.MIN_VALUE) { //if there is no car in our lane
-            vehicle.accelerate(vehicle.getMaxAccelerationRate());
-            System.out.println("if statement 1");
+            vehicle.accelerate(vehicle.getMaxAccelerationRate()); // TODO: aggression
             return;
         }
-        if (vehicleLane.getVehicles().size() == 1) { //if 1 vehicle in the lane, then accelerate freely
-            System.out.println("if statement 2");
-            vehicle.accelerate(vehicle.getMaxAccelerationRate());
-        }else if(approachingTurn(vehicle.getHeadSegment(), stoppingTimeDistance)){ // if we are approaching a turn
-            vehicle.decelerate(vehicle.getMaxDecelerationRate());
-            System.out.println("if statement 3");
-        }else if (vehicleLane.getVehicleAhead(vehicle.getHeadSegment()) != null) {
-            System.out.println("if statement 4");
+        
+        if(approachingTurn(vehicle.getHeadSegment(), stoppingTimeDistance)){ // if we are approaching a turn
+            vehicle.decelerate(vehicle.getMaxDecelerationRate()); // TODO: aggression
+        } else {
             int distance = vehicle.findVehDistanceAhead();
-            if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
+            if (vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             if (crashTimeDistance > stoppingTimeDistance) {
-                vehicle.accelerate(5);
-                System.out.println("if statement 5");
+                // TODO: CRITICAL! ensure that the acceleration won't  
+                // cause a case where next iteration crash is imminent
+                vehicle.accelerate(5); // TODO: aggression 
+                
+                // 1. adjust distance (in local variable) by current speed    (take care of the factor 100)
+                // 2. compute new speed
+                // 3. recompute expected stoppingTimeDistance and crashTimeDistance (new variables)
+                // 4. check for potential crash
+                
             } else if (crashTimeDistance == stoppingTimeDistance) {
-                vehicle.decelerate(2);
-                System.out.println("if statement 6");
+                vehicle.decelerate(2); // TODO: aggression (less important here)
             } else {
+                // this should never really happen if you take care 
+                // of everything else. the cars won't get too close!
                 vehicle.decelerate(vehicle.getMaxDecelerationRate());
-                System.out.println("if statement 7");
             }
         }
         
@@ -107,6 +115,12 @@ public class DriverAI {
         Segment overlappingSegment = findOverlappingSegment(s);
         if(overlappingSegment != null){
             int distanceFromTurn = (overlappingSegment.id() - s.id());
+            // TODO: CRITICAL!
+            // distance from turn is physical distance
+            // stoppingTimeDistance is in # of steps!!!
+            // cannot compare 2 values of different type!
+            // TODO: additional: add an additional constanst time distance
+            // so that we don't have to break rapidly. (CORNER_STOP_TIME_DISTANCE)
             if(stoppingTimeDistance < distanceFromTurn){
                 return true;
             }else{
@@ -122,6 +136,7 @@ public class DriverAI {
         Segment overlappingSegment = null;
         Lane segmentLane = s.getLane();
         ArrayList<Segment> allSegments = segmentLane.getLaneSegments();
+        // TODO: create a cache of overlapping segments (!important)
         for(int i = s.id(); i < allSegments.size(); i++){
             Segment seg = allSegments.get(i);
             Map<Segment, ConnectionType> connectedSegments = seg.getConnectedSegments();
@@ -140,22 +155,25 @@ public class DriverAI {
 
     private void decideLaneChangeDecision(int stoppingTimeDistance, int crashTimeDistance) {
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
-        Lane adjacentLane = getAdjacentLane(vehicle.getHeadSegment());
+        Lane adjacentLane = adjacentSeg.getLane();
         if (adjacentLane.getVehicles().isEmpty()) {
-            System.out.println("we are changing lanes!");
-            changeLane();
+            changeLane(adjacentSeg, adjacentLane);
             return;
         } else {
-            if (adjacentLane.getVehicleAhead(adjacentSeg) != null) {
-                Vehicle ahead = adjacentLane.getVehicleAhead(adjacentSeg);
-                int distance =  ((ahead.getHeadSegment().id() - ahead.getLength()) - vehicle.getHeadSegment().id());
+            Vehicle otherVehicle = null;
+            if (adjacentLane.isVehicleAtSegment(adjacentSeg)) { // if there is a vehicle in the immediately adjacent segment to us
+                vehicle.decelerate(5); //TODO: aggression // TODO: CRITICAL left lane slows, right lane increases speed
+                return;                
+            } else if ((otherVehicle = adjacentLane.getVehicleAhead(adjacentSeg)) != null) {
+                int distance =  ((otherVehicle.getHeadSegment().id() - otherVehicle.getLength()) - vehicle.getHeadSegment().id());
                 if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
-            } else if (adjacentLane.isVehicleAtSegment(adjacentSeg)) { //if there is a vehicle in the immediately adjacent segment to us
-                vehicle.decelerate(5); //TODO: maybe think about constants for the deceleration and accel rate
-                return;
             } else {
-                Vehicle behind = adjacentLane.getVehicleBehind(adjacentSeg);
-                int distance = ((vehicle.getHeadSegment().id() - vehicle.getLength()) - behind.getHeadSegment().id());
+                // TODO: instead of assuming the car has 0 speed we can use the current speed for this one
+                // since the car the AI is driving knows its own speed "reliably"
+                // we then compute the same thing with the difference in speed only. 
+                // careful with negative speed difference
+                otherVehicle = adjacentLane.getVehicleBehind(adjacentSeg);
+                int distance = ((vehicle.getHeadSegment().id() - vehicle.getLength()) - otherVehicle.getHeadSegment().id());
                 if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             }
         }
@@ -163,37 +181,52 @@ public class DriverAI {
             vehicle.decelerate(5);
         }
 
-        if (stoppingTimeDistance < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) {
+        // TODO: critical! this doesn't take into account the corner position
+        // remember that stoppingTimeDistance is the same wherever you are
+        // and only depends on speed!
+        
+        // TODO: additional: you are comparing physical distance and
+        // timeDistance again! this is bad! 
+        
+        // TODO: additional: this should be relative to the safeLaneChangeID
+                                                           // ^^^^ assumes original unfixed version
+        
+        /*if (stoppingTimeDistance < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) {
             vehicle.decelerate(vehicle.getMaxDecelerationRate());
             return;
-        }
+        }*/
 
         if (crashTimeDistance > stoppingTimeDistance) { // if we can stop should the vehicle in front be at speed 0
-            changeLane();
+            changeLane(adjacentSeg, adjacentLane);
         } else {
+            // TODO: aggression 
+            // TODO: CRITICAL: take into account the distance until the
+            // DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE
             vehicle.decelerate(vehicle.getMaxDecelerationRate());
         }
 
-    }
-
-    private Lane getAdjacentLane(Segment s) {
-        Segment adjacentSeg = getAdjacentSegment(s);
-        return adjacentSeg.getLane();
     }
 
     private Segment getAdjacentSegment(Segment s) {
         Segment adjacentSeg = null;
         Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
+        // TODO: IMPORTANT! make sure that changing lane is actually helpful!
+        // we might be changing into a lane that also cannot turn!
+        // need to know whether we actually want to change into a lane or not!
+        // ------
+        // if we need to jump 2 lanes then add some AI for that too. 
         if (connectedSegments.containsValue(ConnectionType.NEXT_TO_LEFT)) {
             for (Entry<Segment, ConnectionType> entry : connectedSegments.entrySet()) {
                 if (entry.getValue() == ConnectionType.NEXT_TO_LEFT) {
                     adjacentSeg = entry.getKey();
+                    break;
                 }
             }
         } else if (connectedSegments.containsValue(ConnectionType.NEXT_TO_RIGHT)) {
             for (Entry<Segment, ConnectionType> entry : connectedSegments.entrySet()) {
                 if (entry.getValue() == ConnectionType.NEXT_TO_RIGHT) {
                     adjacentSeg = entry.getKey();
+                    break;
                 }
             }
         }
@@ -229,12 +262,10 @@ public class DriverAI {
         overlapLane.addVehicle(vehicle);
     }
 
-    protected void changeLane() {
-
-        Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
-        Lane adjacentLane = getAdjacentLane(vehicle.getHeadSegment());
+    protected void changeLane(Segment adjacentSeg, Lane lane) {
+        vehicle.getLane().removeVehicle(vehicle);
+        lane.addVehicle(vehicle);        
         vehicle.setHeadSegment(adjacentSeg);
-        adjacentLane.addVehicle(vehicle);
     }
 
     protected boolean isSafeDistanceAhead() {

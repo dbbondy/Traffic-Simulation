@@ -17,22 +17,15 @@ public abstract class Vehicle {
     protected Color color;
     protected int currentSpeed;
     protected Segment headSegment;
-    protected Lane currentLane;
-    
-    
     private int nextSegmentPercent;
     protected int maxAccelerationRate;
     protected int maxDecelerationRate;
-
-    
-    
     protected DriverAI ai;
 
     public Vehicle() {
     }
 
     public Vehicle(Lane lane, Segment segment, Vehicle inFront, Vehicle behind, Color c) {
-        currentLane = lane;
         headSegment = segment;
         color = c;
         currentSpeed = 50;
@@ -88,19 +81,19 @@ public abstract class Vehicle {
      * assumption: vehicle ahead exists
      */
     public int findVehDistanceAhead() throws RuntimeException{
-        Vehicle vAhead = currentLane.getVehicleAhead(headSegment);
+        Vehicle vAhead = getLane().getVehicleAhead(headSegment);
         if (vAhead == null) throw new RuntimeException("no vehicle ahead");
-        return ((vAhead.getHeadSegment().id() - vAhead.getLength()) - headSegment.id());
+        return ((vAhead.headSegment.id() - vAhead.length) - headSegment.id());
     }
 
     public int findVehDistanceBehind() throws RuntimeException{
-        Vehicle vBehind = currentLane.getVehicleBehind(headSegment);
+        Vehicle vBehind = getLane().getVehicleBehind(headSegment);
         if (vBehind == null) throw new RuntimeException("no vehicle behind");
-        return ((headSegment.id() - length) - vBehind.getHeadSegment().id());
+        return ((headSegment.id() - length) - vBehind.headSegment.id());
     }
 
     public Lane getLane(){
-        return currentLane;
+        return headSegment.getLane();
     }
 
     public int getWidth() {
