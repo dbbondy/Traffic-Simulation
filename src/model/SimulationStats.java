@@ -1,5 +1,6 @@
 package model;
 
+import controller.Simulation;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class SimulationStats {
         System.out.println(allEvents.size());
         for(Event e: allEvents){ //print single events details
             try{
-                outputStream.write("name of event: " + e.getName());
+                outputStream.write("Name of event: " + e.getName());
                 outputStream.newLine();
                 outputStream.write("Time step: " + e.getTimeStep());
                 outputStream.newLine();
@@ -80,6 +81,10 @@ public class SimulationStats {
                 outputStream.newLine();
                 outputStream.write("Maximum Speed of Vehicles in Simulation: " + e.getMaxSpeed());
                 outputStream.newLine();
+                outputStream.write("-------------------------------------------------------------");
+                outputStream.newLine();
+                outputStream.write("-------------------------------------------------------------");
+                outputStream.newLine();
             }catch(IOException ioe){
                 ioe.printStackTrace();
             }
@@ -87,14 +92,14 @@ public class SimulationStats {
         //print a summary of the whole set of events
         try{
             outputStream.newLine();
-            outputStream.newLine();
             outputStream.write("Total output of Cars: " + carCount);
             outputStream.newLine();
             outputStream.write("Total output of Trucks: " + truckCount);
             outputStream.newLine();
             outputStream.write("Total vehicles outputted in Simulation: " + (carCount + truckCount));
             outputStream.newLine();
-            outputStream.write("Simulation was run for: ");
+            outputStream.write("Simulation was run for: "  + Simulation.getTotalTimeSteps() + " time steps");
+            outputStream.close();
         }catch(IOException ioex){
             ioex.printStackTrace();
         }
