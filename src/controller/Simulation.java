@@ -1,11 +1,7 @@
 package controller;
 
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
-import model.*;
 import model.junctions.*;
 import view.SettingsWindow;
 import view.UserInterface;
@@ -25,6 +21,7 @@ public class Simulation {
     public static final String JUNCTION_TYPE = "junction-type";
     public static final String TIME_STEP = "time-step";
     public static final String FILE_EXT = ".tss";
+    public static final String STATS_FILE_EXT = ".txt";
     
     private static boolean paused;
     private static boolean started;
@@ -32,6 +29,7 @@ public class Simulation {
     private static UserInterface ui;
     private static Map<String, Object> settings;
     private static SimulationThread simulationThread;
+    private static int totalTimeSteps;
 
     public static void init() {        
         Junction.registerJunctionType(FlyoverJunction.class);
@@ -51,7 +49,8 @@ public class Simulation {
         paused = false;
         started = false;
         simulationThread = new SimulationThread();
-        settingsWindow = new SettingsWindow();        
+        settingsWindow = new SettingsWindow();
+        totalTimeSteps = 0;
     }
 
     // how to create a proper MVC compliant instantiation
@@ -135,6 +134,10 @@ public class Simulation {
         reset();
     }
     
+    public static int getTotalTimeSteps(){
+        return totalTimeSteps;
+    }
+    
     public static void reset(){
 
         // cannot stop until the current step
@@ -142,7 +145,7 @@ public class Simulation {
         synchronized (ui) {
             Junction jn = (Junction) getOption(JUNCTION_TYPE);
             jn.removeVehicles();
-            SimulationStats.reset();
+            totalTimeSteps = (int) settings.get(TIME_STEP);
             setOption(TIME_STEP, 0); 
             started = false;
             paused = false;

@@ -4,6 +4,7 @@
  */
 package model;
 
+import controller.Simulation;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,7 +18,9 @@ public class DriverAI {
 
     public static final int DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE = 100;
     // extra distance to allow us to slow down gradually before a corner
-    public static final int CORNER_STOP_TIME_DISTANCE = 10;
+    public static final int CORNER_STOP_TIME_DISTANCE = 10; 
+    
+    public static final int CORNER_STOP_DISTANCE = 100; //the distance from the corner that we should consider slowing down 
     
     protected Vehicle vehicle;
     protected Desire desire; // TODO: auto routing based on desired destination!
@@ -81,30 +84,41 @@ public class DriverAI {
     protected void performStraightLaneAI(int stoppingTimeDistance, int crashTimeDistance) {
         
         if (crashTimeDistance == Integer.MIN_VALUE) { //if there is no car in our lane
-            vehicle.accelerate(vehicle.getMaxAccelerationRate()); // TODO: aggression
+            
+            vehicle.accelerate(vehicle.getMaxAccelerationRate()); 
             return;
         }
         
         if(approachingTurn(vehicle.getHeadSegment(), stoppingTimeDistance)){ // if we are approaching a turn
-            vehicle.decelerate(vehicle.getMaxDecelerationRate()); // TODO: aggression
+            int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+            int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+            vehicle.decelerate(decelerationRate); 
         } else {
             int distance = vehicle.findVehDistanceAhead();
             if (vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
             if (crashTimeDistance > stoppingTimeDistance) {
-                // TODO: CRITICAL! ensure that the acceleration won't  
-                // cause a case where next iteration crash is imminent
-                vehicle.accelerate(5); // TODO: aggression 
                 
-                // 1. adjust distance (in local variable) by current speed    (take care of the factor 100)
-                // 2. compute new speed
-                // 3. recompute expected stoppingTimeDistance and crashTimeDistance (new variables)
-                // 4. check for potential crash
+                int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
+                int newSpeed = vehicle.getSpeed() + accelerationRate;
+                Segment currentPos = vehicle.getHeadSegment();
+                vehicle.advanceVehicle(newSpeed);
+                distance = vehicle.findVehDistanceAhead();
+                int newCrashTimeDistance = (distance * 100) / (vehicle.getSpeed() + accelerationRate);
+                int newStoppingDistance = newSpeed / vehicle.getMaxDecelerationRate();
+                
+                if(newCrashTimeDistance < newStoppingDistance){ // if we would crash if we accelerated, then we need to slow down perhaps.
+                    int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+                    vehicle.setHeadSegment(currentPos);
+                    vehicle.decelerate(decelerationRate);
+                }
+                
+                vehicle.accelerate(accelerationRate); 
+                
                 
             } else if (crashTimeDistance == stoppingTimeDistance) {
-                vehicle.decelerate(2); // TODO: aggression (less important here)
+                vehicle.decelerate(2); 
             } else {
-                // this should never really happen if you take care 
-                // of everything else. the cars won't get too close!
                 vehicle.decelerate(vehicle.getMaxDecelerationRate());
             }
         }
@@ -115,13 +129,7 @@ public class DriverAI {
         Segment overlappingSegment = findOverlappingSegment(s);
         if(overlappingSegment != null){
             int distanceFromTurn = (overlappingSegment.id() - s.id());
-            // TODO: CRITICAL!
-            // distance from turn is physical distance
-            // stoppingTimeDistance is in # of steps!!!
-            // cannot compare 2 values of different type!
-            // TODO: additional: add an additional constanst time distance
-            // so that we don't have to break rapidly. (CORNER_STOP_TIME_DISTANCE)
-            if(stoppingTimeDistance < distanceFromTurn){
+            if(distanceFromTurn < (CORNER_STOP_DISTANCE + CORNER_STOP_TIME_DISTANCE)){
                 return true;
             }else{
                 return false;
@@ -162,7 +170,16 @@ public class DriverAI {
         } else {
             Vehicle otherVehicle = null;
             if (adjacentLane.isVehicleAtSegment(adjacentSeg)) { // if there is a vehicle in the immediately adjacent segment to us
-                vehicle.decelerate(5); //TODO: aggression // TODO: CRITICAL left lane slows, right lane increases speed
+                
+                if(vehicle.getLane().canTurnRight()){ // if we are in right lane, we accelerate to avoid deadlock between two cars
+                    int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                    int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
+                    vehicle.accelerate(accelerationRate);
+                }else{
+                    int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                    int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+                    vehicle.decelerate(decelerationRate);  
+                }
                 return;                
             } else if ((otherVehicle = adjacentLane.getVehicleAhead(adjacentSeg)) != null) {
                 int distance =  ((otherVehicle.getHeadSegment().id() - otherVehicle.getLength()) - vehicle.getHeadSegment().id());
@@ -181,28 +198,25 @@ public class DriverAI {
             vehicle.decelerate(5);
         }
 
-        // TODO: critical! this doesn't take into account the corner position
-        // remember that stoppingTimeDistance is the same wherever you are
-        // and only depends on speed!
-        
-        // TODO: additional: you are comparing physical distance and
-        // timeDistance again! this is bad! 
-        
-        // TODO: additional: this should be relative to the safeLaneChangeID
-                                                           // ^^^^ assumes original unfixed version
-        
-        /*if (stoppingTimeDistance < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) {
+        if ((safeLaneChangeID - vehicle.getHeadSegment().id()) < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) { 
             vehicle.decelerate(vehicle.getMaxDecelerationRate());
             return;
-        }*/
+        }
 
         if (crashTimeDistance > stoppingTimeDistance) { // if we can stop should the vehicle in front be at speed 0
             changeLane(adjacentSeg, adjacentLane);
         } else {
-            // TODO: aggression 
-            // TODO: CRITICAL: take into account the distance until the
-            // DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE
-            vehicle.decelerate(vehicle.getMaxDecelerationRate());
+            int distanceBeforeLaneChange = safeLaneChangeID - vehicle.getHeadSegment().id();
+            if(distanceBeforeLaneChange < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE){
+                int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+                vehicle.decelerate(decelerationRate);
+            }else{
+                int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
+                vehicle.accelerate(accelerationRate);
+            }
+            
         }
 
     }

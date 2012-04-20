@@ -14,7 +14,6 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import model.SimulationStats;
-import model.junctions.Junction;
 
 /**
  *
@@ -29,6 +28,7 @@ public class UserInterface extends JFrame {
     private JButton changeSettings;
     private JButton saveJunc;
     private JButton loadJunc;
+    private JButton outputStatistics;
     private DetailsPanel detailPanel;
     private SimulationPanel simPanel;
 
@@ -65,18 +65,22 @@ public class UserInterface extends JFrame {
             pauseSim.setText("Pause Simulation");
             startSim.setText("Start Simulation");
             pauseSim.setEnabled(false);
+            
         } else if (Simulation.isPaused() && Simulation.isStarted()) { // if paused and simulated is running
             pauseSim.setText("Resume Simulation");
             startSim.setText("Stop Simulation");
             pauseSim.setEnabled(true);
+            
         } else if (!Simulation.isPaused() && Simulation.isStarted()) { // if not paused and simulation is running
             pauseSim.setText("Pause Simulation");
             startSim.setText("Stop Simulation");
             pauseSim.setEnabled(true);
+           
         } else if (!Simulation.isPaused() && !Simulation.isStarted()) { //if not paused and not started
             pauseSim.setText("Pause Simulation");
             startSim.setText("Start Simulation");
             pauseSim.setEnabled(false);
+            outputStatistics.setEnabled(true);
         }
     }
 
@@ -89,6 +93,8 @@ public class UserInterface extends JFrame {
         changeSettings = new JButton("Change Settings");
         saveJunc = new JButton("Save");
         loadJunc = new JButton("Load");
+        outputStatistics = new JButton("Output Statistics");
+        outputStatistics.setEnabled(false);
 
         buttonPanel = new JPanel() {
 
@@ -127,6 +133,7 @@ public class UserInterface extends JFrame {
         buttonPanel.add(changeSettings);
         buttonPanel.add(loadJunc);
         buttonPanel.add(saveJunc);
+        buttonPanel.add(outputStatistics);
         buttonPanel.setBackground(new Color(235, 235, 235));
 
         JPanel simulationContainer = new JPanel();
@@ -153,7 +160,6 @@ public class UserInterface extends JFrame {
         this.pack();
     }
 
-    //TODO
     private void addListeners() {
 
         startSim.addActionListener(new ActionListener() { //maybe change this to be just a stop button and make the simulation run automatically. 
@@ -233,7 +239,7 @@ public class UserInterface extends JFrame {
                         super.approveSelection();
                     }
                 };
-                
+
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fileChooser.setAcceptAllFileFilterUsed(false);
                 fileChooser.addChoosableFileFilter(new CustomFilter());
@@ -253,33 +259,73 @@ public class UserInterface extends JFrame {
             }
         });
 
-        loadJunc.addActionListener(
-                new ActionListener() {
+        loadJunc.addActionListener(new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (!Simulation.isPaused()) {
-                            Simulation.pause();
-                        }
-                        final JFileChooser fileChooser = new JFileChooser();
-                        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                        fileChooser.setAcceptAllFileFilterUsed(false);
-                        fileChooser.addChoosableFileFilter(new CustomFilter());
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!Simulation.isPaused()) {
+                    Simulation.pause();
+                }
+                final JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                fileChooser.addChoosableFileFilter(new CustomFilter());
 
-                        int returnOption = fileChooser.showOpenDialog(loadJunc);
-                        if (returnOption == JFileChooser.APPROVE_OPTION) {
-                            File selectedFile = fileChooser.getSelectedFile();
-                            try {
-                                StateLoader.loadState(selectedFile);
-                                reloadGUI();
-                                updateGUI();
-                            } catch (Exception ex) {
-                                displayNotification("Error: unable to load simulation.");
-                                ex.printStackTrace();
+                int returnOption = fileChooser.showOpenDialog(loadJunc);
+                if (returnOption == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    try {
+                        StateLoader.loadState(selectedFile);
+                        reloadGUI();
+                        updateGUI();
+                    } catch (Exception ex) {
+                        displayNotification("Error: unable to load simulation.");
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        
+        outputStatistics.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                 final JFileChooser fileChooser = new JFileChooser(){
+                     @Override
+                    public void approveSelection() {
+                        File f = getSelectedFile();
+                        if (f.exists() && getDialogType() == SAVE_DIALOG) {
+                            int result = JOptionPane.showConfirmDialog(this, "This file already exists, overwrite?", "Existing file", JOptionPane.YES_NO_CANCEL_OPTION);
+                            switch (result) {
+                                case JOptionPane.YES_OPTION:
+                                    super.approveSelection();
+                                    return;
+                                case JOptionPane.NO_OPTION:
+                                    return;
+                                case JOptionPane.CANCEL_OPTION:
+                                    super.cancelSelection();
+                                    return;
                             }
                         }
+                        super.approveSelection();
                     }
-                });
+                };
+                 
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fileChooser.setAcceptAllFileFilterUsed(true);
+
+                int returnOption = fileChooser.showSaveDialog(outputStatistics);
+                if (returnOption == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    if (!selectedFile.getName().endsWith(Simulation.STATS_FILE_EXT)) {
+                        selectedFile = new File(selectedFile.getAbsolutePath().concat(Simulation.STATS_FILE_EXT));
+                    }
+                    SimulationStats.startBuffer(selectedFile.getAbsolutePath());
+                    SimulationStats.outputEvents();
+                }
+            }
+        });
+        
     }
 
     private void onUnPauseButtonPress() {
