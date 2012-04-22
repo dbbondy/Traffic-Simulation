@@ -12,27 +12,37 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * Class for loading a state file into the simulation
+ * @author Daniel Bond
+ */
 public class StateLoader {
 
+    /**
+     * Loads the state of a simulation into the program
+     * @param file the file to load in.
+     * @throws Exception 
+     */
     public static void loadState(File file) throws Exception {
-        
-        synchronized (Simulation.class) {
+       
+        //prevent processing whilst we load the file
+        synchronized (Simulation.class) { 
         
             Simulation.reset();
             
-            if (!Simulation.isPaused()) 
-                Simulation.pause();
+            if (!Simulation.isPaused()) // if not paused
+                Simulation.pause();  // pause the simulation
             
-            Simulation.start();
+            Simulation.start(); 
 
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance(); 
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(file);
 
             ArrayList<Vehicle> vehicles = new ArrayList<>();
             Junction junc = null;
 
-            NodeList detailsNodeList = doc.getElementsByTagName("details").item(0).getChildNodes();
+            NodeList detailsNodeList = doc.getElementsByTagName("details").item(0).getChildNodes(); // get all children of a element named "details"
 
             for (int i = 0; i < detailsNodeList.getLength(); i++) {
 
@@ -60,14 +70,14 @@ public class StateLoader {
                 System.out.println("");
             }
 
-            NodeList vehiclesNodeList = doc.getElementsByTagName("vehicles").item(0).getChildNodes();
+            NodeList vehiclesNodeList = doc.getElementsByTagName("vehicles").item(0).getChildNodes(); // gets all children of an element named "vehicles"
 
             for (int i = 0; i < vehiclesNodeList.getLength(); i++) {
 
                 Node vehicleNode = vehiclesNodeList.item(i);
-                if (vehicleNode.getNodeType() != Node.ELEMENT_NODE) continue;
+                if (vehicleNode.getNodeType() != Node.ELEMENT_NODE) continue; 
 
-                switch (vehicleNode.getNodeName()) {
+                switch (vehicleNode.getNodeName()) { // switch on each node name of the node list
                     case "car": vehicles.add(new Car()); break;
                     case "truck": vehicles.add(new Truck()); break;
                     default: continue;
@@ -82,7 +92,7 @@ public class StateLoader {
                 Element vehicleElm = (Element) vehicleNode;
 
                 Vehicle vehicle = vehicles.get(i);
-
+                // get the values of the variables we need to construct the simulation again.
                 String widthStr = vehicleElm.getElementsByTagName("width").item(0).getTextContent().trim();
                 String lengthStr = vehicleElm.getElementsByTagName("length").item(0).getTextContent().trim();
                 String colorStr = vehicleElm.getElementsByTagName("color").item(0).getTextContent().trim();
@@ -90,6 +100,7 @@ public class StateLoader {
                 String segmentStr = vehicleElm.getElementsByTagName("segment").item(0).getTextContent().trim();
                 String laneStr = vehicleElm.getElementsByTagName("lane").item(0).getTextContent().trim();
 
+                // parse them
                 int width = Integer.parseInt(widthStr);
                 int length = Integer.parseInt(lengthStr);
                 int speed = Integer.parseInt(speedStr);
@@ -98,6 +109,7 @@ public class StateLoader {
 
                 Color color = new Color(Integer.parseInt(colorStr));
 
+                
                 vehicle.setDimensions(width, length);
                 vehicle.setColor(color);
                 vehicle.setSpeed(speed);
@@ -109,7 +121,7 @@ public class StateLoader {
                 lane.addVehicle(vehicle);
 
             }
-
+            
             junc.updateNumberOfVehicles();
             
         }

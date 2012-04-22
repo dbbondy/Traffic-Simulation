@@ -5,19 +5,22 @@ import java.awt.Color;
 
 
 /**
- *
+ * Models a Car in the simulation
  * @author Daniel Bond
  */
 public class Car extends Vehicle {
 
+    // maximum acceleration rate of a car
     private static final int MAX_ACCELERATION_RATE = 10;
+    // maximum deceleration rate of a car
     private static final int MAX_DECELERATION_RATE = 20;
     
+    // width of a car
     private static final int WIDTH = 12;
+    // length of a car
     private static final int LENGTH = 20;
 
-    public Car() {
-    }
+    public Car() {}
 
     public Car(Lane lane) {
         super(lane, lane.getFirstSegment(), null, null, Color.RED);
@@ -54,38 +57,14 @@ public class Car extends Vehicle {
         maxDecelerationRate = MAX_DECELERATION_RATE;
     }
 
+    /**
+     *  provides the general "acting" of a car.
+     */
     @Override
     public void act() {
        
         advanceVehicle(currentSpeed);
         ai.act();
-/*
-        Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
-        Vehicle behind = currentLane.getVehicleBehind(this.getHeadSegment());
-        //if there is only ourselves in the lane, then we can just blindly accelerate up until the maximum speed
-        if (currentLane.getVehicles().size() == 1 && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
-            accelerate();
-            return;
-        }
-
-        if ((findVehDistanceAhead(ahead) == -1 || findVehDistanceAhead(ahead) > 5)
-                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
-            accelerate();
-            return;
-        }
-        
-        if(findVehDistanceAhead(ahead) != -1 && findVehDistanceAhead(ahead) <= 5  
-                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))){
-            decelerate();
-            return;
-        }
-
-        if (adjacentLaneAvailability()) {
-            adjacentLaneAvailability();
-            changeLaneAdjacent();
-            return;
-        }
-        * */
         
     }
 }

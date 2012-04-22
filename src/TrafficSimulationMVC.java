@@ -1,13 +1,10 @@
 
 import controller.Simulation;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
 import javax.swing.UIManager;
 
 /**
- *
- * @author Dan
+ * Main class of the project
+ * @author Daniel Bond
  */
 public class TrafficSimulationMVC {
  

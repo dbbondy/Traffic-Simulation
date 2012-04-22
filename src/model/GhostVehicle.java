@@ -1,16 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 import java.awt.Color;
 
 /**
- *
- * @author Dan
+ * A dummy object for use in the tree-searching algorithms from the {@link java.util.Collections} class
+ * @author Daniel Bond
  */
-
 public class GhostVehicle extends Vehicle {
     
     public GhostVehicle(Lane lane, Segment segment) {

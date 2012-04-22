@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 import controller.Simulation;
@@ -11,16 +7,17 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 /**
- *
- * @author Dan
+ * Models the Driver AI of the vehicles in the simulation
+ * @author Daniel Bond
  */
 public class DriverAI {
 
+    // distance from the end of the safe lane change
     public static final int DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE = 100;
     // extra distance to allow us to slow down gradually before a corner
     public static final int CORNER_STOP_TIME_DISTANCE = 10; 
-    
-    public static final int CORNER_STOP_DISTANCE = 100; //the distance from the corner that we should consider slowing down 
+    //the distance from the corner that we should consider slowing down 
+    public static final int CORNER_STOP_DISTANCE = 100; 
     
     protected Vehicle vehicle;
     protected Desire desire; // TODO: auto routing based on desired destination!
@@ -36,6 +33,9 @@ public class DriverAI {
         getSafeLaneChangeIndex();
     }
 
+    /**
+     * Gets the last point of a lane in which we can change lanes to turn a corner.
+     */
     protected void getSafeLaneChangeIndex() {
         ArrayList<Segment> laneSegments = vehicle.getLane().getLaneSegments();
         for (int i = 0; i < laneSegments.size(); i++) {
@@ -46,6 +46,9 @@ public class DriverAI {
         }
     }
 
+    /**
+     * performs the general "acting" of the intelligence.
+     */
     public void act() {
         int stoppingTimeDistance = ((vehicle.getSpeed()) / (vehicle.getMaxDecelerationRate())); // number of time steps it will take to stop
         int crashTimeDistance = Integer.MIN_VALUE;
@@ -67,6 +70,10 @@ public class DriverAI {
 
     }
 
+    /**
+     * Determines if we are in proximity of final point of which we can change lanes
+     * @return <code> true </code> if we are in proximity of the final point of lane changing. <code> false </code> otherwise.
+     */
     private boolean safeLaneChangeProximity() {
         // TODO: PROBABLY SHOULD DO: this only works if we expect to change lane for 1 reason
         // what if we have 2 reasons to change lane
@@ -81,15 +88,19 @@ public class DriverAI {
         return false;
     }
 
+    /**
+     * Performs the AI related to travelling in a straight lane
+     * @param stoppingTimeDistance the time distance it would take for this vehicle to stop
+     * @param crashTimeDistance the time distance it would take for this vehicle to crash into the vehicle in front, if that vehicle was going at 0 speed
+     */
     protected void performStraightLaneAI(int stoppingTimeDistance, int crashTimeDistance) {
         
         if (crashTimeDistance == Integer.MIN_VALUE) { //if there is no car in our lane
-            
             vehicle.accelerate(vehicle.getMaxAccelerationRate()); 
             return;
         }
         
-        if(approachingTurn(vehicle.getHeadSegment(), stoppingTimeDistance)){ // if we are approaching a turn
+        if(approachingTurn(vehicle.getHeadSegment())){ // if we are approaching a turn
             int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
             int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
             vehicle.decelerate(decelerationRate); 
@@ -125,7 +136,12 @@ public class DriverAI {
         
     }
     
-    protected boolean approachingTurn(Segment s, int stoppingTimeDistance){
+    /**
+     * Determines if the vehicle is approaching a lane turn
+     * @param s the segment we are currently at in the lane
+     * @return <code> true </code> if we are approaching the turn. <code> false </code> otherwise.
+     */
+    protected boolean approachingTurn(Segment s){
         Segment overlappingSegment = findOverlappingSegment(s);
         if(overlappingSegment != null){
             int distanceFromTurn = (overlappingSegment.id() - s.id());
@@ -140,6 +156,12 @@ public class DriverAI {
         
     }
     
+    /**
+     * Finds the first instance of a overlapping segment in the lane of the parameter <code> s </code>
+     * @param s the segment of the lane we want to find an overlapping segment for.
+     * @return <code> null </code> if there was no overlapping segment found for this segments lane. 
+     * @return otherwise we return the reference of the first instance of an overlapping segment
+     */
     private Segment findOverlappingSegment(Segment s){
         Segment overlappingSegment = null;
         Lane segmentLane = s.getLane();
@@ -159,13 +181,16 @@ public class DriverAI {
         return overlappingSegment;
     }
     
-    
-
+    /**
+     * Intelligence for determining if we can change lanes or not.
+     * @param stoppingTimeDistance the time distance it would take for our vehicle to come to a halt.
+     * @param crashTimeDistance the time distance it would take us to crash into the vehicle in front, should its speed be 0.
+     */
     private void decideLaneChangeDecision(int stoppingTimeDistance, int crashTimeDistance) {
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
         Lane adjacentLane = adjacentSeg.getLane();
         if (adjacentLane.getVehicles().isEmpty()) {
-            changeLane(adjacentSeg, adjacentLane);
+            changeLane(adjacentSeg);
             return;
         } else {
             Vehicle otherVehicle = null;
@@ -204,7 +229,7 @@ public class DriverAI {
         }
 
         if (crashTimeDistance > stoppingTimeDistance) { // if we can stop should the vehicle in front be at speed 0
-            changeLane(adjacentSeg, adjacentLane);
+            changeLane(adjacentSeg);
         } else {
             int distanceBeforeLaneChange = safeLaneChangeID - vehicle.getHeadSegment().id();
             if(distanceBeforeLaneChange < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE){
@@ -221,6 +246,11 @@ public class DriverAI {
 
     }
 
+    /**
+     * Gets the immediately adjacent segment to the parameter of this function
+     * @param s the segment we want to retrieve the immediately adjacent segment of
+     * @return <code> null </code> if no adjacent segments were found, otherwise we return the reference of the adjacent segment.
+     */
     private Segment getAdjacentSegment(Segment s) {
         Segment adjacentSeg = null;
         Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
@@ -247,6 +277,13 @@ public class DriverAI {
         return adjacentSeg;
     }
 
+    /**
+     * Gets the overlapping segment from the passed in segment. 
+     * This method assumes that we are immediately connected to an overlapping segment.
+     * If the programmer wishes to search a lane for an overlapping segment, use the <code> findOverlappingSegment(...) </code> function.
+     * @param s the segment we want to retrieve the overlapped segment from.
+     * @return the overlapped segment. <code> null </code> is returned if there is no overlapped segment to be found.
+     */
     private Segment getOverlapSegment(Segment s) {
         Segment overlapSeg = null;
         Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
@@ -260,29 +297,28 @@ public class DriverAI {
         return overlapSeg;
     }
 
-    protected Desire getDesire() {
-        return desire;
-    }
-
-    protected Lane getOverlapLane(Segment s) {
-        Segment overlapSeg = getOverlapSegment(s);
-        return overlapSeg.getLane();
-    }
-
+    
+    /**
+     * Turns the corner of the lane that overlaps with the current lane the vehicle resides on.
+     */
     protected void turnCorner() {
         Segment overlapSeg = getOverlapSegment(vehicle.getHeadSegment());
-        Lane overlapLane = getOverlapLane(vehicle.getHeadSegment());
-        vehicle.setHeadSegment(overlapSeg);
+        Lane overlapLane = overlapSeg.getLane();
+        vehicle.getLane().removeVehicle(vehicle);
         overlapLane.addVehicle(vehicle);
+        vehicle.setHeadSegment(overlapSeg);
+        
     }
 
-    protected void changeLane(Segment adjacentSeg, Lane lane) {
+    /**
+     * Changes the lane of the vehicle to the lane of the <code> adjacentSeg </code> parameter 
+     * @param adjacentSeg the adjacent segment whose lane we want to move into
+     */
+    protected void changeLane(Segment adjacentSeg) {
         vehicle.getLane().removeVehicle(vehicle);
+        Lane lane = adjacentSeg.getLane();
         lane.addVehicle(vehicle);        
         vehicle.setHeadSegment(adjacentSeg);
     }
 
-    protected boolean isSafeDistanceAhead() {
-        return false;
-    }
 }

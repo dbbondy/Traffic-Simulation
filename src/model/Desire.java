@@ -1,12 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package model;
 
 /**
- *
- * @author Dan
+ * Enumeration to denote different desires that a vehicle may have about its journey.
+ * @author Daniel Bond
  */
 public enum Desire {
     

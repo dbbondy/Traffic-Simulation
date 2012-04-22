@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package model;
 
 /**
- *
+ * Enumeration to denote different types of lane connections between one another
  * @author Daniel Bond
  */
 public enum ConnectionType {

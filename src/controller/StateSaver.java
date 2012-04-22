@@ -13,10 +13,20 @@ import model.junctions.Junction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * Class for saving the state of a simulation to a file
+ * @author Daniel Bond
+ */
 public class StateSaver {
 
+    /**
+     * Save the state of the simulation to a file
+     * @param file the file to save the data to
+     * @throws Exception 
+     */
     public static void saveState(File file) throws Exception {
         
+        //prevent processing whilst we save the file
         synchronized (Simulation.class) {
 
             // We only need a fraction of the information stored by Java
@@ -25,7 +35,7 @@ public class StateSaver {
             // Note that if we tried to serialize using standard means
             // we would have thousands of segments that needed storing. 
 
-            DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance(); 
             DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
             Document doc = docBuilder.newDocument();
 
@@ -39,8 +49,9 @@ public class StateSaver {
             Junction junc = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
             ArrayList<Vehicle> vehicles = junc.getVehicles();
 
-            for (Vehicle vehicle : vehicles) {
+            for (Vehicle vehicle : vehicles) { // for all vehicles in the junction
 
+                // store the relevant information 
                 Segment segment = vehicle.getHeadSegment();
                 Lane lane = segment.getLane();
 
@@ -51,6 +62,7 @@ public class StateSaver {
                 if (vehicle instanceof Truck)
                     type = "truck";
 
+                // create elements for the values
                 Element vehicleElm = doc.createElement(type);
                 Element widthElm = doc.createElement("width");
                 Element lengthElm = doc.createElement("length");
@@ -59,7 +71,7 @@ public class StateSaver {
                 Element segmentElm = doc.createElement("segment");
                 Element laneElm = doc.createElement("lane");
 
-
+                // store the values from each individual vehicle
                 String width = Integer.toString(vehicle.getWidth());
                 String length = Integer.toString(vehicle.getLength());
                 String color = Integer.toString(vehicle.getColor().getRGB());
@@ -67,6 +79,7 @@ public class StateSaver {
                 String segmentIndex = Integer.toString(lane.getLaneSegments().indexOf(segment));
                 String laneIndex = Integer.toString(junc.getLanes().indexOf(lane));
 
+                // append the data to the vehicle element
                 vehicleElm.appendChild(widthElm);
                 vehicleElm.appendChild(lengthElm);
                 vehicleElm.appendChild(colorElm);
@@ -74,17 +87,20 @@ public class StateSaver {
                 vehicleElm.appendChild(segmentElm);
                 vehicleElm.appendChild(laneElm);
 
+                // set the content of each of element.
                 widthElm.setTextContent(width);
                 lengthElm.setTextContent(length);
                 colorElm.setTextContent(color);
                 speedElm.setTextContent(speed);
                 segmentElm.setTextContent(segmentIndex);
                 laneElm.setTextContent(laneIndex);
-
+                
+                // append the singular vehicle element to the plural vehicles element as a child
                 vehiclesElm.appendChild(vehicleElm);
 
             }
-
+            
+            // get the values from the environment variables and the count of vehicles passed through the junction
             String timeStep = ((Integer) Simulation.getOption(Simulation.TIME_STEP)).toString();
             String junction = ((Junction) Simulation.getOption(Simulation.JUNCTION_TYPE)).toString();
             String minDensity = ((Integer) Simulation.getOption(Simulation.MIN_DENSITY)).toString();
@@ -96,6 +112,7 @@ public class StateSaver {
             String carCount = Integer.toString(SimulationStats.getCarCount());
             String truckCount = Integer.toString(SimulationStats.getTruckCount());
 
+            // create elements for these values
             Element timeStepElm = doc.createElement(Simulation.TIME_STEP);
             Element junctionElm = doc.createElement(Simulation.JUNCTION_TYPE);
             Element minDensityElm = doc.createElement(Simulation.MIN_DENSITY);
@@ -107,6 +124,7 @@ public class StateSaver {
             Element carCountElm = doc.createElement("carCount");
             Element truckCountElm = doc.createElement("truckCount");
 
+            // set the text content of these values
             timeStepElm.setTextContent(timeStep);
             junctionElm.setTextContent(junction);
             minDensityElm.setTextContent(minDensity);
@@ -118,6 +136,7 @@ public class StateSaver {
             carCountElm.setTextContent(carCount);
             truckCountElm.setTextContent(truckCount);
 
+            // we then append the values to the details element
             detailsElm.appendChild(timeStepElm);
             detailsElm.appendChild(junctionElm);
             detailsElm.appendChild(minDensityElm);
