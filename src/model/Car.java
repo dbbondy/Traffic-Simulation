@@ -1,8 +1,6 @@
 package model;
 
-
 import java.awt.Color;
-
 
 /**
  * Models a Car in the simulation
@@ -57,9 +55,6 @@ public class Car extends Vehicle {
         maxDecelerationRate = MAX_DECELERATION_RATE;
     }
 
-    /**
-     *  provides the general "acting" of a car.
-     */
     @Override
     public void act() {
        

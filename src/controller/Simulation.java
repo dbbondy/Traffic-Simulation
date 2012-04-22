@@ -117,7 +117,7 @@ public class Simulation {
             return;
         }
         reset();
-        ui.reloadGUI();
+        ui.clearJunctionCache();
         ui.updateGUI();
         if (paused == true) { // if we were paused beforehand
             paused = false; // we are not paused anymore
@@ -199,7 +199,7 @@ public class Simulation {
             setOption(TIME_STEP, 0);
             started = false;
             paused = false;
-            ui.reloadGUI();
+            ui.clearJunctionCache();
             ui.updateGUI();
         }
 

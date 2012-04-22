@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
 import controller.Simulation;
@@ -16,21 +12,22 @@ import javax.swing.filechooser.FileFilter;
 import model.SimulationStats;
 
 /**
+ * The Main User Interface class for the program
  *
- * @author Dan
+ * @author Daniel Bond
  */
 public class UserInterface extends JFrame {
 
-    private Container contentPane;
-    private JPanel buttonPanel;
-    private JButton startSim;
+    private Container contentPane; // the content pane for this window
+    private JPanel buttonPanel; // panel for the buttons
+    private JButton startSim; //buttons for the interface
     private JButton pauseSim;
     private JButton changeSettings;
     private JButton saveJunc;
     private JButton loadJunc;
     private JButton outputStatistics;
-    private DetailsPanel detailPanel;
-    private SimulationPanel simPanel;
+    private DetailsPanel detailPanel; // details panel with all environment details information
+    private SimulationPanel simPanel; // simulation panel displaying the junction in a rendered state.
 
     public UserInterface() {
         super("Traffic Simulation");
@@ -40,6 +37,9 @@ public class UserInterface extends JFrame {
         this.setVisible(true);
     }
 
+    /**
+     * Update the GUI with the latest values and repaint the rendering area
+     */
     public void updateGUI() {
 
         detailPanel.setTimeText(Simulation.getOption(Simulation.TIME_STEP).toString());
@@ -55,27 +55,33 @@ public class UserInterface extends JFrame {
         simPanel.repaint();
     }
 
-    public void reloadGUI() {
+    /**
+     * Clears the junction from the GUI
+     */
+    public void clearJunctionCache() {
         simPanel.clearCache();
     }
 
+    /**
+     * Updates the buttons editable states to reflect the current simulation state
+     */
     private void updateButtonState() {
 
         if (Simulation.isPaused() && !Simulation.isStarted()) { //if paused and simulation stopped
             pauseSim.setText("Pause Simulation");
             startSim.setText("Start Simulation");
             pauseSim.setEnabled(false);
-            
+
         } else if (Simulation.isPaused() && Simulation.isStarted()) { // if paused and simulated is running
             pauseSim.setText("Resume Simulation");
             startSim.setText("Stop Simulation");
             pauseSim.setEnabled(true);
-            
+
         } else if (!Simulation.isPaused() && Simulation.isStarted()) { // if not paused and simulation is running
             pauseSim.setText("Pause Simulation");
             startSim.setText("Stop Simulation");
             pauseSim.setEnabled(true);
-           
+
         } else if (!Simulation.isPaused() && !Simulation.isStarted()) { //if not paused and not started
             pauseSim.setText("Pause Simulation");
             startSim.setText("Start Simulation");
@@ -84,8 +90,10 @@ public class UserInterface extends JFrame {
         }
     }
 
+    /**
+     * Initialise the components
+     */
     private void initComponents() {
-
         contentPane = this.getContentPane();
         startSim = new JButton("Start Simulation");
         pauseSim = new JButton("Pause Simulation");
@@ -123,11 +131,12 @@ public class UserInterface extends JFrame {
         this.getContentPane().setPreferredSize(size);
         this.getContentPane().setMaximumSize(size);
         this.setResizable(false);
-
     }
 
+    /**
+     * Add the components to their respective containers
+     */
     private void addComponents() {
-
         buttonPanel.add(startSim);
         buttonPanel.add(pauseSim);
         buttonPanel.add(changeSettings);
@@ -160,6 +169,9 @@ public class UserInterface extends JFrame {
         this.pack();
     }
 
+    /**
+     * Add listeners to components that require them
+     */
     private void addListeners() {
 
         startSim.addActionListener(new ActionListener() { //maybe change this to be just a stop button and make the simulation run automatically. 
@@ -185,7 +197,7 @@ public class UserInterface extends JFrame {
                     Simulation.pause();
                     updateButtonState();
                     detailPanel.repaint();
-                    onUnPauseButtonPress();
+                    onResume();
                 } else { //pause the simulation
                     Simulation.pause();
                     updateButtonState();
@@ -221,7 +233,7 @@ public class UserInterface extends JFrame {
                 final JFileChooser fileChooser = new JFileChooser() {
 
                     @Override
-                    public void approveSelection() {
+                    public void approveSelection() { // provide functionality to ask user if they want to overwrite an existing file
                         File f = getSelectedFile();
                         if (f.exists() && getDialogType() == SAVE_DIALOG) {
                             int result = JOptionPane.showConfirmDialog(this, "This file already exists, overwrite?", "Existing file", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -244,13 +256,13 @@ public class UserInterface extends JFrame {
                 fileChooser.setAcceptAllFileFilterUsed(false);
                 fileChooser.addChoosableFileFilter(new CustomFilter());
                 int returnOption = fileChooser.showSaveDialog(saveJunc);
-                if (returnOption == JFileChooser.APPROVE_OPTION) {
+                if (returnOption == JFileChooser.APPROVE_OPTION) { // if the user clicked "save"
                     File selectedFile = fileChooser.getSelectedFile();
                     if (!selectedFile.getName().endsWith(Simulation.FILE_EXT)) {
                         selectedFile = new File(selectedFile.getAbsolutePath().concat(Simulation.FILE_EXT));
                     }
                     try {
-                        StateSaver.saveState(selectedFile);
+                        StateSaver.saveState(selectedFile); // save the state of the simulation
                     } catch (Exception ex) {
                         displayNotification("Error: unable to save simulation.");
                         ex.printStackTrace();
@@ -263,8 +275,8 @@ public class UserInterface extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!Simulation.isPaused()) {
-                    Simulation.pause();
+                if (!Simulation.isPaused()) { // if we aren't paused
+                    Simulation.pause(); // pause it
                 }
                 final JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -275,8 +287,8 @@ public class UserInterface extends JFrame {
                 if (returnOption == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     try {
-                        StateLoader.loadState(selectedFile);
-                        reloadGUI();
+                        StateLoader.loadState(selectedFile); // load the selected simulation file in
+                        clearJunctionCache();
                         updateGUI();
                     } catch (Exception ex) {
                         displayNotification("Error: unable to load simulation.");
@@ -285,14 +297,15 @@ public class UserInterface extends JFrame {
                 }
             }
         });
-        
+
         outputStatistics.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                 final JFileChooser fileChooser = new JFileChooser(){
-                     @Override
-                    public void approveSelection() {
+                final JFileChooser fileChooser = new JFileChooser() {
+
+                    @Override
+                    public void approveSelection() {// provide functionality to ask user if they want to overwrite an existing file
                         File f = getSelectedFile();
                         if (f.exists() && getDialogType() == SAVE_DIALOG) {
                             int result = JOptionPane.showConfirmDialog(this, "This file already exists, overwrite?", "Existing file", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -310,14 +323,14 @@ public class UserInterface extends JFrame {
                         super.approveSelection();
                     }
                 };
-                 
+
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fileChooser.setAcceptAllFileFilterUsed(true);
 
                 int returnOption = fileChooser.showSaveDialog(outputStatistics);
-                if (returnOption == JFileChooser.APPROVE_OPTION) {
+                if (returnOption == JFileChooser.APPROVE_OPTION) { // if the user clicked "save"
                     File selectedFile = fileChooser.getSelectedFile();
-                    if (!selectedFile.getName().endsWith(Simulation.STATS_FILE_EXT)) {
+                    if (!selectedFile.getName().endsWith(Simulation.STATS_FILE_EXT)) { // if the file does not include the default file extension for text output
                         selectedFile = new File(selectedFile.getAbsolutePath().concat(Simulation.STATS_FILE_EXT));
                     }
                     SimulationStats.startBuffer(selectedFile.getAbsolutePath());
@@ -325,32 +338,53 @@ public class UserInterface extends JFrame {
                 }
             }
         });
-        
+
     }
 
-    private void onUnPauseButtonPress() {
+    /**
+     * Notifies the secondary simulation processing thread to resume
+     */
+    private void onResume() {
         synchronized (Simulation.getSimulationThread()) {
             Simulation.getSimulationThread().notify();
         }
     }
 
+    /**
+     * Helper method to display notifications to the user
+     *
+     * @param message the message to display to the user
+     */
     private void displayNotification(String message) {
         JOptionPane.showMessageDialog(this,
                 message,
                 "Notification",
                 JOptionPane.INFORMATION_MESSAGE);
     }
-}
 
-class CustomFilter extends FileFilter {
+    /**
+     * Custom file filter for open and save dialogs on the file system
+     * @author Daniel Bond
+     */
+    private class CustomFilter extends FileFilter {
 
-    @Override
-    public boolean accept(File f) {
-        return (f.getName().endsWith(Simulation.FILE_EXT));
-    }
+        /**
+         * Predicate to determine if a file is accepted by the filter
+         * @param f the file to check
+         * @return <code> true </code> if the file is accepted by the filter. <code> false </code> otherwise
+         */
+        @Override
+        public boolean accept(File f) {
+            return (f.getName().endsWith(Simulation.FILE_EXT));
+        }
 
-    @Override
-    public String getDescription() {
-        return "Traffic Simulation";
+        /**
+         * Gets the description of this custom file filter
+         * @return the description of this custom file filter.
+         */
+        @Override
+        public String getDescription() {
+            return "Traffic Simulation";
+        }
     }
 }

@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package view;
 
 import controller.Simulation;
@@ -15,12 +12,12 @@ import javax.swing.border.Border;
 import model.SimulationStats;
 
 /**
- *
- * @author Dan
+ * Class for the panel of details explaining what the values of the simulation currently are.
+ * @author Daniel Bond
  */
 public class DetailsPanel extends JPanel {
 
-    private JLabel vehicleMinDensityDetail;
+    private JLabel vehicleMinDensityDetail; // create labels for the details
     private JLabel vehicleMaxDensityDetail;
     private JLabel carAggressiveDetail;
     private JLabel ratioCarsDetail;
@@ -30,10 +27,9 @@ public class DetailsPanel extends JPanel {
     private JLabel carsTr;
     private JLabel trucksTr;
     
-    private JLabel editing;
+    private JLabel editing; // for use when we use advanced keyboard editing of JLabel values
+    private static final String KEYBOARD_LABEL_DEFAULT_VALUE = "      ";
 
-    
-    
     public DetailsPanel() {
         super();
         initComponents();
@@ -43,8 +39,12 @@ public class DetailsPanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
     }
 
+    /**
+     * Initialise the components of this panel
+     */
     private void initComponents() {
         
+        // create the detail labels and add them to panels along with their values
         JLabel vehicleMinDensityDetailL = new JLabel("Vehicle Minimum Density");
         vehicleMinDensityDetail = new JLabel(Simulation.getOption(Simulation.MIN_DENSITY).toString());
         JPanel vehicleMinDensityDetailP = new JPanel();
@@ -127,6 +127,7 @@ public class DetailsPanel extends JPanel {
         
         Border padding = BorderFactory.createEmptyBorder(0, 10, 0, 10);
         
+        // set the borders of the detail labels
         vehicleMinDensityDetailP.setBorder(padding);
         vehicleMaxDensityDetailP.setBorder(padding);
         carAggressiveDetailP.setBorder(padding);
@@ -141,6 +142,7 @@ public class DetailsPanel extends JPanel {
         
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         
+        // add the components
         this.add(vehicleMinDensityDetailP);
         this.add(vehicleMaxDensityDetailP);
         this.add(carAggressiveDetailP);
@@ -154,30 +156,31 @@ public class DetailsPanel extends JPanel {
         this.add(carsTrP);
         this.add(trucksTrP);
         
+        // add ability to edit some of the labels from the keyboard
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
         .addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 synchronized (Simulation.class) {
-                    if (e.getID() == KeyEvent.KEY_PRESSED && editing != null) {
-                        if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
-                            if (editing.getText().equals("      ")) editing.setText("");
-                            editing.setText(editing.getText() + e.getKeyChar());
+                    if (e.getID() == KeyEvent.KEY_PRESSED && editing != null) { // if we pressed a key and there is no label being currently edited
+                        if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') { 
+                            if (editing.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) editing.setText("");
+                            editing.setText(editing.getText() + e.getKeyChar()); // set the text that we input
                             e.consume();
                             return true;
                         }
-                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                            finishEditing();
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) { // if we pressed enter
+                            finishEditing(); // stop editing the label
                             e.consume();
                             return true;
                         }
-                        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                            if (!editing.getText().equals("      ")) {
-                                if (editing.getText().length() == 1) {
-                                    editing.setText("      ");
+                        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) { // if we wanted to delete a character
+                            if (!editing.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) {
+                                if (editing.getText().length() == 1) { // if there was only one character to begin with
+                                    editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE); // go back to default value
                                     e.consume();
                                     return true;
-                                } else {
+                                } else { // else we just delete the end character of the string
                                     editing.setText(editing.getText().substring(0, editing.getText().length()-2));
                                     e.consume();
                                     return true;
@@ -189,20 +192,21 @@ public class DetailsPanel extends JPanel {
                 }
             }
         });
-        
+        // create the mouse listener so that we can click on the labels and edit the values
         MouseListener ml = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    if (!Simulation.isPaused()) Simulation.pause();
+                    if (!Simulation.isPaused()) // if we weren't paused
+                        Simulation.pause(); // pause it
                     finishEditing();
                     editing = (JLabel) e.getSource();
                     editing.setBackground(new Color(10*16+1, 14*16+6, 15*16+7)); // a1d6f7
                     editing.setOpaque(true);
-                    editing.setText("      ");
+                    editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE);
                 }
             }
         };
-        
+        // add the mouse listener to the appropriate labels we want to be able to edit
         vehicleMaxDensityDetail.addMouseListener(ml);
         vehicleMinDensityDetail.addMouseListener(ml);
         carAggressiveDetail.addMouseListener(ml);
@@ -212,19 +216,22 @@ public class DetailsPanel extends JPanel {
         
     }
     
-    void finishEditing(){
-        if (editing != null) {
+    /**
+     * Sets the values of the labels to the environment variables so the changes come into effect
+     */
+    public void finishEditing(){
+        if (editing != null) { // if we are editing a label
             JLabel edited = editing;
             editing.setBackground(null);
             editing.setOpaque(false);
             editing = null;
-            if (edited.getText().equals("      ")) {
+            if (edited.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) {
                 edited.setText(Integer.toString((Integer) Simulation.getOption(edited.getName())));
             } else {
                 try {
                     int value = Integer.parseInt(edited.getText());                    
                     if (edited.getName().equals(Simulation.MAX_DENSITY)) {
-                        if (value > 100) {
+                        if (value > SettingsWindow.MAX_DENSITY_MAXIMUM) {
                             throw new RuntimeException(SettingsWindow.DENSITY_RANGE_ERROR);
                         }
                         if (value < (Integer) Simulation.getOption(Simulation.MIN_DENSITY)) {                            
@@ -232,7 +239,7 @@ public class DetailsPanel extends JPanel {
                         }
                     }                    
                     if (edited.getName().equals(Simulation.MIN_DENSITY)) {
-                        if (value > 100) {
+                        if (value > SettingsWindow.MIN_DENSITY_MAXIMUM) {
                             throw new RuntimeException(SettingsWindow.DENSITY_RANGE_ERROR);
                         }
                         if (value > (Integer) Simulation.getOption(Simulation.MAX_DENSITY)) {                            
@@ -240,12 +247,12 @@ public class DetailsPanel extends JPanel {
                         }
                     }                    
                     if (edited.getName().equals(Simulation.AGGRESSION)) {
-                        if (value > 100) {
+                        if (value > SettingsWindow.AGGRESSION_MAXIMUM) {
                             throw new RuntimeException(SettingsWindow.AGGRESSION_RANGE_ERROR);
                         }
                     }
                     if(edited.getName().equals(Simulation.MAXIMUM_SPEED)){
-                        if(value > 800){
+                        if(value > SettingsWindow.MAXIMUM_SPEED_MAXIMUM){
                             throw new RuntimeException(SettingsWindow.MAXIMUM_SPEED_ERROR);
                         }
                     }
@@ -259,46 +266,82 @@ public class DetailsPanel extends JPanel {
         }
     }
 
-    void setTimeText(String s){
+    /**
+     * Sets the time label with the given text
+     * @param s the string to set as the text
+     */
+    public void setTimeText(String s){
         finishEditing();
         timeDetail.setText(s);
     }
     
-    void setVehicleMinDensityText(String s) {
+    /**
+     * Sets the minimum density label with the given text
+     * @param s the string to set as the text
+     */
+    public void setVehicleMinDensityText(String s) {
         finishEditing();
         vehicleMinDensityDetail.setText(s);
     }
     
-    void setVehicleMaxDensityText(String s){
+    /**
+     * Sets the maximum density label with the given text
+     * @param s the string to set as the text
+     */
+    public void setVehicleMaxDensityText(String s){
         finishEditing();
         vehicleMaxDensityDetail.setText(s);
     }
     
-    void setVehicleAggressionText(String s){
+    /**
+     * Sets the vehicle aggression label with the given text
+     * @param s the string to set as the text
+     */
+    public void setVehicleAggressionText(String s){
         finishEditing();
         carAggressiveDetail.setText(s);
     }
     
-    void setRatioCarsText(String s){
+    /**
+     * Sets the ratio of cars label with the given text
+     * @param s the string to set as the text
+     */
+    public void setRatioCarsText(String s){
         finishEditing();
         ratioCarsDetail.setText(s);
     }
     
-    void setRatioTrucksText(String s){
+    /**
+     * Sets the ratio of trucks label with the given text
+     * @param s the string to set as the text
+     */
+    public void setRatioTrucksText(String s){
         finishEditing();
         ratioTrucksDetail.setText(s);
     }
     
-    void setMaximumSpeedText(String s){
+    /**
+     * Sets the maximum speed label with the given text
+     * @param s the string to set as the text
+     */
+    public void setMaximumSpeedText(String s){
         finishEditing();
         maximumSpeedDetail.setText(s);
     }
     
-    void setCarCountText(String s){
+    /**
+     * Sets the car counter label with the given text
+     * @param s the string to set as the text
+     */
+    public void setCarCountText(String s){
         carsTr.setText(s);
     }
     
-    void setTruckCountText(String s){
+    /**
+     * Sets the truck counter label with the given text
+     * @param s the string to set as the text
+     */
+    public void setTruckCountText(String s){
         trucksTr.setText(s);
     }
 }

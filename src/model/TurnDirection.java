@@ -1,12 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 /**
- *
- * @author Dan
+ * Enumeration of all possible directions that a road can offer a vehicle
+ * @author Daniel Bond
  */
 public enum TurnDirection {
     

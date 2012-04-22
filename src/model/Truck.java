@@ -4,16 +4,19 @@ import controller.Simulation;
 import java.awt.Color;
 
 /**
- *
+ * Models a Truck in the simulation
  * @author Daniel Bond
  */
 public class Truck extends Vehicle{
     
+    // the width of the truck
     private static final int WIDTH = 14;
+    // the length of the truck
     private static final int LENGTH = 30;
+    //the maximum rate of acceleration that a truck can do
     private static final int MAX_ACCELERATION_RATE = 5;
+    // the maximum rate of deceleration that a truck can do
     private static final int MAX_DECELERATION_RATE = 15;
-    // TODO: add max accel etc here
     
     public Truck() {}
     
@@ -51,42 +54,10 @@ public class Truck extends Vehicle{
         maxAccelerationRate = MAX_ACCELERATION_RATE;
         maxDecelerationRate = MAX_DECELERATION_RATE;
     }
-
+    
     @Override
     public void act() {
-        
         advanceVehicle(currentSpeed);
         ai.act();
-        /*
-        System.out.println("this " + this.getHeadSegment());
-        System.out.println("last " + currentLane.getLastSegment());
-        
-
-        Vehicle ahead = currentLane.getVehicleAhead(this.getHeadSegment());
-        Vehicle behind = currentLane.getVehicleBehind(this.getHeadSegment());
-        //if there is only ourselves in the lane, then we can just blindly accelerate up until the maximum speed
-        if (currentLane.getVehicles().size() == 1 && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
-            accelerate();
-            return;
-        }
-
-        if ((findVehDistanceAhead(ahead) == -1 || findVehDistanceAhead(ahead) > 5)
-                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))) {
-            accelerate();
-            return;
-        }
-        
-        if(findVehDistanceAhead(ahead) != -1 && findVehDistanceAhead(ahead) <= 5  
-                && (currentSpeed < (Integer) Simulation.getOption(Simulation.MAXIMUM_SPEED))){
-            decelerate();
-            return;
-        }
-
-        if (adjacentLaneAvailability()) {
-            changeLaneAdjacent();
-            return;
-        }
-        */
     }
-    
 }

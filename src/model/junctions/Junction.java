@@ -9,41 +9,60 @@ import java.util.Set;
 import model.*;
 
 /**
- *
- * @author Dan
+ * Abstract representation of a Junction
+ * @author Daniel Bond
  */
 public abstract class Junction {
 
-    private static HashMap<String, Class> namedJunctionClasses = new HashMap<>();
-    protected static final Color CAR_COLOR = new Color(0, 102, 153);
-    protected static final Color TRUCK_COLOR = new Color(153, 0, 0);
-    protected int numberOfVehicles;
-    protected Random random;
-    private ArrayList<Lane> lanes = new ArrayList<>();
-    private int variableDensityCounter = 0;
-    private int variableDensity = 0;
+    private static HashMap<String, Class> namedJunctionClasses = new HashMap<>(); // the names of each of the registered junction classes
+    protected static final Color CAR_COLOR = new Color(0, 102, 153); // colour of cars in the junction
+    protected static final Color TRUCK_COLOR = new Color(153, 0, 0); // colour of trucks in the junction
+    protected int numberOfVehicles; // number of vehicles in the junction
+    protected Random random; // random number generator
+    private ArrayList<Lane> lanes = new ArrayList<>(); // collection of lanes in the junction
+    private int variableDensityCounter = 0; // counter for determining when we find a new density 
+    private int variableDensity = 0; // variable density value for varying the number of vehicles that can be instantiated
 
     public Junction() {
         random = Randomizer.getInstance();
         numberOfVehicles = 0;
     }
 
-    public static void registerJunctionType(Class cls) {
+    /**
+     * Registers a junction by its class reference.
+     * If the junction declares a field with its "name" stored in it, then the junction is registered successfully.
+     * If the junction we want to register does not declare a field named "name" then this method throws a {@link java.lang.NoSuchFieldException}
+     * @param c the class object of the Junction we want to register
+     */
+    public static void registerJunctionType(Class c) {
         try {
-            namedJunctionClasses.put((String) cls.getDeclaredField("name").get(cls), cls);
-        } catch (Exception e) {
+            namedJunctionClasses.put((String) c.getDeclaredField("name").get(c), c);
+            
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Gets a junction type by its name
+     * @param name the name to look up
+     * @return the class object of the junction. Returns <code> null </code> if there was no junction with the name specified.
+     */
     public static Class getJunctionTypeByName(String name) {
         return namedJunctionClasses.get(name);
     }
 
+    /**
+     * Gets the set of junction names stored 
+     * @return the set of junction names
+     */
     public static Set<String> getJunctionNames() {
         return namedJunctionClasses.keySet();
     }
 
+    /**
+     * Removes all vehicles from the junction
+     */
     public void removeVehicles() {
         numberOfVehicles = 0;
         for (Lane lane : lanes) {
@@ -51,6 +70,10 @@ public abstract class Junction {
         }
     }
 
+    /**
+     * Gets all the vehicles contained in the junction
+     * @return the collection of all vehicles in the junction
+     */
     public ArrayList<Vehicle> getVehicles() {
         ArrayList<Vehicle> allVehicles = new ArrayList<>();
         for (Lane lane : lanes) {
@@ -59,13 +82,21 @@ public abstract class Junction {
         return allVehicles;
     }
 
+    /**
+     * Updates the numberOfVehicles in the junction
+     */
     public void updateNumberOfVehicles() {
         numberOfVehicles = getVehicles().size();
     }
 
+    /**
+     * Distributes new cars given a ratio of cars and trucks
+     * @param cars the cars value of the ratio
+     * @param trucks the trucks value of the ratio
+     */
     public void distributeNewCars(int cars, int trucks) {
 
-        if (random.nextInt(5) == 0) {
+        if (random.nextInt(5) == 0) { // we don't always want to distribute new cars every time step, so if a random number is 0 we don't do anything
             return;
         }
 
@@ -80,7 +111,7 @@ public abstract class Junction {
 
         int localVariableDensity = variableDensity;
 
-        if (numberOfVehicles < localVariableDensity) {
+        if (numberOfVehicles < localVariableDensity) { // we still need to make vehicles as numberOfVehicles < localVariableDensity
             Lane l = chooseLane();
             if (l != null) {
                 generateVehicle(l, cars, trucks);
@@ -88,19 +119,29 @@ public abstract class Junction {
         }
     }
 
+    /**
+     * Generates a vehicle with a random distribution and instantiation ratio
+     * @param l the lane to add the vehicle to
+     * @param carRatio the ratio value for cars
+     * @param truckRatio the ratio value for trucks
+     */
     private void generateVehicle(Lane l, int carRatio, int truckRatio) {
         int totalRatio = carRatio + truckRatio;
         int randRatio = random.nextInt(totalRatio);
         Vehicle v = l.getVehicleAhead(l.getFirstSegment());
-        if (randRatio < carRatio) {
+        if (randRatio < carRatio) { // if ratio < carRatio, then make car
             new Car(l, l.getFirstSegment(), v, null, CAR_COLOR);
             numberOfVehicles++;
-        } else {
+        } else { // else we make truck
             new Truck(l, l.getFirstSegment(), v, null, TRUCK_COLOR);
             numberOfVehicles++;
         }
     }
 
+    /**
+     * Choose a lane to add a vehicle to, if that lane is not occupied by a vehicle at the start of its lane
+     * @return a lane that a vehicle can be added to
+     */
     protected Lane chooseLane() {
         ArrayList<Lane> potentialLanes = new ArrayList<>(lanes.size());
         for (Lane l : lanes) {
@@ -117,13 +158,17 @@ public abstract class Junction {
             }
         }
 
-        if (potentialLanes.isEmpty()) {
+        if (potentialLanes.isEmpty()) { // if no lanes could be found, return null, as there are no lanes suitable
             return null;
-        } else {
+        } else { // else pick one at random.
             return potentialLanes.get(random.nextInt(potentialLanes.size()));
         }
     }
 
+    /**
+     * Update the deletions of vehicles exiting their lanes and the simulation.
+     * This method also adds an event to the statistics to indicate that a deletion had occurred
+     */
     public void updateDeletions() {
         for (Lane l : lanes) {
             Vehicle[] vehArray = l.getVehicles().toArray(new Vehicle[0]);
@@ -133,45 +178,37 @@ public abstract class Junction {
                     numberOfVehicles--;
                     if (v instanceof Car) {
                         SimulationStats.incrementCars();
-                        SimulationStats.addEvent(createEvent(v));
+                        SimulationStats.addEvent(SimulationStats.createVehicleLeavingEvent(v));
                     } else if (v instanceof Truck) {
                         SimulationStats.incrementTrucks();
-                        SimulationStats.addEvent(createEvent(v));
+                        SimulationStats.addEvent(SimulationStats.createVehicleLeavingEvent(v));
                     }
                 }
             }
         }
     }
 
-    private Event createEvent(Vehicle v) {
-        String name = "";
-        if(v instanceof Car){
-            name = "Car leaving Junction";
-        }else if(v instanceof Truck){
-            name = "Truck leaving Junction";
-        }
-        
-        int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
-        int timeStep = (int) Simulation.getOption(Simulation.TIME_STEP);
-        int minDensity = (int) Simulation.getOption(Simulation.MIN_DENSITY);
-        int maxDensity = (int) Simulation.getOption(Simulation.MAX_DENSITY);
-        int ratioCars = (int) Simulation.getOption(Simulation.CAR_RATIO);
-        int ratioTrucks = (int) Simulation.getOption(Simulation.TRUCK_RATIO);
-        int maxSpeed = (int) Simulation.getOption(Simulation.MAXIMUM_SPEED);
-        Event e = new Event(name, timeStep, aggression, minDensity, maxDensity, ratioCars, ratioTrucks, maxSpeed);
-        return e;
-    }
-
+    /**
+     * Manages the vehicles in the junction
+     */
     public void manageJunction() {
         for (Vehicle v : this.getVehicles()) {
             v.act();
         }
     }
 
+    /**
+     * Gets the collection of lanes in the junction
+     * @return the collection of lanes in the junction
+     */
     public ArrayList<Lane> getLanes() {
         return lanes;
     }
 
+    /**
+     * Registers a lane with the junction
+     * @param lane the lane to register with the junction
+     */
     public void registerLane(Lane lane) {
         lanes.add(lane);
     }

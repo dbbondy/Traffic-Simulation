@@ -1,23 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package model.junctions;
 
-import java.util.ArrayList;
-import java.util.Random;
 import model.*;
 import view.SimulationPanel;
 
 /**
- *
- * @author Dan
+ * A class to represent a Two-Lane Junction
+ * @author Daniel Bond
  */
 public class TwoLaneJunction extends Junction {
     
-    public static final String name = "Two-Lane Junction";
+    public static final String name = "Two-Lane Junction"; // the name of the junction. Used for reflection purposes
 
-    private Lane bottomUpwardsLane;
+    private Lane bottomUpwardsLane; // lanes of the junction
     private Lane bottomUpwardsLane2;
     private Lane topDownwardsLane;
     private Lane topDownwardsLane2;
@@ -26,12 +21,9 @@ public class TwoLaneJunction extends Junction {
     private Lane rightLeftwardsLane;
     private Lane rightLeftwardsLane2;
     
-    
-    
-    
-
     public TwoLaneJunction() {
-
+        
+        // create lanes
         bottomUpwardsLane = new Lane(400, SimulationPanel.HEIGHT, 180, TurnDirection.RIGHT_AND_STRAIGHT);
         bottomUpwardsLane2 = new Lane(400 - Segment.WIDTH, SimulationPanel.HEIGHT, 180, TurnDirection.LEFT);
 
@@ -44,9 +36,11 @@ public class TwoLaneJunction extends Junction {
         rightLeftwardsLane = new Lane(800, (350 - (Segment.WIDTH * 2)), 90, TurnDirection.RIGHT_AND_STRAIGHT);
         rightLeftwardsLane2 = new Lane(800, (350 - (Segment.WIDTH * 3)), 90, TurnDirection.LEFT);
 
-        buildRoads();
+        // build lanes and connections between those lanes
+        buildLanes();
         setUpIntersectionConnections();
 
+        // register the lanes with the junction
         registerLane(bottomUpwardsLane);
         registerLane(bottomUpwardsLane2);
         registerLane(topDownwardsLane);
@@ -55,16 +49,21 @@ public class TwoLaneJunction extends Junction {
         registerLane(leftRightwardsLane2);
         registerLane(rightLeftwardsLane);
         registerLane(rightLeftwardsLane2);
- 
     }
 
-    private void buildRoads() {
+    /**
+     * Build the lanes of the junction
+     */
+    private void buildLanes() {
         RoadDesigner.buildParallelLanes(SimulationPanel.HEIGHT, bottomUpwardsLane, bottomUpwardsLane2);
         RoadDesigner.buildParallelLanes(SimulationPanel.HEIGHT, topDownwardsLane, topDownwardsLane2);
         RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, leftRightwardsLane, leftRightwardsLane2);
         RoadDesigner.buildParallelLanes(SimulationPanel.WIDTH, rightLeftwardsLane, rightLeftwardsLane2);
     }
 
+    /**
+     * Set up the connections between the intersecting segments of the junction
+     */
     private void setUpIntersectionConnections() {
 
         Segment s1;
@@ -103,10 +102,12 @@ public class TwoLaneJunction extends Junction {
         s1 = topDownwardsLane.getLaneSegments().get(leftRightwardsLane2.getYStart() - width50);
         s2 = leftRightwardsLane2.getLaneSegments().get(topDownwardsLane.getXStart() + width50);
         s1.addConnectedSegment(s2, ConnectionType.NEXT_TO_LEFT);
-
-
     }
     
+    /**
+     * Returns the named representation of this junction
+     * @return the named representation of this junction
+     */
     @Override
     public String toString() {
         return name;

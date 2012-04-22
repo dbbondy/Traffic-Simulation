@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
 import controller.Simulation;
@@ -13,49 +9,74 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JPanel;
-import model.*;
+import model.Lane;
+import model.Segment;
+import model.Vehicle;
 import model.junctions.Junction;
 
 /**
+ * Class for handling the rendering of junctions and other graphics primitives key to the simulation
  *
- * @author Dan
+ * @author Daniel Bond
  * @author Jonathan Pike ( contact: mats@staite.net )
  */
 public class SimulationPanel extends JPanel {
 
-    private BufferedImage image; //junction image
-    private Junction currentJunction;
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 680;
+    private BufferedImage image; //the junction image
+    private Junction currentJunction; // the current junction we are working with
+    public static final int WIDTH = 800; // the width of the panel
+    public static final int HEIGHT = 680; // the height of the panel
     private Dimension size;
-    
-    private ArrayList<PostRenderGraphic> shapesForPostRender;
+    private ArrayList<PostRenderGraphic> shapesForPostRender; // collection of shapes we want to render again after a rendering cycle has been performed
 
     public SimulationPanel() {
         initPanel();
     }
 
+    /**
+     * Initialise the panel
+     */
     private void initPanel() {
         size = new Dimension(WIDTH, HEIGHT);
         this.setBackground(new Color(10 * 16 + 5, 13 * 16 + 6, 10 * 16 + 3)); // 5B8059   A5 D6 A3    A=10
-        this.shapesForPostRender = new ArrayList<PostRenderGraphic>();
+        this.shapesForPostRender = new ArrayList<>();
     }
 
+    /**
+     * Gets the preferred size of the panel
+     *
+     * @return the {@link java.awt.Dimension} object representing the preferred size of this panel
+     */
     @Override
     public Dimension getPreferredSize() {
         return size;
     }
 
+    /**
+     * Gets the maximum size of the panel
+     *
+     * @return the {@link java.awt.Dimension} object representing the maximum size of this panel
+     */
     @Override
     public Dimension getMaximumSize() {
         return size;
     }
 
+    /**
+     * Gets the minimum size of the panel
+     *
+     * @return the {@link java.awt.Dimension} object representing the minimum size of this panel
+     */
     @Override
     public Dimension getMinimumSize() {
         return size;
     }
 
+    /**
+     * Draws the vehicles onto the screen
+     *
+     * @param g the graphics object we want to use to draw
+     */
     private synchronized void drawVehicles(Graphics g) {
         Graphics2D graphics = (Graphics2D) g;
         ArrayList<Lane> lanes = currentJunction.getLanes();
@@ -78,13 +99,22 @@ public class SimulationPanel extends JPanel {
         }
     }
 
+    /**
+     * Renders a section of road that is straight, to the junction
+     *
+     * @param graphics the graphics object we will use for the rendering
+     * @param angle the angle that the straight section will have
+     * @param x the x-coordinate of the straight section
+     * @param y the y-coordinate of the straight section
+     * @param length the length of the straight section
+     */
     private void renderStraightToImage(Graphics2D graphics, int angle, double x, double y, int length) {
 
         // convert the angle to radians
         double angleRadians = Math.PI * (angle / 180.0);
         int width = Segment.WIDTH;
 
-        // <x> is the "bottom center" and <startX> is the "bottom left". 
+        // x is the "bottom center" and startX is the "bottom left". 
         double startX = (x - (width / 2));
         double startY = (y);
 
@@ -93,7 +123,7 @@ public class SimulationPanel extends JPanel {
 
         Shape straight = new Rectangle2D.Double(startX, startY, width, length + 1);
         graphics.fill(straight);
-        
+
         Shape lineLeft = new Line2D.Double(startX, startY, startX, startY + length);
         Shape lineRight = new Line2D.Double(startX + width, startY, startX + width, startY + length);
         this.shapesForPostRender.add(new PostRenderGraphic(lineLeft, angleRadians, x, y));
@@ -101,9 +131,18 @@ public class SimulationPanel extends JPanel {
 
         // undo rotation of canvas
         graphics.rotate(-angleRadians, x, y);
-
     }
 
+    /**
+     * Renders a section that is curved, to the screen
+     *
+     * @param graphics the graphics object we will use for rendering
+     * @param angle the angle that the corner will be drawn from
+     * @param x the x-coordinate of the corner
+     * @param y the y-coordinate of the corner
+     * @param cornerAngle the angle that the corner will extend for
+     * @return the x and y coordinates of the center of the corner as a 2 element array
+     */
     private double[] renderCornerToImage(Graphics2D graphics, int angle, double x, double y, int cornerAngle) {
 
         // convert the angle to radians
@@ -137,7 +176,7 @@ public class SimulationPanel extends JPanel {
         Rectangle2D bounds = new Rectangle2D.Double(startX, startY, boxSize, boxSize);
         Shape corner = new Arc2D.Double(bounds, -startAngle, -extraCornerAngle, Arc2D.Double.PIE);
         graphics.fill(corner);
-        
+
         Shape cornerOuter = new Arc2D.Double(bounds, -startAngle, -cornerAngle, Arc2D.Double.OPEN);
         this.shapesForPostRender.add(new PostRenderGraphic(cornerOuter, 0, 0, 0));
 
@@ -146,11 +185,14 @@ public class SimulationPanel extends JPanel {
         return new double[]{centerX, centerY};
     }
 
+    /**
+     * Render the junction to an image
+     */
     private void renderToImage() {
 
         // clear from post render
         this.shapesForPostRender.clear();
-        
+
         // we reload the current junction every time we have to render it again
         currentJunction = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
 
@@ -306,10 +348,10 @@ public class SimulationPanel extends JPanel {
                 }
 
             }
-            
+
             last.setNextSegment(null);
         }
-        
+
         graphics.setColor(new Color(80, 80, 80));
         for (PostRenderGraphic over : this.shapesForPostRender) {
             if (over.renderAngle != 0) {
@@ -321,54 +363,50 @@ public class SimulationPanel extends JPanel {
             }
         }
 
-       /* int colorIndex = 0;
-        
-        Color[] colors = new Color[] {
-            Color.RED, Color.BLUE, Color.GREEN,
-            Color.BLACK, Color.ORANGE, Color.PINK, Color.WHITE,
-            new Color(10*16+12, 4*16, 12*16+7)
-        };
-
-        for (Lane lane : lanes) {
-
-            Segment next = lane.getFirstSegment();
-
-            while (true) {
-
-                Set<Segment> segments = next.getConnectedSegments().keySet();
-                
-                for (Segment segment : segments) {
-                    ConnectionType ct = next.getConnectedSegments().get(segment);
-                    if (ct != ConnectionType.OVERLAP) continue;
-                    graphics.setColor(colors[colorIndex]);
-                    int x = (int) next.getRenderX();
-                    int y = (int) next.getRenderY();
-                    graphics.fillRect(x-2, y-2, 4, 4);
-                    x = (int) segment.getRenderX();
-                    y = (int) segment.getRenderY();
-                    graphics.fillRect(x-2, y-2, 4, 4);
-                    colorIndex++;
-                }
-                
-                // no more segments so we exit the loop
-                if ((next = next.getNextSegment()) == null) break;
-
-            }
-            
-        }*/
+        /*
+         * int colorIndex = 0;
+         *
+         * Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GREEN, Color.BLACK, Color.ORANGE, Color.PINK, Color.WHITE, new Color(10*16+12, 4*16, 12*16+7) };
+         *
+         * for (Lane lane : lanes) {
+         *
+         * Segment next = lane.getFirstSegment();
+         *
+         * while (true) {
+         *
+         * Set<Segment> segments = next.getConnectedSegments().keySet();
+         *
+         * for (Segment segment : segments) { ConnectionType ct = next.getConnectedSegments().get(segment); if (ct != ConnectionType.OVERLAP) continue; graphics.setColor(colors[colorIndex]); int x =
+         * (int) next.getRenderX(); int y = (int) next.getRenderY(); graphics.fillRect(x-2, y-2, 4, 4); x = (int) segment.getRenderX(); y = (int) segment.getRenderY(); graphics.fillRect(x-2, y-2, 4,
+         * 4); colorIndex++; }
+         *
+         * // no more segments so we exit the loop if ((next = next.getNextSegment()) == null) break;
+         *
+         * }
+         *
+         * }
+         */
     }
 
+    /**
+     * Clears the cache for the current junction and the buffered image from this class
+     */
     public synchronized void clearCache() {
         currentJunction = null;
         image = null;
     }
-    
+
+    /**
+     * Main painting method
+     *
+     * @param graphics1 the graphics object we will use to render the junction
+     */
     @Override
     public synchronized void paintComponent(Graphics graphics1) {
-        
+
         // prevent AI while rendering
         synchronized (Simulation.class) {
-            
+
             super.paintComponent(graphics1);
 
             // no need to paint if we can't see it
@@ -382,7 +420,7 @@ public class SimulationPanel extends JPanel {
                     || image.getHeight() != getHeight()) {
                 renderToImage();
             }
-           
+
             Graphics2D graphics = (Graphics2D) graphics1;
 
             graphics.setRenderingHint(
@@ -399,20 +437,26 @@ public class SimulationPanel extends JPanel {
                 graphics.fillRect(this.getWidth() - 50, 20, 10, 40);
                 graphics.fillRect(this.getWidth() - 30, 20, 10, 40);
             }
-            
+
         }
     }
-}
 
-class PostRenderGraphic {
-    public Shape shape;
-    public double renderAngle;
-    public double rotateX;
-    public double rotateY;
-    public PostRenderGraphic(Shape shape, double renderAngle, double rotateX, double rotateY) {
-        this.shape = shape;
-        this.renderAngle = renderAngle;
-        this.rotateX = rotateX;
-        this.rotateY = rotateY;
+    /**
+     * Inner class that allows us to store shapes that require extra rendering attention in the junction
+     * @author Daniel Bond
+     */
+    private class PostRenderGraphic {
+
+        public Shape shape; // the shape we want to render again
+        public double renderAngle; // the angle at which we will render the shape
+        public double rotateX; // the x-coordinate at which we will render the shape
+        public double rotateY; // the y-coordinate at which we will render the shape
+
+        public PostRenderGraphic(Shape shape, double renderAngle, double rotateX, double rotateY) {
+            this.shape = shape;
+            this.renderAngle = renderAngle;
+            this.rotateX = rotateX;
+            this.rotateY = rotateY;
+        }
     }
 }
