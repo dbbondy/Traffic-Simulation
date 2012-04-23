@@ -14,10 +14,16 @@ public class DriverAI {
 
     // distance from the end of the safe lane change
     public static final int DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE = 100;
+    
     // extra distance to allow us to slow down gradually before a corner
     public static final int CORNER_STOP_TIME_DISTANCE = 10; 
+    
     //the distance from the corner that we should consider slowing down 
     public static final int CORNER_STOP_DISTANCE = 100; 
+    
+    // the time distance (exceeding stopping distance) that cars should aim for
+    // between the current vehicle and the vehicle ahead of it
+    public static final int EXTRA_GAP_TIME_DISTANCE = 10;
     
     protected Vehicle vehicle;
     protected Desire desire; // TODO: auto routing based on desired destination!
@@ -28,8 +34,13 @@ public class DriverAI {
     public DriverAI(Vehicle vehicle) {
         this.vehicle = vehicle;
         rnd = Randomizer.getInstance();
-        Desire[] allDesires = Desire.values();
-        desire = allDesires[rnd.nextInt(allDesires.length)];
+        
+        // TODO: CRITICAL: ensure desire is valid
+        // TODO: (better): do auto-routing between segment A and segment B
+        // Desire[] allDesires = Desire.values();
+        // desire = allDesires[rnd.nextInt(allDesires.length)];
+        desire = Desire.STRAIGHT;
+        
         getSafeLaneChangeIndex();
     }
 
@@ -47,15 +58,18 @@ public class DriverAI {
     }
 
     /**
-     * performs the general "acting" of the intelligence.
+     * Performs the general "acting" of the intelligence.
      */
     public void act() {
-        int stoppingTimeDistance = ((vehicle.getSpeed()) / (vehicle.getMaxDecelerationRate())); // number of time steps it will take to stop
+        
+        int stoppingTimeDistance = (int) ((double) (vehicle.getSpeed()) / (vehicle.getMaxDecelerationRate())); // number of time steps it will take to stop
         int crashTimeDistance = Integer.MIN_VALUE;
         
         if (vehicle.getLane().getVehicleAhead(vehicle.getHeadSegment()) != null) {
             int distance = vehicle.findVehDistanceAhead();
-            if(vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
+            if(vehicle.getSpeed() != 0) crashTimeDistance = (int) ((distance * 100.0) / vehicle.getSpeed());
+        } else {
+            
         }
 
         // TODO: other types of turn direction combinations
@@ -100,49 +114,53 @@ public class DriverAI {
             return;
         }
         
-        if(approachingTurn(vehicle.getHeadSegment())){ // if we are approaching a turn
-            int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
-            int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+        int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+        if (approachingTurn(vehicle.getHeadSegment())){ // if we are approaching a turn         
+            
+            int decelerationRate = (int) ((aggression / 100.0) * vehicle.getMaxDecelerationRate());
             vehicle.decelerate(decelerationRate); 
-        } else {
-            int distance = vehicle.findVehDistanceAhead();
-            if (vehicle.getSpeed() != 0) crashTimeDistance = (distance * 100) / vehicle.getSpeed();
-            if (crashTimeDistance > stoppingTimeDistance) {
-                
-                int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
-                int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
-                int newSpeed = vehicle.getSpeed() + accelerationRate;
-                Segment currentPos = vehicle.getHeadSegment();
-                vehicle.advanceVehicle(newSpeed);
-                distance = vehicle.findVehDistanceAhead();
-                int newCrashTimeDistance = (distance * 100) / (vehicle.getSpeed() + accelerationRate);
-                int newStoppingDistance = newSpeed / vehicle.getMaxDecelerationRate();
-                
-                if(newCrashTimeDistance < newStoppingDistance){ // if we would crash if we accelerated, then we need to slow down perhaps.
-                    int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
-                    vehicle.setHeadSegment(currentPos);
-                    vehicle.decelerate(decelerationRate);
-                }
-                
-                vehicle.accelerate(accelerationRate); 
-                
-                
-            } else if (crashTimeDistance == stoppingTimeDistance) {
-                vehicle.decelerate(2); 
-            } else {
-                vehicle.decelerate(vehicle.getMaxDecelerationRate());
+            
+        } else { // if we are not approaching a turn
+            
+            int distance = vehicle.findVehDistanceAhead();            
+            int maxDecel = vehicle.getMaxDecelerationRate();
+            
+            int newSpeed = (int) ((1.0/2.0) * (
+                Math.sqrt(
+                    (400 * distance * maxDecel)
+                    + Math.pow(maxDecel, 2) 
+                    - (2 * maxDecel * EXTRA_GAP_TIME_DISTANCE) 
+                    + Math.pow(EXTRA_GAP_TIME_DISTANCE, 2)
+                )
+                + maxDecel 
+                - EXTRA_GAP_TIME_DISTANCE    
+            ));
+            
+            int accelerationRate = newSpeed - vehicle.getSpeed();
+            
+            if (accelerationRate > 0) {
+                accelerationRate = Math.min(accelerationRate, vehicle.getMaxAccelerationRate());
+                vehicle.accelerate((int) (accelerationRate * (aggression / 100.0)));
+            } else if (accelerationRate < 0) {
+                int decelerationRate = Math.min(-accelerationRate, vehicle.getMaxDecelerationRate());
+                vehicle.decelerate(decelerationRate);
             }
+            
         }
         
     }
     
     /**
-     * Determines if the vehicle is approaching a lane turn
+     * Determines if the vehicle is approaching a lane turn (and has desire to make such a turn)
      * @param s the segment we are currently at in the lane
      * @return <code> true </code> if we are approaching the turn. <code> false </code> otherwise.
      */
     protected boolean approachingTurn(Segment s){
+        // TODO: IMPORTANT! this assumes there is only 1!
         Segment overlappingSegment = findOverlappingSegment(s);
+        if (desire == Desire.STRAIGHT) return false;
+        if (desire == Desire.TURN_LEFT && !vehicle.getLane().canTurnLeft()) return false;
+        if (desire == Desire.TURN_RIGHT && !vehicle.getLane().canTurnRight()) return false;
         if(overlappingSegment != null){
             int distanceFromTurn = (overlappingSegment.id() - s.id());
             if(distanceFromTurn < (CORNER_STOP_DISTANCE + CORNER_STOP_TIME_DISTANCE)){
@@ -152,8 +170,6 @@ public class DriverAI {
             }
         }
         return false;
-        
-        
     }
     
     /**
@@ -188,6 +204,8 @@ public class DriverAI {
      */
     private void decideLaneChangeDecision(int stoppingTimeDistance, int crashTimeDistance) {
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
+        if(adjacentSeg == null)
+            return;
         Lane adjacentLane = adjacentSeg.getLane();
         if (adjacentLane.getVehicles().isEmpty()) {
             changeLane(adjacentSeg);

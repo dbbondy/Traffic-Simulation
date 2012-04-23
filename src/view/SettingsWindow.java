@@ -32,9 +32,9 @@ public class SettingsWindow extends JFrame {
             = "You cannot have a maximum speed of greater than 800.";
     
     // default value for the minimum density
-    public static final String MIN_DENSITY_DEFAULT = "10"; 
+    public static final String MIN_DENSITY_DEFAULT = "2"; 
     // default value for the maximum density
-    public static final String MAX_DENSITY_DEFAULT = "25";
+    public static final String MAX_DENSITY_DEFAULT = "2";
     // default value for the vehicle aggression
     public static final String AGGRESSION_DEFAULT = "25";
     // default value for the car ratio
@@ -317,7 +317,7 @@ public class SettingsWindow extends JFrame {
         carRatioField.setText(CAR_RATIO_DEFAULT);
         truckRatioField.setText(TRUCK_RATIO_DEFAULT);
         maximumSpeedField.setText(MAXIMUM_SPEED_DEFAULT);
-        junctions.setSelectedIndex(2);
+        junctions.setSelectedIndex(4);
     }
     
     /**

@@ -8,7 +8,7 @@ import java.util.Arrays;
  * This class provides various functions that can be combined together to produce complex roads
  * @author Daniel Bond
  */
-public class RoadDesigner {
+public abstract class RoadDesigner {
 
     public RoadDesigner() {
     }

@@ -91,6 +91,23 @@ public abstract class Vehicle {
     }
     
     /**
+     * Advances the vehicle in the road (test only)
+     * @param value the amount to advance the vehicle by 
+     * @return the expected segment if committed
+     */
+    public Segment advanceVehicleTest(int value) {
+        int newValue = value + nextSegmentPercent;
+        int advanceSegments = newValue / 100;
+        Segment expectedSegment = headSegment;
+        for (int i = 0; i < advanceSegments; i++) {
+            Segment next = expectedSegment.getNextSegment();
+            if (next == null) break;
+            expectedSegment = next;
+        }
+        return expectedSegment;
+    }
+    
+    /**
      * Finds the distance between this vehicle and the vehicle ahead
      * We assume that a vehicle ahead exists for this method to work correctly.
      * If this assumption does not hold at method invocation, then we throw a {@link java.lang.RuntimeException}
@@ -99,6 +116,10 @@ public abstract class Vehicle {
     public int findVehDistanceAhead() {
         Vehicle vAhead = getLane().getVehicleAhead(headSegment);
         if (vAhead == null) throw new RuntimeException("no vehicle ahead");
+        System.out.println(vAhead.headSegment.id());
+        System.out.println(vAhead.length);
+        System.out.println(headSegment.id());
+        System.out.println("---");
         return ((vAhead.headSegment.id() - vAhead.length) - headSegment.id());
     }
 

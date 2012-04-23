@@ -125,7 +125,7 @@ public abstract class Junction {
      * @param carRatio the ratio value for cars
      * @param truckRatio the ratio value for trucks
      */
-    private void generateVehicle(Lane l, int carRatio, int truckRatio) {
+    private void generateVehicle(Lane l, int carRatio, int truckRatio) {        
         int totalRatio = carRatio + truckRatio;
         int randRatio = random.nextInt(totalRatio);
         Vehicle v = l.getVehicleAhead(l.getFirstSegment());

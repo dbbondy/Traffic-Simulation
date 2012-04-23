@@ -2,8 +2,6 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Models a lane for a junction
@@ -17,8 +15,6 @@ public class Lane {
     private int initialAngle; // the initial angle that the lane will be drawn from
     private ArrayList<Vehicle> vehicles; // the collection of vehicles contained in the lane
     private TurnDirection direction; // the direction of a turn for the lane
-    public static final int SAFE_VEHICLE_DISTANCE = 25; // the safe vehicle distance between two vehicles
-    public static final int SAFE_SPEED_DIFFERENTIAL = 5; // the safe speed differential between vehicles in the lane
     private int newSegmentID = 0; // the id of each segment in a lane. the segment id is lane specfic
     
     public Lane(int xCoord, int yCoord, int initialAngle, TurnDirection direction) {
@@ -124,21 +120,6 @@ public class Lane {
     }
 
     /**
-     * Finds the position of the vehicle within the lane.
-     * @param vehicle the vehicle we want to find the position of
-     * @return the index where the vehicle is at in the list of segments
-     */
-    public int findSegmentPosition(Vehicle vehicle) {
-        Comparator com = VehicleComparator.getInstance();
-        int index = Collections.binarySearch(vehicles, vehicle, com);
-
-        if (index < 0) {
-            return -1;
-        }
-        return index;
-    }
-
-    /**
      * Gets the list of vehicles
      * @return the list of vehicles
      */
@@ -166,48 +147,16 @@ public class Lane {
      * @return the vehicle ahead of our segment. <code> null </code> is returned if there is no vehicle ahead
      */
     public Vehicle getVehicleAhead(Segment segment) {
-        Comparator com = VehicleComparator.getInstance();
-
-        // ghost vehicle represents imaginary vehicle positioned at the desired segment
-        Vehicle ghostVehicle = new GhostVehicle(this, segment);
-        int index = Collections.binarySearch(vehicles, ghostVehicle, com);
-
-        // when index returned is negative it represents the location the object would be inserted in but made negative to indicate that it wasn't found
-        if (index < 0) {
-            index = (index * -1) - 1;
-        }
-        vehicles.remove(ghostVehicle);
-        if (index == vehicles.size()) {
-            return null;
-        }
-        Vehicle ahead = vehicles.get(index);
-        if(ahead.getHeadSegment().equals(segment))return null;
-        return ahead;
+       return VehicleBinarySearch.findVehicleAhead(vehicles, segment);
     }
-
+    
     /**
      * Finds the first instance of a vehicle behind a segment
      * @param segment the segment we want to find a vehicle behind
      * @return the vehicle behind of our segment. <code> null </code> is returned if there is no vehicle behind
      */
     public Vehicle getVehicleBehind(Segment segment) {
-        Comparator com = VehicleComparator.getInstance();
-
-        // ghost vehicle represents imaginary vehicle positioned at the desired segment
-        Vehicle ghostVehicle = new GhostVehicle(this, segment);
-        int index = Collections.binarySearch(vehicles, ghostVehicle, com);
-
-        // when index returned is negative it represents the location the object would be inserted in but made negative to indicate that it wasn't found
-        if (index < 0) {
-            index = (index * -1) - 1;
-        }
-        vehicles.remove(ghostVehicle);
-        if (index == 0) {
-            return null;
-        }
-        Vehicle behind = vehicles.get(index - 1);
-        if(behind.getHeadSegment().equals(segment)) return null;
-        return behind;
+       return VehicleBinarySearch.findVehicleBehind(vehicles, segment);
     }
 
     /**
@@ -216,16 +165,7 @@ public class Lane {
      * @param vehicle the vehicle to add to the collection
      */
     public void addVehicle(Vehicle vehicle) {
-        Comparator com = VehicleComparator.getInstance();
-        int index = Collections.binarySearch(vehicles, vehicle, com);
-
-        // when index returned is negative it represents
-        // the location the object would be inserted in
-        // but made negative to indicate that it wasn't found
-        if (index < 0) {
-            index = (index * -1) - 1;
-        }
-        vehicles.add(index, vehicle);
+        VehicleBinarySearch.addVehicle(vehicles, vehicle);
     }
 
     /**
