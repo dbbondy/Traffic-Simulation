@@ -23,7 +23,7 @@ public class DriverAI {
     // between the current vehicle and the vehicle ahead of it
     public static final int EXTRA_GAP_TIME_DISTANCE = 10;
     
-    public static final int BLOCKED_LANE_SAFE_DISTANCE = 200; // the safe distance between a car and the end of a blocked road, should the ai encounter one
+    public static final int BLOCKED_LANE_SAFE_DISTANCE = 100; // the safe distance between a car and the end of a blocked road, should the ai encounter one
     
     protected Vehicle vehicle;
     protected Desire desire; // TODO: auto routing based on desired destination!
@@ -48,6 +48,10 @@ public class DriverAI {
      */
     protected void getSafeLaneChangeIndex() {
         ArrayList<Segment> laneSegments = vehicle.getLane().getLaneSegments();
+        if(vehicle.getLane().isBlocked()){
+            safeLaneChangeID = vehicle.getLane().getLastSegment().id() - DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE;
+            return;
+        }
         for (int i = 0; i < laneSegments.size(); i++) {
             Map<Segment, ConnectionType> connectedSegments = laneSegments.get(i).getConnectedSegments();
             if (connectedSegments.containsValue(ConnectionType.OVERLAP)) {
@@ -239,8 +243,9 @@ public class DriverAI {
                     int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
                     vehicle.accelerate(accelerationRate);
                 } else if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id() < BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are getting close to the end of the lane
-                    System.out.println("we should be steeply slowing down. 1");
-                    vehicle.decelerate(vehicle.getMaxDecelerationRate());
+                    int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                    int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+                    vehicle.decelerate(decelerationRate);
                 }else {
                     int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
                     int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
@@ -249,25 +254,28 @@ public class DriverAI {
                 return;
             } else if ((otherVehicle = adjacentLane.getVehicleAhead(adjacentSeg)) != null) {
                 int distance = ((otherVehicle.getHeadSegment().id() - otherVehicle.getLength()) - vehicle.getHeadSegment().id());
-                if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLaneSegments().size() - vehicle.getHeadSegment().id() > BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are distant enough from the end of the lane
+                if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id() > BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are distant enough from the end of the lane
                     int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
                     int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
                     vehicle.accelerate(accelerationRate);
-                    if(distance > vehicle.getLength()){
+                    if(distance > (vehicle.getLength()+ 50)){
                         changeLane(adjacentSeg);
                         return;
                     }
+                    
                 }else if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id() < BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are getting close to the end of the lane
-                    System.out.println("we should be steeply slowing down. 2");
-                    vehicle.decelerate(vehicle.getMaxDecelerationRate());
-                    if(distance > vehicle.getLength()){
+                    int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                    int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+                    vehicle.decelerate(decelerationRate);
+                    if(distance > (vehicle.getLength() + 50)){
                         changeLane(adjacentSeg);
-                        return;
+                        
                     }
                 }
                 if (vehicle.getSpeed() != 0) {
                     crashTimeDistance = (distance * 100) / vehicle.getSpeed();
                 }
+                return;
             } else {
                 // TODO: instead of assuming the car has 0 speed we can use the current speed for this one
                 // since the car the AI is driving knows its own speed "reliably"
@@ -275,21 +283,24 @@ public class DriverAI {
                 // careful with negative speed difference
                 otherVehicle = adjacentLane.getVehicleBehind(adjacentSeg);
                 int distance = ((vehicle.getHeadSegment().id() - vehicle.getLength()) - otherVehicle.getHeadSegment().id());
-                if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLaneSegments().size() - vehicle.getHeadSegment().id() > BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are distant enough from the end of the lane
+                if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id() > BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are distant enough from the end of the lane
                     int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
                     int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
                     vehicle.accelerate(accelerationRate);
-                    if(distance > vehicle.getLength()){
+                    if(distance > (vehicle.getLength()+ 50)){
                         changeLane(adjacentSeg);
                         return;
                     }
+                    return;
                 }else if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id() < BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are getting close to the end of the lane
-                    System.out.println("we should be steeply slowing down. 3");
-                    vehicle.decelerate(vehicle.getMaxDecelerationRate());
-                    if(distance > vehicle.getLength()){
+                    int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                    int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+                    vehicle.decelerate(decelerationRate);
+                    if(distance > (vehicle.getLength()+ 50)){
                         changeLane(adjacentSeg);
                         return;
                     }
+                    return;
                 }
                 if (vehicle.getSpeed() != 0) {
                     crashTimeDistance = (distance * 100) / vehicle.getSpeed();
@@ -298,6 +309,7 @@ public class DriverAI {
         }
         if (safeLaneChangeProximity()) {
             vehicle.decelerate(5);
+            return;
         }
 
         if ((safeLaneChangeID - vehicle.getHeadSegment().id()) < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) {

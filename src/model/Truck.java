@@ -1,6 +1,5 @@
 package model;
 
-import controller.Simulation;
 import java.awt.Color;
 
 /**
