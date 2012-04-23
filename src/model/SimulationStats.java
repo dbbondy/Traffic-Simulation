@@ -122,7 +122,6 @@ public class SimulationStats {
      * It also resets the counters for the statistics once the method completes.
      */
     public static void outputEvents(){
-        System.out.println(allEvents.size());
         for(Event e: allEvents){ //print single events details
             try{
                 outputStream.write("Name of event: " + e.getName());

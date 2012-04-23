@@ -44,10 +44,7 @@ public class Simulation {
      * Initialisation of the simulation.
      */
     public static void init() {
-        Junction.registerJunctionType(FlyoverJunction.class);
-        Junction.registerJunctionType(PlainJunction.class);
-        Junction.registerJunctionType(RoundaboutJunction.class);
-        Junction.registerJunctionType(TrafficLightJunction.class);
+        Junction.registerJunctionType(BlockedLaneJunction.class);
         Junction.registerJunctionType(TwoLaneJunction.class);
         settings = new HashMap<>();
         settings.put(MIN_DENSITY, 0);

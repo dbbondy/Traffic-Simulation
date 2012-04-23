@@ -32,7 +32,6 @@ public abstract class VehicleBinarySearch {
         if (indexMin == vehicles.size()) {
             return null;
         }
-        
         return vehicles.get(indexMin);
     }
     

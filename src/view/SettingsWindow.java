@@ -317,7 +317,7 @@ public class SettingsWindow extends JFrame {
         carRatioField.setText(CAR_RATIO_DEFAULT);
         truckRatioField.setText(TRUCK_RATIO_DEFAULT);
         maximumSpeedField.setText(MAXIMUM_SPEED_DEFAULT);
-        junctions.setSelectedIndex(4);
+        junctions.setSelectedIndex(0);
     }
     
     /**

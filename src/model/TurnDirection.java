@@ -6,6 +6,6 @@ package model;
  */
 public enum TurnDirection {
     
-    LEFT, LEFT_AND_STRAIGHT, STRAIGHT, RIGHT, RIGHT_AND_STRAIGHT, ALL;
+    LEFT, LEFT_AND_STRAIGHT, STRAIGHT, RIGHT, RIGHT_AND_STRAIGHT, ALL, BLOCKED;
     
 }

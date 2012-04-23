@@ -56,6 +56,15 @@ public class Lane {
         if (direction == TurnDirection.ALL) return true;
         return false;
     }
+    
+    /**
+     * Predicate that determines if the lane is blocked and vehicles need to change lanes
+     * @return <code> true </code> if the lane is blocked. <code> false </code> otherwise.
+     */
+    public boolean isBlocked(){
+        if(direction == TurnDirection.BLOCKED) return true;
+        return false;
+    }
         
     /**
      * Predicate that determines if the lane allows a vehicle to turn right.

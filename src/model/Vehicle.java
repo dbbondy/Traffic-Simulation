@@ -116,10 +116,6 @@ public abstract class Vehicle {
     public int findVehDistanceAhead() {
         Vehicle vAhead = getLane().getVehicleAhead(headSegment);
         if (vAhead == null) throw new RuntimeException("no vehicle ahead");
-        System.out.println(vAhead.headSegment.id());
-        System.out.println(vAhead.length);
-        System.out.println(headSegment.id());
-        System.out.println("---");
         return ((vAhead.headSegment.id() - vAhead.length) - headSegment.id());
     }
 
