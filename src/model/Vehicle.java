@@ -18,6 +18,10 @@ public abstract class Vehicle {
     protected int maxAccelerationRate; // the maximum rate of acceleration a vehicle has
     protected int maxDecelerationRate; // the maximum rate of deceleration a vehicle has
     protected DriverAI ai; // the driver intelligence
+    
+    // a little buffer distance (bumper) that reduces rounding errors and
+    // adds a more realistic spacing in tight situations
+    public static final int BUMPER_DISTANCE = 5;
 
     public Vehicle() {
     }
@@ -25,7 +29,11 @@ public abstract class Vehicle {
     public Vehicle(Lane lane, Segment segment, Vehicle inFront, Vehicle behind, Color c) {
         headSegment = segment;
         color = c;
-        currentSpeed = 50;
+        
+        currentSpeed = (int) ((3.0/5.0) * (int) Simulation.getOption(Simulation.MAXIMUM_SPEED));
+        Vehicle vAhead = getLane().getVehicleAhead(headSegment);
+        if (vAhead != null) currentSpeed = vAhead.currentSpeed;
+        
         lane.addVehicle(this);
         nextSegmentPercent = 0;
         maxAccelerationRate = 0;
@@ -116,7 +124,8 @@ public abstract class Vehicle {
     public int findVehDistanceAhead() {
         Vehicle vAhead = getLane().getVehicleAhead(headSegment);
         if (vAhead == null) throw new RuntimeException("no vehicle ahead");
-        return ((vAhead.headSegment.id() - vAhead.length) - headSegment.id());
+        // we reduce actual distance by one to prevent overlap due to partial segment progression
+        return ((vAhead.headSegment.id() - vAhead.length) - headSegment.id()) - 1;
     }
 
     /**
@@ -128,7 +137,8 @@ public abstract class Vehicle {
     public int findVehDistanceBehind() {
         Vehicle vBehind = getLane().getVehicleBehind(headSegment);
         if (vBehind == null) throw new RuntimeException("no vehicle behind");
-        return ((headSegment.id() - length) - vBehind.headSegment.id());
+        // we reduce actual distance by one to prevent overlap due to partial segment progression
+        return ((headSegment.id() - length) - vBehind.headSegment.id()) - 1;
     }
 
     /**

@@ -23,8 +23,6 @@ public class DriverAI {
     // between the current vehicle and the vehicle ahead of it
     public static final int EXTRA_GAP_TIME_DISTANCE = 10;
     
-    public static final int BLOCKED_LANE_SAFE_DISTANCE = 100; // the safe distance between a car and the end of a blocked road, should the ai encounter one
-    
     protected Vehicle vehicle;
     protected Desire desire; // TODO: auto routing based on desired destination!
     protected Random rnd;
@@ -47,6 +45,9 @@ public class DriverAI {
      * Gets the last point of a lane in which we can change lanes to turn a corner.
      */
     protected void getSafeLaneChangeIndex() {
+        
+        /* 
+
         ArrayList<Segment> laneSegments = vehicle.getLane().getLaneSegments();
         if(vehicle.getLane().isBlocked()){
             safeLaneChangeID = vehicle.getLane().getLastSegment().id() - DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE;
@@ -58,6 +59,9 @@ public class DriverAI {
                 safeLaneChangeID = laneSegments.get(i - DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE).id();
             }
         }
+
+        */
+        
     }
 
     /**
@@ -73,19 +77,40 @@ public class DriverAI {
             if (vehicle.getSpeed() != 0) {
                 crashTimeDistance = (int) ((distance * 100.0) / vehicle.getSpeed());
             }
-        } else {
         }
 
-        // TODO: other types of turn direction combinations
-        if ((desire == Desire.TURN_LEFT) && (!vehicle.getLane().canTurnLeft())) {
+        /* if ((desire == Desire.TURN_LEFT) && (!vehicle.getLane().canTurnLeft())) {
             decideLaneChangeDecision(stoppingTimeDistance, crashTimeDistance);
         } else if ((desire == Desire.TURN_RIGHT) && (!vehicle.getLane().canTurnRight())) {
             decideLaneChangeDecision(stoppingTimeDistance, crashTimeDistance);
-        } else if (vehicle.getLane().isBlocked()) {
-            decideLaneChangeDecision(stoppingTimeDistance, crashTimeDistance);
-        } else { // if we are in correct lane then do AI based in that.
+        } else */
+        
+        if (vehicle.getLane().isBlocked()) {
+            decideBlockedLaneChangeDecision();
+            // still in a blocked lane => check distance to end
+            // and slow down if required to prevent crash
+            if (vehicle.getLane().isBlocked()) {
+                if (!approachingBlockedLaneEnd()) {
+                    // we are not near end of lane so normal rules 
+                    performStraightLaneAI(stoppingTimeDistance, crashTimeDistance);
+                }
+            }
+        } else {
+            // we have no blocked lane, no desire to change
             performStraightLaneAI(stoppingTimeDistance, crashTimeDistance);
         }
+    }
+    
+    public boolean approachingBlockedLaneEnd(){
+        int distanceToEnd = vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id();
+        double currentSpeed = vehicle.getSpeed();
+        int maxDeceleration = vehicle.getMaxDecelerationRate();
+        int distanceToStop = (int) ((currentSpeed / maxDeceleration) * (currentSpeed / 2));
+        if (distanceToStop >= distanceToEnd) {
+            vehicle.decelerate(maxDeceleration);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -132,8 +157,14 @@ public class DriverAI {
 
             int distance = vehicle.findVehDistanceAhead();
             int maxDecel = vehicle.getMaxDecelerationRate();
+            
+            if (distance < Vehicle.BUMPER_DISTANCE) {
+                vehicle.decelerate(maxDecel);
+                return;
+            }
 
             // determine increase or decrease in speed proportional to how much we are safely allowed to
+            // written by Jonathan Pike (mats@staite.net)
             int newSpeed = (int) ((1.0 / 2.0) * (Math.sqrt(
                     (400 * distance * maxDecel)
                     + Math.pow(maxDecel, 2)
@@ -221,7 +252,52 @@ public class DriverAI {
      * @param stoppingTimeDistance the time distance it would take for our vehicle to come to a halt.
      * @param crashTimeDistance the time distance it would take us to crash into the vehicle in front, should its speed be 0.
      */
-    private void decideLaneChangeDecision(int stoppingTimeDistance, int crashTimeDistance) {
+    
+    // written by Jonathan Pike (mats@staite.net)
+    private void decideBlockedLaneChangeDecision() {
+        
+        Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
+        if (adjacentSeg == null) return;
+        
+        Lane adjacentLane = adjacentSeg.getLane();
+        
+        if (adjacentLane.getVehicles().isEmpty()) { // if the adjacent lane is empty then we can change lanes
+            changeLane(adjacentSeg);
+            return;
+        } else {
+            Vehicle otherVehicle = null;
+            if (adjacentLane.isVehicleAtSegment(adjacentSeg)) return;
+            
+            // if there is a vehicle behind our desired change position
+            if ((otherVehicle = adjacentLane.getVehicleBehind(adjacentSeg)) != null) {
+                int distance = ((adjacentSeg.id() - vehicle.getLength()) - otherVehicle.getHeadSegment().id());
+                if (distance < Vehicle.BUMPER_DISTANCE) return;
+                int otherVehicleStoppingTimeDistance = (int) (((double) otherVehicle.getSpeed()) / otherVehicle.getMaxDecelerationRate());
+                int otherVehicleCrashTimeDistance = (int) ((distance * 100.0) / otherVehicle.getSpeed());
+                if(otherVehicleCrashTimeDistance <= otherVehicleStoppingTimeDistance) return;
+            }
+                        
+            // if there is a vehicle ahead of the desired change position
+            if ((otherVehicle = adjacentLane.getVehicleAhead(adjacentSeg)) != null) {
+                int distance = ((otherVehicle.getHeadSegment().id() - otherVehicle.getLength()) - adjacentSeg.id());
+                if (distance < Vehicle.BUMPER_DISTANCE) return;
+                int stoppingTimeDistance = (int) (((double) vehicle.getSpeed()) / vehicle.getMaxDecelerationRate());
+                int crashTimeDistance = (int) ((distance * 100.0) / vehicle.getSpeed());
+                if (crashTimeDistance <= stoppingTimeDistance) return;
+            }
+            
+            changeLane(adjacentSeg);
+        }
+    }
+    
+     /** Daniel's version. buggy and does not work as intended.used in place of decideBlockedLaneDecision()
+      * 
+     * Intelligence for determining if we can change lanes or not.
+     *
+     * @param stoppingTimeDistance the time distance it would take for our vehicle to come to a halt.
+     * @param crashTimeDistance the time distance it would take us to crash into the vehicle in front, should its speed be 0.
+     */
+    /*private void decideLaneChangeDecision(int stoppingTimeDistance, int crashTimeDistance) {
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
         if (adjacentSeg == null) {
             return;
@@ -333,6 +409,39 @@ public class DriverAI {
 
         }
 
+    }*/
+    
+    public void decideLaneChangeDecision(int  stoppingTimeDistance, int crashTimeDistance) {
+        
+        /* 
+
+        if (safeLaneChangeProximity()) {
+            vehicle.decelerate(5);
+            return;
+        }
+
+        if ((safeLaneChangeID - vehicle.getHeadSegment().id()) < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) {
+            vehicle.decelerate(vehicle.getMaxDecelerationRate());
+            return;
+        }
+
+        if (crashTimeDistance > stoppingTimeDistance) { // if we can stop should the vehicle in front be at speed 0
+            changeLane(adjacentSeg);
+        } else {
+            int distanceBeforeLaneChange = safeLaneChangeID - vehicle.getHeadSegment().id();
+            if (distanceBeforeLaneChange < DISTANCE_BEFORE_TURN_FOR_SAFE_LANE_CHANGE) {
+                int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                int decelerationRate = (aggression / 100) * vehicle.getMaxDecelerationRate();
+                vehicle.decelerate(decelerationRate);
+            } else {
+                int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);
+                int accelerationRate = (aggression / 100) * vehicle.getMaxAccelerationRate();
+                vehicle.accelerate(accelerationRate);
+            }
+        }
+         
+        */
+        
     }
 
     /**

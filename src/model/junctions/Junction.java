@@ -152,10 +152,20 @@ public abstract class Junction {
             Vehicle firstVehicle = l.getVehicles().get(0);
             Segment vehicleSegment = firstVehicle.getHeadSegment();
             Segment firstSegment = l.getFirstSegment();
-            // TODO: -5 is a constant. make it depend on the initial speed of the car!!!!
-            if (firstSegment.id() < vehicleSegment.id() - firstVehicle.getLength() - 5) {
+            
+            // written by Jonathan Pike (mats@staite.net)
+            int allVehicleMaxDeceleration = Math.min(Car.MAX_DECELERATION_RATE, Truck.MAX_DECELERATION_RATE);
+            int stoppingTimeDistance = (int) (((double) firstVehicle.getSpeed()) / allVehicleMaxDeceleration);
+            int distance = vehicleSegment.id() - firstVehicle.getLength() - firstSegment.id() - 1;
+            int crashTimeDistance = (int) ((distance * 100.0) / firstVehicle.getSpeed());
+            if (crashTimeDistance > stoppingTimeDistance) {
                 potentialLanes.add(l);
             }
+            
+            /* Daniel's version. does not depend on initial speed of vehicle in lane, so is buggy in certain cases
+            if (firstSegment.id() < vehicleSegment.id() - firstVehicle.getLength() - 5) {
+                potentialLanes.add(l);
+            }*/
         }
 
         if (potentialLanes.isEmpty()) { // if no lanes could be found, return null, as there are no lanes suitable

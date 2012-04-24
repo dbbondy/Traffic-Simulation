@@ -9,13 +9,13 @@ import java.awt.Color;
 public class Truck extends Vehicle{
     
     // the width of the truck
-    private static final int WIDTH = 14;
+    public static final int WIDTH = 14;
     // the length of the truck
-    private static final int LENGTH = 30;
+    public static final int LENGTH = 30;
     //the maximum rate of acceleration that a truck can do
-    private static final int MAX_ACCELERATION_RATE = 5;
+    public static final int MAX_ACCELERATION_RATE = 5;
     // the maximum rate of deceleration that a truck can do
-    private static final int MAX_DECELERATION_RATE = 15;
+    public static final int MAX_DECELERATION_RATE = 15;
     
     public Truck() {}
     
