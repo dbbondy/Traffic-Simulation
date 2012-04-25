@@ -10,13 +10,13 @@ import view.SimulationPanel;
  */
 public class BlockedLaneJunction extends Junction {
 
-    public static final String name = "Blocked-Lane Junction";
+    public static final String NAME = "Blocked-Lane Junction";
     private Lane unblockedLane;
     private Lane blockedLane;
 
     public BlockedLaneJunction() {
 
-        unblockedLane = new Lane(400 - Segment.WIDTH, SimulationPanel.HEIGHT, 180, TurnDirection.STRAIGHT); // 400, SimulationPanel.HEIGHT, 180,
+        unblockedLane = new Lane(400 - Segment.WIDTH, SimulationPanel.HEIGHT, 180, TurnDirection.STRAIGHT); 
         blockedLane = new Lane(400, SimulationPanel.HEIGHT, 180, TurnDirection.BLOCKED);
 
         buildRoads();
@@ -46,5 +46,10 @@ public class BlockedLaneJunction extends Junction {
                 }
             }
         }
+    }
+    
+    @Override
+    public String toString(){
+        return NAME;
     }
 }

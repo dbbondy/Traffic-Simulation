@@ -10,7 +10,7 @@ import view.SimulationPanel;
  */
 public class TwoLaneJunction extends Junction {
     
-    public static final String name = "Two-Lane Junction"; // the name of the junction. Used for reflection purposes
+    public static final String NAME = "Two-Lane Junction"; // the name of the junction. Used for reflection purposes
 
     private Lane bottomUpwardsLane; // lanes of the junction
     private Lane bottomUpwardsLane2;
@@ -110,6 +110,6 @@ public class TwoLaneJunction extends Junction {
      */
     @Override
     public String toString() {
-        return name;
+        return NAME;
     }
 }

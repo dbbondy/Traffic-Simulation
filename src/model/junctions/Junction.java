@@ -36,7 +36,7 @@ public abstract class Junction {
      */
     public static void registerJunctionType(Class c) {
         try {
-            namedJunctionClasses.put((String) c.getDeclaredField("name").get(c), c);
+            namedJunctionClasses.put((String) c.getDeclaredField("NAME").get(c), c);
             
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();

@@ -16,20 +16,16 @@ import model.junctions.Junction;
 public class SettingsWindow extends JFrame {
     
     // constant for the error message for the density range
-    public static final String DENSITY_RANGE_ERROR 
-            = "You cannot have a density level greater than 100";
+    public static final String DENSITY_RANGE_ERROR = "You cannot have a density level greater than 100";
     
     // constant for the error message for the aggression range
-    public static final String AGGRESSION_RANGE_ERROR 
-            = "You cannot have an aggression level greater than 100";
+    public static final String AGGRESSION_RANGE_ERROR = "You cannot have an aggression level greater than 100";
     
     // constant for the error message for the density difference
-    public static final String DENSITY_DIFFERENCE_ERROR 
-            = "Maximum density must be greater than or equal to minimum density. ";
+    public static final String DENSITY_DIFFERENCE_ERROR  = "Maximum density must be greater than or equal to minimum density. ";
     
     // constant for the error message for the maximum speed range
-    public static final String MAXIMUM_SPEED_ERROR
-            = "You cannot have a maximum speed of greater than 800.";
+    public static final String MAXIMUM_SPEED_ERROR = "You cannot have a maximum speed of greater than 800.";
     
     // default value for the minimum density
     public static final String MIN_DENSITY_DEFAULT = "10"; 

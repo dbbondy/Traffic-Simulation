@@ -363,7 +363,7 @@ public class SimulationPanel extends JPanel {
             }
         }
 
-        /*
+        /* TEST CODE FOR REVIEWING CONNECTIONS AT INTERSECTION
          * int colorIndex = 0;
          *
          * Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GREEN, Color.BLACK, Color.ORANGE, Color.PINK, Color.WHITE, new Color(10*16+12, 4*16, 12*16+7) };
