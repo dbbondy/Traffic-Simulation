@@ -139,7 +139,6 @@ public class Simulation {
             // when cars go outof the end of the junction, they get "deleted" and statistics are incremented.   
 
             setOption(TIME_STEP, ((int) getOption(TIME_STEP) + 1));
-
         }
     }
 

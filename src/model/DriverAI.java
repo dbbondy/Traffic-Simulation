@@ -24,7 +24,7 @@ public class DriverAI {
     public static final int EXTRA_GAP_TIME_DISTANCE = 10;
     
     protected Vehicle vehicle;
-    protected Desire desire; // TODO: auto routing based on desired destination!
+    protected Desire desire; 
     protected Random rnd;
     protected int safeLaneChangeID; // the ID of the segment that is the last safe point of changing lanes for turning
 
@@ -32,21 +32,21 @@ public class DriverAI {
         this.vehicle = vehicle;
         rnd = Randomizer.getInstance();
 
-        // TODO: CRITICAL: ensure desire is valid
+        
         // TODO: (better): do auto-routing between segment A and segment B
         // Desire[] allDesires = Desire.values();
         // desire = allDesires[rnd.nextInt(allDesires.length)];
         desire = Desire.STRAIGHT;
 
-        getSafeLaneChangeIndex();
+        //getSafeLaneChangeIndex();
     }
 
     /**
      * Gets the last point of a lane in which we can change lanes to turn a corner.
      */
-    protected void getSafeLaneChangeIndex() {
+   /* protected void getSafeLaneChangeIndex() {
         
-        /* 
+         
 
         ArrayList<Segment> laneSegments = vehicle.getLane().getLaneSegments();
         if(vehicle.getLane().isBlocked()){
@@ -60,9 +60,9 @@ public class DriverAI {
             }
         }
 
-        */
         
-    }
+        
+    }*/
 
     /**
      * Performs the general "acting" of the intelligence.
@@ -101,6 +101,10 @@ public class DriverAI {
         }
     }
     
+    /**
+     * Determines whether we are approaching the end of a road that is blocked.
+     * @return <code> true </code> if we are approaching the end of the road. <code> false </code> otherwise
+     */
     public boolean approachingBlockedLaneEnd(){
         int distanceToEnd = vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id();
         double currentSpeed = vehicle.getSpeed();
@@ -121,13 +125,6 @@ public class DriverAI {
      * <code> false </code> otherwise.
      */
     private boolean safeLaneChangeProximity() {
-        // TODO: PROBABLY SHOULD DO: this only works if we expect to change lane for 1 reason
-        // what if we have 2 reasons to change lane
-        // 1. turn left in a short while
-        // 2. turn left in a long while 
-        // this SHOULD allow for this
-        // safeLaneChangeID is relevant to a specific corner
-        // in another lane and NOT the entire lane
         if (safeLaneChangeID - vehicle.getHeadSegment().id() < 100) { // TODO: 100 should be a constant
             return true;
         }
@@ -196,7 +193,7 @@ public class DriverAI {
      * <code> false </code> otherwise.
      */
     protected boolean approachingTurn(Segment s) {
-        // TODO: IMPORTANT! this assumes there is only 1!
+        
         Segment overlappingSegment = findOverlappingSegment(s);
         if (desire == Desire.STRAIGHT) {
             return false;
@@ -253,7 +250,7 @@ public class DriverAI {
      * @param crashTimeDistance the time distance it would take us to crash into the vehicle in front, should its speed be 0.
      */
     
-    // written by Jonathan Pike (mats@staite.net)
+    
     private void decideBlockedLaneChangeDecision() {
         
         Segment adjacentSeg = getAdjacentSegment(vehicle.getHeadSegment());
@@ -269,6 +266,7 @@ public class DriverAI {
             if (adjacentLane.isVehicleAtSegment(adjacentSeg)) return;
             
             // if there is a vehicle behind our desired change position
+            // written by Jonathan Pike (mats@staite.net)
             if ((otherVehicle = adjacentLane.getVehicleBehind(adjacentSeg)) != null) {
                 int distance = ((adjacentSeg.id() - vehicle.getLength()) - otherVehicle.getHeadSegment().id());
                 if (distance < Vehicle.BUMPER_DISTANCE) return;
@@ -353,10 +351,6 @@ public class DriverAI {
                 }
                 return;
             } else {
-                // TODO: instead of assuming the car has 0 speed we can use the current speed for this one
-                // since the car the AI is driving knows its own speed "reliably"
-                // we then compute the same thing with the difference in speed only. 
-                // careful with negative speed difference
                 otherVehicle = adjacentLane.getVehicleBehind(adjacentSeg);
                 int distance = ((vehicle.getHeadSegment().id() - vehicle.getLength()) - otherVehicle.getHeadSegment().id());
                 if(vehicle.getLane().isBlocked() && (vehicle.getLane().getLastSegment().id() - vehicle.getHeadSegment().id() > BLOCKED_LANE_SAFE_DISTANCE)){ // if our lane is blocked and we are distant enough from the end of the lane
@@ -411,9 +405,9 @@ public class DriverAI {
 
     }*/
     
-    public void decideLaneChangeDecision(int  stoppingTimeDistance, int crashTimeDistance) {
+    /*public void decideLaneChangeDecision(int  stoppingTimeDistance, int crashTimeDistance) {
         
-        /* 
+         
 
         if (safeLaneChangeProximity()) {
             vehicle.decelerate(5);
@@ -440,9 +434,9 @@ public class DriverAI {
             }
         }
          
-        */
         
-    }
+        
+    }*/
 
     /**
      * Gets the immediately adjacent segment to the parameter of this function
@@ -454,11 +448,7 @@ public class DriverAI {
     private Segment getAdjacentSegment(Segment s) {
         Segment adjacentSeg = null;
         Map<Segment, ConnectionType> connectedSegments = s.getConnectedSegments();
-        // TODO: IMPORTANT! make sure that changing lane is actually helpful!
-        // we might be changing into a lane that also cannot turn!
-        // need to know whether we actually want to change into a lane or not!
-        // ------
-        // if we need to jump 2 lanes then add some AI for that too. 
+
         if (connectedSegments.containsValue(ConnectionType.NEXT_TO_LEFT)) {
             for (Entry<Segment, ConnectionType> entry : connectedSegments.entrySet()) {
                 if (entry.getValue() == ConnectionType.NEXT_TO_LEFT) {
