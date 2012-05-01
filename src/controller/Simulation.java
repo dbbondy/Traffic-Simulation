@@ -46,6 +46,7 @@ public class Simulation {
     public static void init() {
         Junction.registerJunctionType(BlockedLaneJunction.class);
         Junction.registerJunctionType(TwoLaneJunction.class);
+        Junction.registerJunctionType(TurnJunc.class);
         settings = new HashMap<>();
         settings.put(MIN_DENSITY, 0);
         settings.put(MAX_DENSITY, 0);

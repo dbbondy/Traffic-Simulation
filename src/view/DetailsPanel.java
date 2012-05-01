@@ -175,6 +175,11 @@ public class DetailsPanel extends JPanel {
                             return true;
                         }
                         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) { // if we wanted to delete a character
+                            if(editing.getText().length() == 0){
+                                editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE);
+                                e.consume();
+                                return true;
+                            }
                             if (!editing.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) {
                                 if (editing.getText().length() == 1) { // if there was only one character to begin with
                                     editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE); // go back to default value
