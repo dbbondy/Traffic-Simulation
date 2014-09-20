@@ -2,14 +2,15 @@
 package view;
 
 import controller.Simulation;
+import model.SimulationStats;
+
+import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.*;
-import javax.swing.border.Border;
-import model.SimulationStats;
 
 /**
  * Class for the panel of details explaining what the values of the simulation currently are.
@@ -158,43 +159,40 @@ public class DetailsPanel extends JPanel {
         
         // add ability to edit some of the labels from the keyboard
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
-        .addKeyEventDispatcher(new KeyEventDispatcher() {
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                synchronized (Simulation.class) {
-                    if (e.getID() == KeyEvent.KEY_PRESSED && editing != null) { // if we pressed a key and there is no label being currently edited
-                        if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') { 
-                            if (editing.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) editing.setText("");
-                            editing.setText(editing.getText() + e.getKeyChar()); // set the text that we input
+        .addKeyEventDispatcher(e -> {
+            synchronized (Simulation.class) {
+                if (e.getID() == KeyEvent.KEY_PRESSED && editing != null) { // if we pressed a key and there is no label being currently edited
+                    if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9') {
+                        if (editing.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) editing.setText("");
+                        editing.setText(editing.getText() + e.getKeyChar()); // set the text that we input
+                        e.consume();
+                        return true;
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) { // if we pressed enter
+                        finishEditing(); // stop editing the label
+                        e.consume();
+                        return true;
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) { // if we wanted to delete a character
+                        if(editing.getText().length() == 0){
+                            editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE);
                             e.consume();
                             return true;
                         }
-                        if (e.getKeyCode() == KeyEvent.VK_ENTER) { // if we pressed enter
-                            finishEditing(); // stop editing the label
-                            e.consume();
-                            return true;
-                        }
-                        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) { // if we wanted to delete a character
-                            if(editing.getText().length() == 0){
-                                editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE);
+                        if (!editing.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) {
+                            if (editing.getText().length() == 1) { // if there was only one character to begin with
+                                editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE); // go back to default value
+                                e.consume();
+                                return true;
+                            } else { // else we just delete the end character of the string
+                                editing.setText(editing.getText().substring(0, editing.getText().length()-2));
                                 e.consume();
                                 return true;
                             }
-                            if (!editing.getText().equals(KEYBOARD_LABEL_DEFAULT_VALUE)) {
-                                if (editing.getText().length() == 1) { // if there was only one character to begin with
-                                    editing.setText(KEYBOARD_LABEL_DEFAULT_VALUE); // go back to default value
-                                    e.consume();
-                                    return true;
-                                } else { // else we just delete the end character of the string
-                                    editing.setText(editing.getText().substring(0, editing.getText().length()-2));
-                                    e.consume();
-                                    return true;
-                                }
-                            }
                         }
                     }
-                    return false;
                 }
+                return false;
             }
         });
         // create the mouse listener so that we can click on the labels and edit the values

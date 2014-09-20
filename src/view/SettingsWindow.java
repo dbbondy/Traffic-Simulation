@@ -2,12 +2,11 @@
 package view;
 
 import controller.Simulation;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import javax.swing.*;
 import model.junctions.Junction;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Class to represent the window from which the user can edit the values of the simulation variables
@@ -212,93 +211,81 @@ public class SettingsWindow extends JFrame {
      * Add the listeners to the appropriate components that require them
      */
     private void addListeners() {
-        submitBtn.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int newValues = 0;
-                for (JTextField field : fields) { // for all text fields
-                    if (!field.getText().isEmpty()) {
-                        try {
-                            int value = Integer.parseInt(field.getText());
-                            
-                            // determine what the field is, and whether the value is a safe value
-                            if (value < 0) {
-                                showErrMessage("You have inputted negative values for 1 or more fields. Please enter sensible, positive values", "Error");
-                                return;
-                            }
-                            
-                            if (field.getName().equals(Simulation.MIN_DENSITY)) {
-                                if (value > MIN_DENSITY_MAXIMUM) {
-                                    showErrMessage(DENSITY_RANGE_ERROR, "Error");
-                                    return;
-                                }
-                            }
-                            
-                            if (field.getName().equals(Simulation.MAX_DENSITY)) {
-                                if (value > MAX_DENSITY_MAXIMUM) {
-                                    showErrMessage(DENSITY_RANGE_ERROR, "Error");
-                                    return;
-                                }
-                            }
-                            
-                            if (field.getName().equals(Simulation.AGGRESSION)) {
-                                if (value > AGGRESSION_MAXIMUM) {
-                                    showErrMessage(AGGRESSION_RANGE_ERROR, "Error");
-                                    return;
-                                }
-                            }
-                            
-                            if(field.getName().equals(Simulation.MAXIMUM_SPEED)){
-                                if(value > MAXIMUM_SPEED_MAXIMUM){
-                                    showErrMessage(MAXIMUM_SPEED_ERROR, "Error");
-                                    return;
-                                }
-                            }
-                            
-                            Simulation.setOption(field.getName(), value);
-                            newValues++;
-                        } catch (NumberFormatException nfe) {
-                            showErrMessage("Some inputted values are incorrect. Please enter correct values", "Error");
+        submitBtn.addActionListener(e -> {
+            int newValues = 0;
+            for (JTextField field : fields) { // for all text fields
+                if (!field.getText().isEmpty()) {
+                    try {
+                        int value = Integer.parseInt(field.getText());
+
+                        // determine what the field is, and whether the value is a safe value
+                        if (value < 0) {
+                            showErrMessage("You have inputted negative values for 1 or more fields. Please enter sensible, positive values", "Error");
                             return;
                         }
+
+                        if (field.getName().equals(Simulation.MIN_DENSITY)) {
+                            if (value > MIN_DENSITY_MAXIMUM) {
+                                showErrMessage(DENSITY_RANGE_ERROR, "Error");
+                                return;
+                            }
+                        }
+
+                        if (field.getName().equals(Simulation.MAX_DENSITY)) {
+                            if (value > MAX_DENSITY_MAXIMUM) {
+                                showErrMessage(DENSITY_RANGE_ERROR, "Error");
+                                return;
+                            }
+                        }
+
+                        if (field.getName().equals(Simulation.AGGRESSION)) {
+                            if (value > AGGRESSION_MAXIMUM) {
+                                showErrMessage(AGGRESSION_RANGE_ERROR, "Error");
+                                return;
+                            }
+                        }
+
+                        if(field.getName().equals(Simulation.MAXIMUM_SPEED)){
+                            if(value > MAXIMUM_SPEED_MAXIMUM){
+                                showErrMessage(MAXIMUM_SPEED_ERROR, "Error");
+                                return;
+                            }
+                        }
+
+                        Simulation.setOption(field.getName(), value);
+                        newValues++;
+                    } catch (NumberFormatException nfe) {
+                        showErrMessage("Some inputted values are incorrect. Please enter correct values", "Error");
+                        return;
                     }
                 }
-                
-                if (newValues < fields.length) {
-                    showErrMessage("You need to enter values for all fields", "Error");
-                    return;
-                }
-                
-                if ((int) Simulation.getOption(Simulation.MIN_DENSITY) > (int) Simulation.getOption(Simulation.MAX_DENSITY)) {
-                    showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
-                    return;
-                }
-                
-                if ((int) Simulation.getOption(Simulation.MAX_DENSITY) < (int) Simulation.getOption(Simulation.MIN_DENSITY)) {
-                    showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
-                    return;
-                }
-                
-                determineJuncInit();
-                Simulation.settingsChanged();
-                
-                
-                
-                synchronized (Simulation.getSimulationThread()) { //notifying simulation thread that we are done with waiting.
-                    Simulation.getSimulationThread().notify();
-                }
-                SettingsWindow.this.dispose(); // garbage collect this window as we are done.
             }
+
+            if (newValues < fields.length) {
+                showErrMessage("You need to enter values for all fields", "Error");
+                return;
+            }
+
+            if ((int) Simulation.getOption(Simulation.MIN_DENSITY) > (int) Simulation.getOption(Simulation.MAX_DENSITY)) {
+                showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
+                return;
+            }
+
+            if ((int) Simulation.getOption(Simulation.MAX_DENSITY) < (int) Simulation.getOption(Simulation.MIN_DENSITY)) {
+                showErrMessage(DENSITY_DIFFERENCE_ERROR, "Error");
+                return;
+            }
+
+            determineJuncInit();
+            Simulation.settingsChanged();
+
+            synchronized (Simulation.getSimulationThread()) { //notifying simulation thread that we are done with waiting.
+                Simulation.getSimulationThread().notify();
+            }
+            SettingsWindow.this.dispose(); // garbage collect this window as we are done.
         });
         
-        defaultBtn.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setDefaultValues();
-            }
-        });
+        defaultBtn.addActionListener(e -> setDefaultValues());
         
     }
     
