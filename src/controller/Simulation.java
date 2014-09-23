@@ -1,10 +1,11 @@
 package controller;
 
-import java.util.HashMap;
-import java.util.Map;
 import model.junctions.*;
 import view.SettingsWindow;
 import view.UserInterface;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The main simulation controller class
@@ -131,7 +132,8 @@ public class Simulation {
         synchronized (Simulation.class) {
 
             // core simulation step progress.
-            Junction junc = (Junction) getOption(Simulation.JUNCTION_TYPE);
+            IJunction junc = (IJunction) getOption(Simulation.JUNCTION_TYPE);
+            //FIXME: fix this when junctions are migrated completely to IJunction
             int carsRatio = (Integer) getOption(Simulation.CAR_RATIO);
             int trucksRatio = (Integer) getOption(Simulation.TRUCK_RATIO);
             junc.distributeNewCars(carsRatio, trucksRatio);
@@ -190,7 +192,7 @@ public class Simulation {
         // cannot stop until the current step
         // and rendering is complete
         synchronized (ui) {
-            Junction jn = (Junction) getOption(JUNCTION_TYPE);
+            IJunction jn = (IJunction) getOption(JUNCTION_TYPE);
             jn.removeVehicles();
             totalTimeSteps = (int) settings.get(TIME_STEP);
             setOption(TIME_STEP, 0);

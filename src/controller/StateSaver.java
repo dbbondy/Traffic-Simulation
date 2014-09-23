@@ -1,17 +1,18 @@
 package controller;
 
-import java.io.File;
-import java.util.ArrayList;
+import model.*;
+import model.junctions.IJunction;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import model.*;
-import model.junctions.Junction;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.File;
+import java.util.List;
 
 /**
  * Class for saving the state of a simulation to a file
@@ -46,8 +47,9 @@ public class StateSaver {
             rootElm.appendChild(vehiclesElm);
             rootElm.appendChild(detailsElm);
 
-            Junction junc = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
-            ArrayList<Vehicle> vehicles = junc.getVehicles();
+            IJunction junc = (IJunction) Simulation.getOption(Simulation.JUNCTION_TYPE);
+            //FIXME: when junctions are migrated to IJunction, this will need to be fixed properly
+            List<Vehicle> vehicles = junc.getVehicles();
 
             for (Vehicle vehicle : vehicles) { // for all vehicles in the junction
 
@@ -102,7 +104,7 @@ public class StateSaver {
             
             // get the values from the environment variables and the count of vehicles passed through the junction
             String timeStep = ((Integer) Simulation.getOption(Simulation.TIME_STEP)).toString();
-            String junction = ((Junction) Simulation.getOption(Simulation.JUNCTION_TYPE)).toString();
+            String junction = ((IJunction) Simulation.getOption(Simulation.JUNCTION_TYPE)).toString();
             String minDensity = ((Integer) Simulation.getOption(Simulation.MIN_DENSITY)).toString();
             String maxDensity = ((Integer) Simulation.getOption(Simulation.MAX_DENSITY)).toString();
             String aggression = ((Integer) Simulation.getOption(Simulation.AGGRESSION)).toString();

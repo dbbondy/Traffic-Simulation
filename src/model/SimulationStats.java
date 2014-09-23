@@ -1,6 +1,7 @@
 package model;
 
 import controller.Simulation;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -82,8 +83,10 @@ public class SimulationStats {
         String name = "";
         if(v instanceof Car){
             name = "Car leaving Junction";
+            incrementCars();
         }else if(v instanceof Truck){
             name = "Truck leaving Junction";
+            incrementTrucks();
         }
         
         int aggression = (int) Simulation.getOption(Simulation.AGGRESSION);

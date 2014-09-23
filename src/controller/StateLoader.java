@@ -1,16 +1,18 @@
 package controller;
 
-import java.awt.Color;
-import java.io.File;
-import java.util.ArrayList;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import model.*;
+import model.junctions.IJunction;
 import model.junctions.Junction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Class for loading a state file into the simulation
@@ -40,8 +42,8 @@ public class StateLoader {
             Document doc = dBuilder.parse(file);
 
             ArrayList<Vehicle> vehicles = new ArrayList<>();
-            Junction junc = null;
-
+            IJunction junc = null;
+            //FIXME: fix when IJunction migration completed.
             NodeList detailsNodeList = doc.getElementsByTagName("details").item(0).getChildNodes(); // get all children of a element named "details"
 
             for (int i = 0; i < detailsNodeList.getLength(); i++) {
@@ -58,7 +60,7 @@ public class StateLoader {
                         SimulationStats.setTruckCount(truckCount);
                         break;
                     case Simulation.JUNCTION_TYPE:
-                        junc = (Junction) Junction.getJunctionTypeByName(detailNode.getTextContent().trim()).newInstance();
+                        junc = (IJunction) Junction.getJunctionTypeByName(detailNode.getTextContent().trim()).newInstance();
                         Simulation.setOption(Simulation.JUNCTION_TYPE, junc);
                         break;
                     default:
@@ -109,7 +111,6 @@ public class StateLoader {
 
                 Color color = new Color(Integer.parseInt(colorStr));
 
-                
                 vehicle.setDimensions(width, length);
                 vehicle.setColor(color);
                 vehicle.setSpeed(speed);
@@ -122,7 +123,7 @@ public class StateLoader {
 
             }
             
-            junc.updateNumberOfVehicles();
+            junc.updateVehicles();
             
         }
         

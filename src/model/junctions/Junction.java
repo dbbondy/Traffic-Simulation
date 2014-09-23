@@ -1,12 +1,10 @@
 package model.junctions;
 
 import controller.Simulation;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Set;
 import model.*;
+
+import java.awt.*;
+import java.util.*;
 
 /**
  * Abstract representation of a Junction
@@ -20,7 +18,7 @@ public abstract class Junction {
     protected int numberOfVehicles; // number of vehicles in the junction
     protected Random random; // random number generator
     private ArrayList<Lane> lanes = new ArrayList<>(); // collection of lanes in the junction
-    private int variableDensityCounter = 0; // counter for determining when we find a new density 
+    private int variableDensityCounter = 0; // counter for determining when we find a new density
     private int variableDensity = 0; // variable density value for varying the number of vehicles that can be instantiated
 
     public Junction() {
@@ -181,16 +179,14 @@ public abstract class Junction {
      */
     public void updateDeletions() {
         for (Lane l : lanes) {
-            Vehicle[] vehArray = l.getVehicles().toArray(new Vehicle[0]);
-            for (Vehicle v : vehArray) {
-                if (v.getHeadSegment().equals(l.getLastSegment())) {
-                    l.getVehicles().remove(v);
+            for (Iterator<Vehicle> iterator = l.getVehicles().iterator(); iterator.hasNext(); ) {
+                Vehicle v = iterator.next();
+                if(Objects.equals(v.getHeadSegment(), l.getLastSegment())){
+                    iterator.remove();
                     numberOfVehicles--;
                     if (v instanceof Car) {
-                        SimulationStats.incrementCars();
                         SimulationStats.addEvent(SimulationStats.createVehicleLeavingEvent(v));
                     } else if (v instanceof Truck) {
-                        SimulationStats.incrementTrucks();
                         SimulationStats.addEvent(SimulationStats.createVehicleLeavingEvent(v));
                     }
                 }
@@ -202,9 +198,7 @@ public abstract class Junction {
      * Manages the vehicles in the junction
      */
     public void manageJunction() {
-        for (Vehicle v : this.getVehicles()) {
-            v.act();
-        }
+        this.getVehicles().stream().forEach(v -> v.act());
     }
 
     /**

@@ -1,6 +1,13 @@
 package view;
 
 import controller.Simulation;
+import model.Lane;
+import model.Segment;
+import model.Vehicle;
+import model.junctions.BlockedLaneJunction;
+import model.junctions.IJunction;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
@@ -8,11 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import javax.swing.JPanel;
-import model.Lane;
-import model.Segment;
-import model.Vehicle;
-import model.junctions.Junction;
+import java.util.List;
 
 /**
  * Class for handling the rendering of junctions and other graphics primitives key to the simulation
@@ -23,7 +26,7 @@ import model.junctions.Junction;
 public class SimulationPanel extends JPanel {
 
     private BufferedImage image; //the junction image
-    private Junction currentJunction; // the current junction we are working with
+    private IJunction currentJunction; // the current junction we are working with
     public static final int WIDTH = 800; // the width of the panel
     public static final int HEIGHT = 680; // the height of the panel
     private Dimension size;
@@ -79,7 +82,7 @@ public class SimulationPanel extends JPanel {
      */
     private synchronized void drawVehicles(Graphics g) {
         Graphics2D graphics = (Graphics2D) g;
-        ArrayList<Lane> lanes = currentJunction.getLanes();
+        List<Lane> lanes = currentJunction.getLanes();
         for (Lane l : lanes) {
             for (Vehicle v : l.getVehicles()) {
                 Segment head = v.getHeadSegment();
@@ -194,12 +197,12 @@ public class SimulationPanel extends JPanel {
         this.shapesForPostRender.clear();
 
         // we reload the current junction every time we have to render it again
-        currentJunction = (Junction) Simulation.getOption(Simulation.JUNCTION_TYPE);
-
+        currentJunction = (BlockedLaneJunction) Simulation.getOption(Simulation.JUNCTION_TYPE);
+        //TODO: FIX THIS PROPERLY ONCE MIGRATION TO IJUNCTION HAS BEEN COMPLETED
         image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         // create a graphics object from the buffered image object
         Graphics2D graphics = image.createGraphics();
-        ArrayList<Lane> lanes = currentJunction.getLanes();
+        List<Lane> lanes = currentJunction.getLanes();
 
         int angle;
         double currentX, currentY;
